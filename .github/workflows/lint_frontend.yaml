@@ -1,0 +1,27 @@
+# .github/workflows/lint_frontend.yml
+name: Lint frontend
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "20.10.0"
+
+      - name: Install dependencies
+        run: |
+          npm install
+
+      - name: Run frontend linter
+        run: |
+          npx eslint . --ext .js,.vue
