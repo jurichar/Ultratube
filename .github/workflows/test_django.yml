@@ -19,16 +19,12 @@ jobs:
               with:
                 python-version: '3.12.1'
 
-            - name: Change directory to backend
-              run: cd backend
-
-            - name: Check folder
-              run: ls -la
-
             - name: Install dependencies
               run: |
+                cd backend
                 pip install -r requirements.txt
 
             - name: Run Django tests
               run: |
+                cd backend
                 python manage.py test
