@@ -29,4 +29,4 @@ jobs:
       - name: Run frontend linter
         run: |
           cd frontend
-          npx eslint src
+          npx eslint /github/workspace/frontend/src
