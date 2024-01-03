@@ -21,7 +21,10 @@ jobs:
 
             - name: Change directory to backend
               run: cd backend
-            
+
+            - name: Check folder
+              run: ls -la
+
             - name: Install dependencies
               run: |
                 pip install -r requirements.txt
