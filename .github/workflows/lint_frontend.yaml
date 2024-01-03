@@ -23,8 +23,10 @@ jobs:
 
       - name: Install dependencies
         run: |
+          cd frontend
           npm install
 
       - name: Run frontend linter
         run: |
+          cd frontend
           npx eslint . --ext .js,.vue
