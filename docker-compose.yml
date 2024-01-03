@@ -3,31 +3,31 @@ version: '3'
 
 services:
 
-  db:
-    image: postgres:16.1
-    environment:
-      POSTGRES_DB: formationdjango
-      POSTGRES_USER: djangouser
-      POSTGRES_PASSWORD: secret
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+  # db:
+  #   image: postgres:16.1
+  #   environment:
+  #     POSTGRES_DB: formationdjango
+  #     POSTGRES_USER: djangouser
+  #     POSTGRES_PASSWORD: secret
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
 
   backend:
     build:
       context: ./backend
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - .:/app/backend
+      - ./backend:/app/backend
     ports:
       - "8000:8000"
-    depends_on:
-      - db
-    environment:
-      - DB_NAME=formationdjango
-      - DB_USER=djangouser
-      - DB_PASSWORD=secret
-      - DB_HOST=db
-      - DB_PORT=5432
+    # depends_on:
+      # - db
+    # environment:
+    #   - DB_NAME=formationdjango
+    #   - DB_USER=djangouser
+    #   - DB_PASSWORD=secret
+    #   - DB_HOST=db
+    #   - DB_PORT=5432
 
   frontend:
     build:

@@ -1,9 +1,9 @@
 # backend/Dockerfile
-FROM python:3.13
+FROM python:3.12.1
 
 WORKDIR /app/backend
 
-COPY . /app/backend
+COPY . .
 
 RUN pip install -r requirements.txt
 
