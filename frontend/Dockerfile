@@ -3,8 +3,10 @@ FROM node:20.10.0
 
 WORKDIR /app/frontend
 
-COPY . /app/frontend
+COPY . .
 
-RUN npm install
+RUN yarn install
 
-CMD npm start
+EXPOSE 3000
+
+CMD ["yarn", "dev"]
