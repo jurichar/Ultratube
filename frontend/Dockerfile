@@ -1,11 +1,9 @@
 # frontend/Dockerfile
-FROM node:18
+FROM node:18-alpine
 
 WORKDIR /app/frontend
 
-COPY package.json .
-
-COPY . /app/frontend
+COPY . .
 
 RUN yarn
 
