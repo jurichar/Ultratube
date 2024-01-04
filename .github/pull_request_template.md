@@ -1,9 +1,13 @@
-## Describe the changes you made in this PR
+# Pull Request Template
 
-## How can this PR be tested?
+## Describe your changes 🫵
 
-## Checklist
+## Issue ticket number and link 🔗
 
-- [ ] I have tested this code
-- [ ] I have added tests to cover my changes
-- [ ] All new and existing tests passed
+## Checklist before requesting a review 📝
+
+- [ ] I have performed a self-review of my code 👍🏻
+- [ ] If it is a core feature, I have added thorough tests. ✅
+- [ ] Do we need to implement analytics? 📊
+- [ ] Will this be part of a product update? If yes, please write one phrase about this update.
+- [ ] I have added the issue number to the PR title. 📝
