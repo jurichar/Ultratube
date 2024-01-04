@@ -4,12 +4,10 @@ name: Check eslint
 on:
   push:
     branches: [main]
-    paths:
+    paths-ignore:
       - "frontend/**"
   pull_request:
     branches: [main]
-    paths:
-      - "frontend/**"
 
 jobs:
   test:
