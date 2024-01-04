@@ -3,9 +3,12 @@ FROM node:21.5.0
 
 WORKDIR /app/frontend
 
-COPY . .
+COPY package.json .
+COPY yarn.lock .
 
-RUN yarn
+RUN yarn install --frozen-lockfile
+
+COPY . .
 
 EXPOSE 3000
 
