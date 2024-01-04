@@ -1,16 +1,9 @@
-### Description
+## Describe the changes you made in this PR
 
-[Remplacer par une brève description de votre PR]
+## How can this PR be tested?
 
-### Checklist
+## Checklist
 
-- [ ] Ca compile.
-- [ ] J'ai testé les modifications localement.
-
-### Screenshots (le cas échéant)
-
-[Insérez des captures d'écran si cela aide à visualiser les changements]
-
-### Informations additionnelles
-
-[Tout autre détail pertinent à ajouter]
+- [ ] I have tested this code
+- [ ] I have added tests to cover my changes
+- [ ] All new and existing tests passed
