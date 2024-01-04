@@ -24,8 +24,10 @@ jobs:
         run: |
           cd frontend
           yarn install
+          yarn upgrade eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin eslint-plugin-react eslint-plugin-react-hooks
 
       - name: Check eslint
         run: |
           cd frontend
+
           yarn lint
