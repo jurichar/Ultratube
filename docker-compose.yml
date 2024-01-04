@@ -1,41 +1,25 @@
 # docker-compose.yml
-version: '3'
+version: '3.8'
 
 services:
-
-  # db:
-  #   image: postgres:16.1
-  #   environment:
-  #     POSTGRES_DB: formationdjango
-  #     POSTGRES_USER: djangouser
-  #     POSTGRES_PASSWORD: secret
-  #   volumes:
-  #     - postgres_data:/var/lib/postgresql/data
-
   backend:
-    build:
-      context: ./backend
+    build: ./backend
+    container_name: backend
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ./backend:/app/backend
     ports:
       - "8000:8000"
-    # depends_on:
-      # - db
-    # environment:
-    #   - DB_NAME=formationdjango
-    #   - DB_USER=djangouser
-    #   - DB_PASSWORD=secret
-    #   - DB_HOST=db
-    #   - DB_PORT=5432
 
   frontend:
-    build:
-      context: ./frontend
+    build: ./frontend
+    container_name: frontend
+    command: yarn dev
     volumes:
       - ./frontend:/app/frontend
     ports:
       - "3000:3000"
+    tty: true
 
 volumes:
-  postgres_data:
+  data: {}

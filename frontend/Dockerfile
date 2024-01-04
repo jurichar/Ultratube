@@ -1,11 +1,13 @@
 # frontend/Dockerfile
-FROM node:20.10.0
+FROM node:18
 
 WORKDIR /app/frontend
 
-COPY . .
+COPY package.json .
 
-RUN yarn install
+COPY . /app/frontend
+
+RUN yarn
 
 EXPOSE 3000
 
