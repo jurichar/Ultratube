@@ -3,33 +3,27 @@ name: Check eslint
 
 on:
   push:
-    branches: [main]
-    paths-ignore:
-      - "frontend/**"
-  pull_request:
-    branches: [main]
+    paths:
+      - "*.py"
 
 jobs:
-  test:
+  flake8_py3:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
         with:
-          node-version: 21.5.0
+          python-version: 3.12.1
 
       - name: Install dependencies
         run: |
-          cd frontend
-          yarn install
-          yarn upgrade eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin eslint-plugin-react eslint-plugin-react-hooks
+          python -m pip install --upgrade pip
+          pip install flake8
 
-      - name: Check eslint
+      - name: Run flake8
         run: |
-          cd frontend
-
-          yarn lint
+          flake8 --ignore=E203,W503 .
