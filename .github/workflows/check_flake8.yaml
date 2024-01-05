@@ -3,8 +3,19 @@ name: Check eslint
 
 on:
   push:
+    branches:
+      - "main"
+      - "*"
     paths:
       - "*.py"
+      - "*/**.py"
+  pull_request:
+    branches:
+      - "main"
+      - "*"
+    paths:
+      - "*.py"
+      - "*/**.py"
 
 jobs:
   flake8_py3:
