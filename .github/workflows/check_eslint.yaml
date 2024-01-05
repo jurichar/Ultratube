@@ -3,9 +3,17 @@ name: Check eslint
 
 on:
   push:
-    branches: [main]
+    branches:
+      - "main"
+      - "*"
+    paths:
+      - "frontend/**"
   pull_request:
-    branches: [main]
+    branches:
+      - "main"
+      - "*"
+    paths:
+      - "frontend/**"
 
 jobs:
   test:
@@ -29,5 +37,4 @@ jobs:
       - name: Check eslint
         run: |
           cd frontend
-
           yarn lint

@@ -11,3 +11,4 @@
 - [ ] Do we need to implement analytics? 📊
 - [ ] Will this be part of a product update? If yes, please write one phrase about this update.
 - [ ] I have added the issue number to the PR title. 📝
+- Test

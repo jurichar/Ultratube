@@ -1,0 +1,43 @@
+# .github/workflows/check_eslint.yml
+name: Check eslint
+
+on:
+  push:
+    branches:
+      - "main"
+      - "*"
+    paths:
+      - "*.py"
+      - "*/**.py"
+  pull_request:
+    branches:
+      - "main"
+      - "*"
+    paths:
+      - "*.py"
+      - "*/**.py"
+
+jobs:
+  flake8_py3:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.12.1
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install flake8
+
+      - name: Run flake8
+        run: |
+          cd backend
+          flake8 --max-line-length=120 --ignore=E203,W503
