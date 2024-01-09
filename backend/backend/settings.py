@@ -25,7 +25,6 @@ SECRET_KEY = "django-insecure-&(ab8zxcll5f(5y$6+58juu*ph=r893nt&+fnsr!7l9qp4egpw
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -38,16 +37,19 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework_swagger",
+    'corsheaders',
+    'rest_framework',
+    'authentication'
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = "backend.urls"
@@ -69,7 +71,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "backend.wsgi.application"
-
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
@@ -111,6 +112,10 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
+
+CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ALLOW_CREDENTIALS = True
 
 
 # Static files (CSS, JavaScript, Images)
