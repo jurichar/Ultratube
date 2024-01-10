@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "@studio-freight/react-lenis": "^0.0.43"
+    "locomotive-scroll": "^4.1.4",
+    "react-locomotive-scroll": "^0.2.2"
   }
 }
