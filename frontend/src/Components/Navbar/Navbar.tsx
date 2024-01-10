@@ -10,7 +10,7 @@ export default function Navbar() {
                     <path d="M20 0L22.5 5H18.75L16.25 0H13.75L16.25 5H12.5L10 0H7.5L10 5H6.25L3.75 0H2.5C1.11875 0 0.0125 1.11875 0.0125 2.5L0 17.5C0 18.8813 1.11875 20 2.5 20H22.5C23.8813 20 25 18.8813 25 17.5V0H20Z" fill="#FC4747" />
                 </svg>
             </NavLink>
-            <NavLink to="/login">
+            <NavLink to="/profile">
                 <div className="bg-white w-7 h-7 rounded-2xl">
                 </div>
             </NavLink>

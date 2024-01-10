@@ -7,7 +7,7 @@ export default function Root() {
   return (
     <div className="flex flex-col h-screen">
       <Navbar />
-      <div className="bg-primary flex-1 overflow-y-auto pt-14">
+      <div className="bg-primary flex-1 overflow-y-auto pt-16">
         <Outlet />
       </div>
     </div>
