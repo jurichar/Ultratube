@@ -8,7 +8,9 @@ export default function Root() {
   return (
     <div className="flex flex-col h-screen">
       <Navbar />
-      <Outlet />
-    </div >
+      <div id="your-scroll-container" className="bg-primary flex-1 overflow-y-auto pt-16">
+        <Outlet />
+      </div>
+    </div>
   );
 }
