@@ -54,7 +54,7 @@ export default function Home() {
           <MovieCardTrending />
           <MovieCardTrending />
         </div>
-      </div>
+      </div >
       <div className="w-full h-full flex flex-col gap-4 ">
         <span>Recommended for you</span>
         <div className="flex flex-row flex-wrap gap-5">
@@ -140,6 +140,6 @@ export default function Home() {
           <MovieCard />
         </div>
       </div>
-    </div>
+    </div >
   );
 }
