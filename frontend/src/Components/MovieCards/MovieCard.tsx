@@ -12,7 +12,7 @@ export default function MovieCard({ movie }: { movie: Movie }) {
                     backgroundSize: "cover",
                     backgroundPosition: "center"
                 }}>
-                <button className="z-10 opacity-0 w-full h-full bg-tertiary hover:opacity-50 rounded flex justify-center items-center"
+                <button className="transition-all z-10 opacity-0 w-full h-full bg-tertiary hover:opacity-50 rounded flex justify-center items-center"
                     onClick={
                         () => {
                             window.location.href = `/movie/${movie.id}`;
