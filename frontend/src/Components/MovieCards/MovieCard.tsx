@@ -1,6 +1,6 @@
 // src/Components/MovieCards/MovieCard.tsx
 
-import BookmarkIcon from "../MovieCards/BookmarkIcon";
+import BookmarkIcon from "./BookmarkIcon";
 
 export default function MovieCard() {
     return (
