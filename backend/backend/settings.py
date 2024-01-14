@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import os
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,10 +26,21 @@ SECRET_KEY = "django-insecure-&(ab8zxcll5f(5y$6+58juu*ph=r893nt&+fnsr!7l9qp4egpw
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
-
-
-# Application definition
+env = environ.Env(
+DEBUG=(bool, False)
+)
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+DISCORD_KEY=env('AUTH_DISCORD_KEY')
+DISCORD_SECRET=env('AUTH_DISCORD_SECRET')
+DISCORD_REDIRECT=env('AUTH_DISCORD_REDIRECT_API')
+FORTYTWO_KEY=env('AUTH42_UID')
+FORTYTWO_SECRET=env('AUTH42_SECRET')
+FORTYTWO_REDIRECT=env('AUTH42_REDIRECT_API')
+GITHUB_KEY=env('AUTH_GITHUB_KEY')
+GITHUB_SECRET=env('AUTH_GITHUB_SECRET')
+GITHUB_REDIRECT=env('AUTH_GITHUB_REDIRECT_API')
+DJANGO_UID=env('DJANGO_AUTH_UID')
+DJANGO_SECRET=env('DJANGO_AUTH_SECRET')
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -39,8 +52,25 @@ INSTALLED_APPS = [
     "rest_framework_swagger",
     'corsheaders',
     'rest_framework',
-    'authentication'
+    'authentication',
+    'oauth2_provider',
 ]
+
+AUTHENTICATION_BACKENDS = ['authentication.custom_authenticate.CustomAuth']
+AUTH_USER_MODEL='authentication.User'
+
+OAUTH2_PROVIDER = {
+    'SCOPES': {'read': 'Read scope', 'write': 'Write scope', 'groups': 'Access to your groups'}
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+       'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+        
+    )
+}
+
+LOGIN_URL = '/admin/login/'
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -52,6 +82,7 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 ROOT_URLCONF = "backend.urls"
 
 TEMPLATES = [
