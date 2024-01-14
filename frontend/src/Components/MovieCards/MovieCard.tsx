@@ -2,8 +2,15 @@
 
 import BookmarkIcon from "./BookmarkIcon";
 import { Movie } from "../../types";
+interface MovieCardProps {
+    movie: Movie;
+}
 
-export default function MovieCard({ movie }: { movie: Movie }) {
+export default function MovieCard({ movie }: MovieCardProps) {
+    const handleMovieClick = () => {
+        window.location.href = `/movie/${movie.id}`;
+    };
+
     return (
         <div className="flex flex-col">
             <div className="flex-shrink-0 mb-2 w-40 h-28 flex justify-end rounded relative"
@@ -13,11 +20,7 @@ export default function MovieCard({ movie }: { movie: Movie }) {
                     backgroundPosition: "center"
                 }}>
                 <button className="transition-all z-10 opacity-0 w-full h-full bg-tertiary hover:opacity-50 rounded flex justify-center items-center"
-                    onClick={
-                        () => {
-                            window.location.href = `/movie/${movie.id}`;
-                        }
-                    }>
+                    onClick={handleMovieClick}>
                     Play
                 </button>
                 <BookmarkIcon />
