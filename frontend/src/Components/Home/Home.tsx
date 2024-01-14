@@ -17,9 +17,16 @@ export default function Home() {
     setMovies(data);
   }, []);
 
+  function handleSearch(search: string) {
+    const filteredMovies = data.filter((movie) => {
+      return movie.title.toLowerCase().includes(search.toLowerCase());
+    });
+    setMovies(filteredMovies);
+  }
+
   return (
     <div className="w-full h-max text-quinary p-4 flex flex-col items-center justify-around gap-6">
-      <SearchBar />
+      <SearchBar onSearch={handleSearch} />
       <div className="w-full h-full flex flex-col gap-4 ">
         <span>Trending</span>
         <div className="overflow-x-auto w-full flex flex-row gap-4">
