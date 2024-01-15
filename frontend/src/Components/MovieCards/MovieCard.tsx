@@ -2,11 +2,19 @@
 
 import BookmarkIcon from "./BookmarkIcon";
 import { Movie } from "../../types";
+import { useState } from "react";
+import Loading from "../Loading/Loading";
 interface MovieCardProps {
     movie: Movie;
 }
 
 export default function MovieCard({ movie }: MovieCardProps) {
+    const [loading, setLoading] = useState(true);
+
+    const handleImageLoad = () => {
+        setLoading(false);
+    }
+
     const handleMovieClick = () => {
         window.location.href = `/movie/${movie.id}`;
     };
@@ -19,6 +27,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
                     backgroundSize: "cover",
                     backgroundPosition: "center"
                 }}>
+                {loading && <Loading />}
                 <button className="transition-all z-10 opacity-0 w-full h-full bg-tertiary hover:opacity-50 rounded flex justify-center items-center"
                     onClick={handleMovieClick}>
                     Play
@@ -33,6 +42,12 @@ export default function MovieCard({ movie }: MovieCardProps) {
                 <span className="text-quaternary text-xs ">Movie</span>
             </div>
             <span className="text-quinary">{movie.title.length > 14 ? movie.title.slice(0, 14) + "..." : movie.title}</span>
+            <img
+                src={movie.image}
+                alt={movie.title}
+                onLoad={handleImageLoad}
+                style={{ display: "none" }}
+            />
         </div>
     );
 }

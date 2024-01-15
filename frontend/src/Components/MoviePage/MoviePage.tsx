@@ -11,13 +11,24 @@ export default function MoviePage() {
         if (id) {
             const movie = data.find((movie) => movie.id === id);
             setMovie(movie);
-            console.log(movie);
         }
     }, [id]);
 
+
     return (
-        <div className="w-full h-full bg-secondary p-4 flex flex-col items-center justify-around gap-6">
-            {movie?.title}
+        <div className="flex flex-col justify-center items-center gap-4">
+            <div className="w-full h-40 text-quinary opacity-100 relative flex flex-col justify-center items-center">
+                <div className="w-full h-full bg-cover bg-center bg-no-repeat opacity-30 absolute" style={{ backgroundImage: `url(${movie?.image})` }}>
+                </div>
+                <h1 className="text-4xl font-bold opacity-100">{movie?.title}</h1>
+                <h2 className="text-2xl">{movie?.release}</h2>
+            </div>
+            <div className=" w-80 h-40 bg-secondary">
+            </div>
+            {/* movie comments */}
+            <div className="w-full h-1/4 flex flex-col justify-center items-center">
+                <h1 className="text-4xl font-bold text-white">Comments</h1>
+            </div>
         </div>
     );
 }

@@ -7,10 +7,12 @@ def generate_fake_data(count):
     data = []
     for _ in range(count):
         movie = {
-            "title": fake.catch_phrase(),
+            "id": fake.uuid4(),
+            "title": fake.sentence(nb_words=3),
             "release": fake.date_this_decade().isoformat(),
             "image": fake.image_url(),
-            "id": fake.uuid4(),
+            "synopsis": fake.text(),
+            "trailer": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
         }
         data.append(movie)
     return data
