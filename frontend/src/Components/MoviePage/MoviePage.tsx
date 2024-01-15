@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Movie } from "../../types";
-import data from "../../utils/data_all.json";
+import data from "../../utils/movies.json";
 
 export default function MoviePage() {
     const { id } = useParams<{ id: string }>();

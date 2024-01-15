@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import MovieCard from "../MovieCards/MovieCard";
 import MovieCardTrending from "../MovieCards/MovieCardTrending";
 import SearchBar from "../SearchBar/SearchBar";
-import data from "../../utils/data_all.json";
-import dataTrending from "../../utils/data_trending.json";
+import data from "../../utils/movies.json";
+import dataTrending from "../../utils/trending.json";
 import { Movie } from "../../types";
 
 export default function Home() {
