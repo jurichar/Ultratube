@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
+from django.core.validators import MinValueValidator
 from django.db import models
 
 
@@ -7,11 +8,11 @@ class Movie(models.Model):
     name = models.CharField(max_length=128, unique=True)
     synopsis = models.TextField(null=True)
     thumbnail_cover = models.CharField(max_length=255)
-    production_year = models.IntegerField(null=True)
+    production_year = models.IntegerField(validators=[MinValueValidator(1888)], null=True)
     duration = models.DurationField()
     genre = models.CharField(max_length=255)
-    imdb_rating = models.FloatField(null=True)
-    peer = models.IntegerField()  # to sort movies can also be downloaded or seeders
+    imdb_rating = models.FloatField(validators=[MinValueValidator(0.0)], null=True)
+    peer = models.IntegerField(validators=[MinValueValidator(0)])  # to sort movies can also be downloaded or seeders
     casting = ArrayField(
         models.CharField(max_length=64)
     )
