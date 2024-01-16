@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Movie } from "../../types";
 import data from "../../utils/movies.json";
+import dataTrending from "../../utils/trending.json";
 
 export default function MoviePage() {
     const { id } = useParams<{ id: string }>();
@@ -11,6 +12,11 @@ export default function MoviePage() {
         if (id) {
             const movie = data.find((movie) => movie.id === id);
             setMovie(movie);
+
+            if (!movie) {
+                const movie = dataTrending.find((movie) => movie.id === id);
+                setMovie(movie);
+            }
         }
     }, [id]);
 

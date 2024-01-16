@@ -2,8 +2,24 @@
 
 import BookmarkIcon from "./BookmarkIcon";
 import { Movie } from "../../types";
+import { useState } from "react";
+import Loading from "../Loading/Loading";
 
-export default function MovieCardTrending({ movie }: { movie: Movie }) {
+interface MovieCardProps {
+    movie: Movie;
+}
+
+export default function MovieCardTrending({ movie }: MovieCardProps) {
+    const [loading, setLoading] = useState(true);
+
+    const handleImageLoad = () => {
+        setLoading(false);
+    }
+
+    const handleMovieClick = () => {
+        window.location.href = `/movie/${movie.id}`;
+    };
+
     return (
         <div className="flex-shrink-0 w-60 h-32 rounded flex flex-col justify-between relative"
             style={{
@@ -11,12 +27,9 @@ export default function MovieCardTrending({ movie }: { movie: Movie }) {
                 backgroundSize: "cover",
                 backgroundPosition: "center"
             }}>
+            {loading && <Loading />}
             <button className="z-10 opacity-0 w-full h-full bg-tertiary hover:opacity-50 rounded flex justify-center items-center transition-all"
-                onClick={
-                    () => {
-                        window.location.href = `/movie/${movie.id}`;
-                    }
-                }>
+                onClick={handleMovieClick}>
                 Play
             </button>
             <BookmarkIcon />
@@ -29,6 +42,12 @@ export default function MovieCardTrending({ movie }: { movie: Movie }) {
                     <span className="text-quaternary text-xs ">Movie</span>
                 </div>
                 <span className="text-quinary">{movie.title.length > 25 ? movie.title.slice(0, 25) + "..." : movie.title}</span>
+                <img
+                    src={movie.image}
+                    alt={movie.title}
+                    onLoad={handleImageLoad}
+                    style={{ display: "none" }}
+                />
             </div>
         </div >
     );
