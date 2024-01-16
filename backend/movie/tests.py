@@ -1,9 +1,10 @@
 import datetime
 
+from django.contrib.auth import get_user_model
 from django.core.validators import ValidationError
 from django.test import TestCase
 
-from .models import Movie
+from .models import Comment, Movie, Subtitle
 
 
 class MovieTestCase(TestCase):
@@ -17,7 +18,7 @@ class MovieTestCase(TestCase):
             casting=["Georges Lucas", "Mark Hamill"],
         )
 
-    def test_movie_str(self):
+    def test_str(self):
         movie = Movie.objects.first()
         self.assertEqual(str(movie), movie.name)
 
@@ -95,3 +96,40 @@ class MovieTestCase(TestCase):
         movie.full_clean()
         movie.save()
         self.assertEqual(movies_count_before_create + 1, Movie.objects.all().count())
+
+
+class SubtitleTestCase(TestCase):
+    def setUp(self) -> None:
+        Movie.objects.create(
+            name="Return of the Jedi",
+            thumbnail_cover="path/to/thumbnail/",
+            duration=datetime.timedelta(days=20, hours=10),
+            genre="epic space opera",
+            peer=0,
+            casting=["Georges Lucas", "Mark Hamill"],
+        )
+
+        Subtitle.objects.create(location="path", language="EN", movie=Movie.objects.get(name="Return of the Jedi"))
+
+    def test_str(self):
+        sub = Subtitle.objects.first()
+        self.assertEqual(str(sub), f"{sub.language}: {sub.movie.name}")
+
+
+class CommentTestCase(TestCase):
+    def setUp(self) -> None:
+        movie = Movie.objects.create(
+            name="Return of the Jedi",
+            thumbnail_cover="path/to/thumbnail/",
+            duration=datetime.timedelta(days=20, hours=10),
+            genre="epic space opera",
+            peer=0,
+            casting=["Georges Lucas", "Mark Hamill"],
+        )
+        user = get_user_model().objects.create_user(username="toto", password="tata")
+
+        Comment.objects.create(author=user, movie=movie, content="Lorem ipsum")
+
+    def test_str(self):
+        comment = Comment.objects.first()
+        self.assertEqual(str(comment), comment.content)

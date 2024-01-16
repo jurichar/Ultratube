@@ -27,7 +27,7 @@ class Subtitle(models.Model):
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.language}: {self.movie__name}"
+        return f"{self.language}: {self.movie.name}"
 
 
 class WatchedMovie(models.Model):
