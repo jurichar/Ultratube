@@ -83,7 +83,7 @@ DATABASES = {
         "NAME": os.environ.get('POSTGRES_NAME'),
         "USER": os.environ.get('POSTGRES_USER'),
         "PASSWORD": os.environ.get('POSTGRES_PASSWORD'),
-        "HOST": "db" if not os.os.environ.get('GITHUB_WORKFLOW') else "127.0.0.1",
+        "HOST": "db" if not os.environ.get('GITHUB_WORKFLOW') else "127.0.0.1",
         "PORT": 5432,
     }
 }
