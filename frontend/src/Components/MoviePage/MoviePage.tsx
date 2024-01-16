@@ -29,7 +29,8 @@ export default function MoviePage() {
                 <h1 className="text-4xl font-bold opacity-100">{movie?.title}</h1>
                 <h2 className="text-2xl">{movie?.release}</h2>
             </div>
-            <div className=" w-80 h-40 bg-secondary">
+            <div className=" h-auto w-auto bg-secondary">
+                <iframe height="390" width="765" src="https://moacloud.com/iframe/FavoXpQrbD" allowFullScreen></iframe>
             </div>
             {/* movie comments */}
             <div className="w-full h-1/4 flex flex-col justify-center items-center">

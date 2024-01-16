@@ -12,7 +12,7 @@ def movies ():
         'release': fake.date(),
         'image': fake.image_url(),
         'synopsis': fake.text(),
-        'trailer': fake.url(),
+        'views': random.randint(0, 1000),
         'url': fake.url()
     }
 
