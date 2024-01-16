@@ -13,6 +13,17 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      db:
+        image: postgres:16.1
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: github_actions
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -25,9 +36,17 @@ jobs:
       - name: Install dependencies
         run: |
           cd backend
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run Django tests
+      - name: Run migrations
         run: |
           cd backend
-          python manage.py test
+          ./manage.py makemigrations
+          ./manage.py migrate
+
+      - name: Run tests
+        run: |
+          cd backend
+          ./manage.py test
+
