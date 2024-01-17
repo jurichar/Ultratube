@@ -8,3 +8,11 @@ export interface Movie {
     synopsis: string;
     trailer: string;
 }
+
+export interface User {
+    id: string;
+    name: string;
+    email: string;
+    password: string;
+    avatar: string;
+}
