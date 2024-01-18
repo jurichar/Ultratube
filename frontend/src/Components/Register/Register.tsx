@@ -1,4 +1,13 @@
+import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
+
 export default function Register() {
+  const handlePermission = () => {
+    fetchWrapper("oauth/user/", { method: "get" })
+      .then((data) => console.log(data))
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   return (
     <div>
       Register
@@ -14,6 +23,10 @@ export default function Register() {
         {" "}
         log with github
       </a>
+      <button style={{ backgroundColor: "red" }} onClick={handlePermission}>
+        {" "}
+        test if we have right
+      </button>
       {/* <button onClick={auth42}> LOG with 0auth2 </button> */}
     </div>
   );

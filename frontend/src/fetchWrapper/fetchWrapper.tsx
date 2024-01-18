@@ -14,10 +14,10 @@ async function fetchWrapper<T>(url: string, { headers, method, params, body }: F
   const response = await fetch("http://localhost:8000/" + fullUrl, {
     method,
     headers: {
-      // "Content-Type": "application/json",
-      // credentials: "true",
+      "Content-Type": "application/json",
       // ...(headers || {}),
     },
+    credentials: "include",
     body: requestBody,
   });
 

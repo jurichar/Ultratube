@@ -4,7 +4,6 @@ from rest_framework import serializers
 from oauth2_provider.models import AccessToken
 
 
-
 class AccessTokenSerializer(serializers.ModelSerializer):
     class Meta:
         model = AccessToken
@@ -12,6 +11,6 @@ class AccessTokenSerializer(serializers.ModelSerializer):
 
 
 class UserModelSerializer(serializers.ModelSerializer):
-  class Meta:
-    model = User
-    fields = ['id', 'username', 'email']
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email']
