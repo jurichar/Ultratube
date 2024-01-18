@@ -2,6 +2,17 @@
 version: '3.8'
 
 services:
+  db:
+    container_name: postgres
+    image: postgres:16.1
+    ports:
+      - '5432:5432'
+    volumes:
+      - data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=hypertube
+      - POSTGRES_USER=hypertuber
+      - POSTGRES_PASSWORD=hypersecret
   backend:
     build: ./backend
     container_name: backend
@@ -10,7 +21,13 @@ services:
       - ./backend:/app/backend
     ports:
       - "8000:8000"
-
+    environment:
+      - POSTGRES_NAME=hypertube
+      - POSTGRES_USER=hypertuber
+      - POSTGRES_PASSWORD=hypersecret
+    depends_on:
+      - db
+    restart: on-failure:10
   frontend:
     build: ./frontend
     container_name: frontend
