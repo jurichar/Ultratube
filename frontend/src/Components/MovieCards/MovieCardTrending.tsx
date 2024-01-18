@@ -46,6 +46,7 @@ export default function MovieCardTrending({ movie }: MovieCardProps) {
                     src={movie.image}
                     alt={movie.title}
                     onLoad={handleImageLoad}
+                    onError={() => setLoading(false)}
                     style={{ display: "none" }}
                 />
             </div>
