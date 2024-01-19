@@ -26,12 +26,28 @@ export default function FormAuthenticate({ handleSubmit, nameForm, nameOtherAuth
             </React.Fragment>
           );
         })}
-        <ButtonCallToAction handleClick={handleSubmit} type="submit" width="md" name={nameForm} value={nameSubmit} Icon={null} />
+        <ButtonCallToAction handleClick={handleSubmit} type="submit" width="md" name={nameForm} value={nameSubmit} colorHover={"bg-quinary"} Icon={null} />
       </form>
-      <div className="flex gap-3 mt-4">
-        <ButtonCallToAction handleClick={handleSubmit} type="button" width="sm" name="42" value={`${nameForm} `} Icon={<FaGithub />} />
-        <ButtonCallToAction handleClick={handleSubmit} type="button" width="sm" name="discord" value={`${nameForm} `} Icon={<FaDiscord />} />
-        <ButtonCallToAction handleClick={handleSubmit} type="button" width="sm" name="github" value={`${nameForm} `} Icon={<FaGithub />} />
+      <div className="flex gap-3 mt-4 justify-evenly">
+        <ButtonCallToAction
+          handleClick={handleSubmit}
+          type="button"
+          width="sm"
+          name="42"
+          colorHover="bg-quinary"
+          value={`${nameForm} `}
+          Icon={<img className="size-8" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/512px-42_Logo.svg.png" />}
+        />
+        <ButtonCallToAction
+          handleClick={handleSubmit}
+          type="button"
+          width="sm"
+          name="discord"
+          value={`${nameForm} `}
+          colorHover={"bg-discord"}
+          Icon={<FaDiscord className="size-8 text-black" />}
+        />
+        <ButtonCallToAction handleClick={handleSubmit} type="button" width="sm" name="github" value={`${nameForm} `} colorHover={"bg-github"} Icon={<FaGithub className="size-8  text-black" />} />
       </div>
       <div className="flex w-full gap-3 justify-center mt-4">
         <h3 className="text-quinary text-body-md">{nameOtherAuth}</h3>
