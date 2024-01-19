@@ -24,7 +24,7 @@ class Movie(models.Model):
 class Subtitle(models.Model):
     location = models.CharField(max_length=255)
     language = models.CharField(max_length=5)
-    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name="available_subtitles")
 
     def __str__(self):
         return f"{self.language}: {self.movie.name}"

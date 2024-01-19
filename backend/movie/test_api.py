@@ -68,7 +68,7 @@ class TestMovie(APITestCase):
             "name": movie.name,
             "imdb_rating": movie.imdb_rating,
             "production_year": movie.production_year,
-            "duration": "02:28: 00",
+            "duration": "02:28:00",
             "comments_number": 0,
             "available_subtitles": []
         }
