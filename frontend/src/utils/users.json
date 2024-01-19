@@ -4,6 +4,6 @@
         "name": "Barry Mcdonald",
         "email": "alee@example.org",
         "password": "ZL6HgSRM(8",
-        "avatar": "https://picsum.photos/578/728"
+        "avatar": "./src/assets/profiles/1.svg"
     }
 ]
