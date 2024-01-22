@@ -30,12 +30,8 @@ export default function Profile() {
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    console.log("User submitted form:");
-    console.log("Name:", formData.name);
-    console.log("Email:", formData.email);
-    console.log("Current Password:", formData.currentPassword);
-    console.log("New Password:", formData.newPassword);
+    if (!checkFormValidity()) return;
+    console.log("Form submitted");
   };
 
   const togglePasswordVisibility = () => {
@@ -70,8 +66,35 @@ export default function Profile() {
     }));
   };
 
+  const checkFormValidity = () => {
+    let valid = true;
+    let message = "";
+    if (!checkNameValidity()) valid = false; message += "Name must be at least 3 characters long.\n";
+    if (!checkEmailValidity()) valid = false; message += "Email must be valid.\n";
+    if (!checkCurrentPasswordValidity()) valid = false; message += "Current password must be at least 8 characters long.\n";
+    if (!checkNewPasswordValidity()) valid = false; message += "New password must be at least 8 characters long and different from current password.\n";
+    if (!valid) alert(message);
+    return valid;
+  }
+
+  const checkNameValidity = () => {
+    return formData.name.length >= 3;
+  }
+
+  const checkCurrentPasswordValidity = () => {
+    return formData.currentPassword.length >= 8;
+  }
+
+  const checkNewPasswordValidity = () => {
+    return formData.newPassword.length >= 8 && formData.currentPassword !== formData.newPassword;
+  }
+
+  const checkEmailValidity = () => {
+    return formData.email.includes("@") && formData.email.includes(".");
+  }
+
   return (
-    <div className="w-full p-14 gap-10 overflow-y-auto flex flex-col items-center justify-around">
+    <div className="w-full p-6 gap-10 overflow-y-auto flex flex-col items-center justify-around">
       <h1 className="text-quinary text-heading-lg">Edit profile</h1>
       <button className="w-32 h-32 rounded-full relative transition-all transform hover:scale-105 outline outline-transparent outline-4 hover:outline-white " style={{
         backgroundImage: `url(${selectedImage || user.avatar})`,
