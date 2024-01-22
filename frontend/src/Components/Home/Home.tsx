@@ -25,7 +25,7 @@ export default function Home() {
   }
 
   return (
-    <div className="w-full h-max text-quinary p-4 flex flex-col items-center justify-around gap-6">
+    <div className="w-full h-max text-quinary p-4 flex flex-col items-center justify-around gap-6 md:p-0 md:pl-9">
       <SearchBar onSearch={handleSearch} />
       <div className="w-full h-full flex flex-col gap-4 ">
         <span>Trending</span>
