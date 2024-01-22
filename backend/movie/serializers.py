@@ -4,6 +4,7 @@ from .models import Comment, Movie, Subtitle
 
 
 class SubtitleListSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Subtitle
         fields = ["location", "language"]
@@ -17,6 +18,7 @@ class MovieListSerializer(serializers.ModelSerializer):
 
 
 class MovieDetailSerializer(serializers.ModelSerializer):
+
     comments_number = serializers.SerializerMethodField()
     available_subtitles = SubtitleListSerializer(many=True)
 
@@ -26,3 +28,14 @@ class MovieDetailSerializer(serializers.ModelSerializer):
 
     def get_comments_number(self, obj):
         return Comment.objects.filter(movie=obj).count()
+
+
+class CommentViewSerializer(serializers.ModelSerializer):
+    author = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Comment
+        fields = ["author", "id", "created_at", "content"]
+
+    def get_author(self, obj):
+        return obj.author.username

@@ -18,12 +18,15 @@ from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
 
-from movie.views import MovieViewSet
+from movie.views import CommentViewSet, MovieViewSet
 
 router = routers.SimpleRouter()
-router.register("movie", MovieViewSet, basename="movie")
+
+router.register("movies", MovieViewSet, basename="movies")
+router.register("comments", CommentViewSet, basename="comments")
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/", include(router.urls))
+    path("api/", include(router.urls)),
 ]
