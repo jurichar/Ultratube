@@ -16,3 +16,10 @@ export interface User {
     password: string;
     avatar: string;
 }
+
+export interface Comment {
+    id: string;
+    user: User;
+    comment: string;
+    movie: Movie;
+}
