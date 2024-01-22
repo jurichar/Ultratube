@@ -79,10 +79,10 @@ class AccountTests(APITestCase, URLPatternsTestCase):
         application = Application.objects.create(name=settings.DJANGO_CLIENT_NAME,
                                                  client_id=settings.DJANGO_UID, client_secret=settings.DJANGO_SECRET, client_type=settings.DJANGO_CLIENT_TYPE, authorization_grant_type=settings.DJANGO_GRANT_AUTHORIZATION,  user=user)
         print(application)
-        date_actuelle = timezone.now()
+        datenow = timezone.now()
 
-        date_future = date_actuelle + timezone.timedelta(days=7)
+        expiry_date = datenow + timezone.timedelta(days=7)
         acces_token = AccessToken.objects.create(
-            user=user, application=application, expires=date_future)
+            user=user, application=application, expires=expiry_date)
         client = APIClient()
         client.login(username='testf', password='test')
