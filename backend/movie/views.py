@@ -4,21 +4,22 @@ from rest_framework.mixins import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from .models import Comment, Movie
-from .serializers import (CommentViewSerializer, MovieDetailSerializer,
-                          MovieListSerializer)
+from .serializers import (CommentUpdateSerializer, CommentViewSerializer,
+                          MovieDetailSerializer, MovieListSerializer)
 
 
 class MultipleSerializerMixin:
 
     detail_serializer_class = None
-    partial_update_serializer_class = None
+    update_serializer_class = None
     create_serializer_class = None
 
     def get_serializer_class(self):
 
         opt = {
             "retrieve": self.detail_serializer_class,
-            "partial_update": self.partial_update_serializer_class,
+            "partial_update": self.update_serializer_class,
+            "update": self.update_serializer_class,
             "create": self.create_serializer_class,
         }.get(self.action, super().get_serializer_class())
 
@@ -43,7 +44,10 @@ class MovieViewSet(MultipleSerializerMixin, ReadOnlyModelViewSet):
 
 class CommentViewSet(MultipleSerializerMixin, ModelViewSet):
 
+    http_method_names = ["get", "post", "patch", "delete"]
+
     serializer_class = CommentViewSerializer
+    update_serializer_class = CommentUpdateSerializer
 
     def get_queryset(self):
         return Comment.objects.all()

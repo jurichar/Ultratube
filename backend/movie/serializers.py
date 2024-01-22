@@ -31,11 +31,24 @@ class MovieDetailSerializer(serializers.ModelSerializer):
 
 
 class CommentViewSerializer(serializers.ModelSerializer):
+
     author = serializers.SerializerMethodField()
 
     class Meta:
         model = Comment
         fields = ["author", "id", "created_at", "content"]
+
+    def get_author(self, obj):
+        return obj.author.username
+
+
+class CommentUpdateSerializer(serializers.ModelSerializer):
+
+    author = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Comment
+        fields = ["author", "content"]
 
     def get_author(self, obj):
         return obj.author.username

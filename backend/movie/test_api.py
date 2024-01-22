@@ -128,3 +128,18 @@ class TestComment(MovieAPITestCase):
         }
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), expected)
+
+    def test_delete(self):
+        comment_to_delete = Comment.objects.create(
+            author=self.user,
+            movie=self.movie,
+            content="Lorem ipsum",
+        )
+        self.assertEqual(Comment.objects.all().count(), 3)
+        self.client.delete(reverse("comments-detail", args=[comment_to_delete.id]))
+        self.assertEqual(Comment.objects.all().count(), 2)
+
+    def test_patch(self):
+        response = self.client.patch(reverse("comments-detail", args=[self.comment.id]), {"content": "I AM UPDATED"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Comment.objects.get(pk=self.comment.pk).content, "I AM UPDATED")
