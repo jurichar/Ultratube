@@ -15,11 +15,14 @@ class MultipleSerializerMixin:
     create_serializer_class = None
 
     def get_serializer_class(self):
-        return {
+
+        opt = {
             "retrieve": self.detail_serializer_class,
             "partial_update": self.partial_update_serializer_class,
             "create": self.create_serializer_class,
         }.get(self.action, super().get_serializer_class())
+
+        return super().get_serializer_class() if not opt else opt
 
 
 class MovieViewSet(MultipleSerializerMixin, ReadOnlyModelViewSet):
@@ -38,7 +41,7 @@ class MovieViewSet(MultipleSerializerMixin, ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 
-class CommentViewSet(ModelViewSet):
+class CommentViewSet(MultipleSerializerMixin, ModelViewSet):
 
     serializer_class = CommentViewSerializer
 
