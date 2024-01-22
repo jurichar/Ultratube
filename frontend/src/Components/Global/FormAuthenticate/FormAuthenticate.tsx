@@ -6,7 +6,7 @@ import { FaGithub } from "react-icons/fa";
 import { FaDiscord } from "react-icons/fa";
 import { Link } from "react-router-dom";
 interface Props {
-  handleSubmit: (event: MouseEvent<HTMLButtonElement>) => void;
+  handleSubmit: (event: MouseEvent<HTMLButtonElement>, name: string) => void;
   nameForm: string;
   formInput: FormInput[];
   nameSubmit: string;
@@ -16,7 +16,7 @@ interface Props {
 }
 export default function FormAuthenticate({ handleSubmit, nameForm, nameOtherAuth, linkOtherAUth, valueLinkOtherAuth, formInput, nameSubmit }: Props) {
   return (
-    <div className="  bg-tertiary m-auto p-6 md:p-8  mt-20 w-10/12 h-3/6 md:w-6/12  lg:w-3/12 lg:h-4/6  rounded">
+    <div className="  bg-tertiary m-auto p-6 md:p-8  mt-20 w-10/12 h-3/6 md:w-6/12  lg:w-96 lg:h-4/6  rounded">
       <h1 className="mb-10 text-heading-lg text-quinary text-light font-custom"> {nameForm}</h1>
       <form className="flex flex-col gap-6 ">
         {formInput?.map((input, index) => {

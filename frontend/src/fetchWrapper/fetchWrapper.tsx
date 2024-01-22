@@ -11,14 +11,14 @@ async function fetchWrapper<T>(url: string, { headers, method, params, body }: F
   const queryParams = new URLSearchParams(params).toString();
   const fullUrl = queryParams ? `${url}?${queryParams}` : url;
   const requestBody = body ? JSON.stringify(body) : undefined;
+  console.log(requestBody);
   const response = await fetch("http://localhost:8000/" + fullUrl, {
     method,
+    body: requestBody,
     headers: {
       "Content-Type": "application/json",
-      // ...(headers || {}),
     },
     credentials: "include",
-    body: requestBody,
   });
 
   if (!response.ok) {

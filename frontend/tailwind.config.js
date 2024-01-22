@@ -11,6 +11,8 @@ export default {
         tertiary: "#161D2F",
         quaternary: "#5A698F",
         quinary: "#FFFFFF",
+        discord: "#7289DA",
+        github: "#2dba4e",
       },
       fontSize: {
         "heading-lg": ["32px", { fontWeight: "300", letterSpacing: "-0.031em", lineHeight: "normal" }],

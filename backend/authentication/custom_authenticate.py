@@ -8,6 +8,7 @@ class CustomAuth(ModelBackend):
         try:
             user = UserModel.objects.get(username=username)
             if user.check_password(password) or password is None:
+                print('auth', user, password)
                 return user
             return None
         except UserModel.DoesNotExist:

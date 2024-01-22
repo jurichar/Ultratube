@@ -2,22 +2,20 @@ import { ChangeEvent, MouseEvent } from "react";
 // import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
 import FormAuthenticate from "../Global/FormAuthenticate/FormAuthenticate";
 import LogoComponent from "../Global/LogoComponent/LogoComponent";
+import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
 
 export type FormInput = { name: string; value: string; placeholder: string; handleChange: (event: ChangeEvent<HTMLInputElement>) => void };
 export default function Register() {
-  // const handlePermission = () => {
-  //   fetchWrapper("oauth/user/", { method: "get" })
-  //     .then((data) => console.log(data))
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  // };
+  const handlePermission = () => {
+    fetchWrapper("oauth/user/", { method: "get" })
+      .then((data) => console.log(data))
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   const handleChange = (event: ChangeEvent) => {
     console.log("lol", event);
-  };
-  const handleSubmit = (event: MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    console.log(event);
   };
   const formInput: FormInput[] = [
     { name: "username", value: "", placeholder: "username", handleChange },
@@ -27,6 +25,27 @@ export default function Register() {
     { name: "password", value: "", placeholder: "password", handleChange },
     { name: "password-1", value: "", placeholder: "Repeat password", handleChange },
   ];
+  const handleSubmit = (event: MouseEvent<HTMLButtonElement>, name: string) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (name == "Register") {
+      createUser();
+    }
+
+    console.log(name);
+  };
+  async function createUser() {
+    await fetchWrapper("oauth/register/", {
+      method: "POST",
+      body: {
+        username: "test",
+        first_name: "lol",
+        last_name: "lol",
+        email: "lololo@lol.com",
+        password: "123",
+      },
+    });
+  }
   return (
     <div className="flex flex-col w-full">
       <header className="w-full flex justify-center mt-12">
@@ -41,6 +60,7 @@ export default function Register() {
         formInput={formInput}
         nameSubmit="Create an account"
       />
+      <button onClick={handlePermission}> click</button>
     </div>
   );
   // return (

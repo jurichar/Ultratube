@@ -3,8 +3,7 @@ import requests
 
 from django.contrib.auth import authenticate, login
 
-
-from .serializer import AccessTokenSerializer, UserModelSerializer
+from .serializer import AccessTokenSerializer, UserLoginSerializer, UserModelSerializer
 from .models import User
 from django.shortcuts import redirect
 from rest_framework.response import Response
@@ -17,6 +16,7 @@ from oauth2_provider.contrib.rest_framework import OAuth2Authentication, TokenHa
 from rest_framework.authentication import SessionAuthentication
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework import status
 
 
 def create_or_get_user(username="", password="", email="", firstname="", lastname=""):
@@ -54,7 +54,30 @@ def call_application_get_access_token(url, token_params):
         return {'cant get information, the authentication fail , please try again'}
 
 
-def get_access_token_api(client_id, client_secret):
+def add_user_to_access_token(request, access_token):
+    update_token_url = 'http://localhost:8000/oauth/update-token/' + access_token + '/'
+    update_data = {
+        'user': request.user.pk,
+    }
+    csrf_token = request.COOKIES.get('csrftoken', '')
+    if len(csrf_token) == 0:
+        csrf_token = get_token(request)
+    headers = {
+        'Authorization': 'Bearer ' + access_token,
+        'X-CSRFToken': csrf_token,
+    }
+    modified_cookies = request.COOKIES.copy()
+    if 'sessionid' not in modified_cookies:
+        modified_cookies['sessionid'] = request.session.session_key
+    if 'csrftoken' not in modified_cookies:
+        modified_cookies['csrftoken'] = csrf_token
+    response = requests.put(
+        update_token_url, data=update_data, headers=headers, cookies=modified_cookies)
+    if response.status_code != 200:
+        raise response
+
+
+def create_access_token_api(request, client_id, client_secret):
     try:
         headers = {
             "Content-Type": "application/x-www-form-urlencoded",
@@ -67,9 +90,124 @@ def get_access_token_api(client_id, client_secret):
         }
         response = requests.post(
             'http://localhost:8000/o/token/', headers=headers, data=data)
-        return response
+        if (response.status_code == 201 or response.status_code == 200):
+            try:
+                responseJson = response.json()
+                add_user_to_access_token(request, responseJson['access_token'])
+                return responseJson['access_token']
+            except Exception:
+                return "cant update token with te user"
     except Exception:
         return "Cant get token, client_id and secret are not matching"
+
+
+def authenticate_login_user(request, username, password=""):
+    try:
+        print('cc', request.user, username, password)
+        user = authenticate(request, username=username, password=password)
+        print('the user', user)
+        backend = 'authentication.custom_authenticate.CustomAuth'
+        if user is not None:
+            login(request, user, backend=backend)
+            request.session.save()
+        else:
+            raise "error user cant connect"
+
+    except Exception as e:
+        print(e)
+        raise e
+
+
+def get_or_create_access_token(request):
+    try:
+
+        token_api = AccessToken.objects.get(user=request.user.pk)
+        return token_api.token
+    except Exception:
+        try:
+            token_api = create_access_token_api(request,
+                                                settings.DJANGO_UID, settings.DJANGO_SECRET)
+            return token_api
+        except Exception as e:
+            print(e)
+            raise 'cant create access token'
+
+
+class UserRegister(APIView):
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [AllowAny]
+
+    @csrf_exempt
+    def post(self, request, format=None):
+        serializer = UserModelSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            try:
+                authenticate_login_user(
+                    request, username=serializer.data['username'], password=request.data['password'])
+                if not request.session.session_key:
+                    request.session.save()
+                access_token = get_or_create_access_token(request)
+            except Exception:
+                return Response('error', status=status.HTTP_400_BAD_REQUEST)
+            response_serializer = Response(
+                {'data': serializer.data, 'access_token': access_token, 'session': request.session.session_key}, status=status.HTTP_201_CREATED)
+            if len(access_token):
+                response_serializer.set_cookie(
+                    'token', access_token, path='/', domain='localhost', httponly=True, samesite='None', expires=None,)
+            response_serializer.set_cookie(
+                'csrftoken', get_token(request), path='/', domain='localhost', httponly=True, samesite='None', expires=None,)
+            return response_serializer
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserLogin(APIView):
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [AllowAny]
+
+    def get_object(self, username):
+        try:
+            return User.objects.get(username=username)
+        except User.DoesNotExist:
+            raise Http404
+
+    @csrf_exempt
+    def post(self, request, format=None):
+        try:
+
+            snippet = self.get_object(request.data['username'])
+            serializer = UserLoginSerializer(snippet)
+            try:
+                authenticate_login_user(
+                    request=request, username=request.data['username'], password=request.data['password'])
+                if not request.session.session_key:
+                    request.session.save()
+                access_token = get_or_create_access_token(request)
+
+                print(serializer.data)
+                response = Response(
+                    {'data': serializer.data, 'ACCESTOKEN': access_token})
+                response.set_cookie(
+                    'token', access_token, path='/', domain='localhost', httponly=True, samesite='None', expires=None,)
+                return response
+            except Exception:
+                return Response('password doesnt match ', status=status.HTTP_401_UNAUTHORIZED)
+        except Exception as e:
+            print(e)
+            return Response('user doesnt exist', status=status.HTTP_403_FORBIDDEN)
+
+
+class UserLogout(APIView):
+    authentication_classes = [OAuth2Authentication]
+    permission_classes = [IsAuthenticated, TokenHasReadWriteScope]
+
+    def post(self, request, format=None):
+        try:
+            request.auth.delete()
+            return Response({'message': 'Successfully logged out.'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class FortyTwoAuthView(APIView):
@@ -93,7 +231,7 @@ class FortyTwoAuthView(APIView):
         if user is not None:
             login(request, user, backend=backend)
             request.session.save()
-            token_api = get_access_token_api(
+            token_api = create_access_token_api(
                 settings.DJANGO_UID, settings.DJANGO_SECRET).json()
             update_token_url = 'http://localhost:8000/oauth/update-token/' + \
                 token_api['access_token'] + '/'
@@ -156,5 +294,4 @@ class UserList(generics.ListAPIView):
     permission_classes = [IsAuthenticated, TokenHasReadWriteScope]
     queryset = User.objects.all()
     required_scopes = ['read']
-
     serializer_class = UserModelSerializer
