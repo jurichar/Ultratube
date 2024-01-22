@@ -28,5 +28,7 @@ export default {
   variants: {
     fill: ['hover', 'focus'],
   },
-  plugins: [],
+  plugins: [
+    '@tailwindcss/aspect-ratio',
+  ],
 }

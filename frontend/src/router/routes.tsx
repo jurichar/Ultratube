@@ -31,7 +31,7 @@ export const router = createBrowserRouter([
         element: <Profile />,
       },
       {
-        path: "/movie/:id",
+        path: "/:id",
         element: <MoviePage />,
       }
     ],

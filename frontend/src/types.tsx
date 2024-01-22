@@ -19,7 +19,10 @@ export interface User {
 
 export interface Comment {
     id: string;
-    user: User;
-    comment: string;
-    movie: Movie;
+    user_id: string;
+    movie_id: string;
+    content: string;
+    date: string;
+    user?: User;
+    movie?: Movie;
 }

@@ -31,7 +31,7 @@ const ImagePopup: React.FC<ImagePopupProps> = ({ setShowImagePopup, setSelectedI
   };
 
   return (
-    <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50 flex justify-center items-center px-4">
+    <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-10 flex justify-center items-center px-4">
       <div className="w-96 h-96 bg-tertiary rounded flex flex-col justify-center items-center gap-6 p-4">
         <h1 className="text-quinary text-heading-md">Choose your avatar</h1>
         <div className="w-full h-80 flex flex-wrap justify-center items-center gap-6 overflow-y-auto p-4">

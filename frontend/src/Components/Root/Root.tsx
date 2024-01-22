@@ -3,14 +3,10 @@
 import { Outlet } from 'react-router-dom';
 import Navbar from '../Navbar/Navbar';
 import { User } from '../../types';
+import users from '../../utils/users.json';
+
 export default function Root() {
-  const user: User = {
-    id: "1",
-    name: "John Doe",
-    avatar: "./src/assets/profiles/1.svg",
-    password: "123456",
-    email: "",
-  };
+  const user: User = users[0];
 
   return (
     <div className="flex flex-col h-screen">

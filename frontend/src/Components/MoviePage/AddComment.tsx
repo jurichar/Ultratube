@@ -1,0 +1,35 @@
+import React, { useState } from 'react';
+
+const AddComment = () => {
+  const [comment, setComment] = useState('');
+
+  const handleCommentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setComment(event.target.value);
+  };
+
+  const handleCommentSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+
+
+    // ! TODO: Submit comment to backend
+    console.log("Comment submitted")
+  };
+
+  return (
+    <form onSubmit={handleCommentSubmit} className="w-full mt-4 flex flex-row justify-between items-center gap-4 px-4">
+      <input
+        type="textarea"
+        value={comment}
+        onChange={handleCommentChange}
+        className="w-full h-12 outline-none px-4 bg-tertiary border-b border-quaternary text-quaternary focus:text-quinary placeholder:text-quaternary focus:border-quinary transition-all"
+        placeholder="Add a comment"
+      />
+      <button type="submit" className="h-8 w-8 shrink-0 rounded-full" style={{
+        backgroundImage: `url('./src/assets/send.svg')`,
+      }}>
+      </button>
+    </form>
+  );
+};
+
+export default AddComment;
