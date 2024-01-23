@@ -23,7 +23,7 @@ export default function MoviePage() {
     }, [id]);
 
     return (
-        <div className="flex flex-col justify-center items-center gap-4">
+        <div className="flex flex-col justify-center items-center gap-4 md:pl-9">
             <div className="w-full text-quinary opacity-100 relative flex flex-col justify-center items-center">
                 <div className="w-full h-full bg-cover bg-center bg-no-repeat opacity-30 absolute" style={{ backgroundImage: `url(${movie?.image})` }}>
                 </div>

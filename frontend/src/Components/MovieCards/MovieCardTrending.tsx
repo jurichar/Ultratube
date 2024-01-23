@@ -18,7 +18,7 @@ export default function MovieCardTrending({ movie }: MovieCardProps) {
     }
 
     return (
-        <NavLink className="flex-shrink-0 w-60 h-32 rounded flex flex-col justify-between relative"
+        <NavLink className="flex-shrink-0 w-60 h-32 rounded flex flex-col justify-between relative md:w-[29.375rem] md:h-[14.375rem]"
             style={{
                 backgroundImage: `url(${movie.image})`,
                 backgroundSize: "cover",
