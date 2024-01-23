@@ -1,11 +1,14 @@
+from django.core.exceptions import ValidationError
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.mixins import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from .models import Comment, Movie
-from .serializers import (CommentUpdateSerializer, CommentViewSerializer,
-                          MovieDetailSerializer, MovieListSerializer)
+from .serializers import (CommentCreateSerializer, CommentUpdateSerializer,
+                          CommentViewSerializer, MovieDetailSerializer,
+                          MovieListSerializer)
 
 
 class MultipleSerializerMixin:
@@ -34,12 +37,22 @@ class MovieViewSet(MultipleSerializerMixin, ReadOnlyModelViewSet):
     def get_queryset(self):
         return Movie.objects.all()
 
-    @action(detail=True, methods=['GET'])
-    def comments(self, _, pk=None):
+    @action(detail=True, methods=["GET", "POST"])
+    def comments(self, request, pk=None):
         movie = get_object_or_404(Movie, pk=pk)
-        comments = Comment.objects.filter(movie=movie)
-        serializer = CommentViewSerializer(comments, many=True)
-        return Response(serializer.data)
+        if request.method == "GET":
+            comments = Comment.objects.filter(movie=movie)
+            serializer = CommentViewSerializer(comments, many=True)
+            return Response(serializer.data)
+        elif request.method == "POST":
+            comment = Comment(author=request.user, movie=movie, content=request.POST.get("content"))
+            serializer = CommentCreateSerializer(comment)
+            try:
+                comment.full_clean()
+                comment.save()
+            except ValidationError:
+                return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class CommentViewSet(MultipleSerializerMixin, ModelViewSet):
@@ -48,6 +61,10 @@ class CommentViewSet(MultipleSerializerMixin, ModelViewSet):
 
     serializer_class = CommentViewSerializer
     update_serializer_class = CommentUpdateSerializer
+    create_serializer_class = CommentCreateSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
     def get_queryset(self):
         return Comment.objects.all()

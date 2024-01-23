@@ -52,3 +52,10 @@ class CommentUpdateSerializer(serializers.ModelSerializer):
 
     def get_author(self, obj):
         return obj.author.username
+
+
+class CommentCreateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Comment
+        fields = ["movie", "content"]

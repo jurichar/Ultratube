@@ -100,17 +100,29 @@ class TestMovie(MovieAPITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), expected)
 
-    def test_movie_comments(self):
+    def test_movie_comments_get(self):
+
         response = self.client.get(reverse('movies-comments', args=[self.movie.id]))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()), 2)
         self.assertIn("This is a great movie !", response.data[0]['content'])
         self.assertIn("I love it !", response.data[1]['content'])
 
+    def test_movie_comments_post(self):
+
+        self.client.force_login(self.user)
+        response_success = self.client.post(reverse("movies-comments", args=[self.movie.id]),
+                                            {"movie": self.movie.id, "content": "test"})
+        self.assertEqual(response_success.status_code, 201)
+
+        response_error = self.client.post(reverse("movies-comments", args=[self.movie.id]))
+        self.assertEqual(response_error.status_code, 400)
+
 
 class TestComment(MovieAPITestCase):
 
     def test_list(self):
+
         response = self.client.get(reverse("comments-list"))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['count'], 2)
@@ -119,6 +131,7 @@ class TestComment(MovieAPITestCase):
         self.assertIn(self.format_datetime(self.comment.created_at), response.json()['results'][1]['created_at'])
 
     def test_detail(self):
+
         response = self.client.get(reverse("comments-detail", args=[self.comment.id]))
         expected = {
             "author": self.comment.author.username,
@@ -130,6 +143,7 @@ class TestComment(MovieAPITestCase):
         self.assertEqual(response.json(), expected)
 
     def test_delete(self):
+
         comment_to_delete = Comment.objects.create(
             author=self.user,
             movie=self.movie,
@@ -140,6 +154,15 @@ class TestComment(MovieAPITestCase):
         self.assertEqual(Comment.objects.all().count(), 2)
 
     def test_patch(self):
+
         response = self.client.patch(reverse("comments-detail", args=[self.comment.id]), {"content": "I AM UPDATED"})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Comment.objects.get(pk=self.comment.pk).content, "I AM UPDATED")
+
+    def test_post(self):
+
+        self.client.force_login(self.user)
+        response = self.client.post(reverse("comments-list"),
+                                    {"movie": self.movie.id, "content": "test"})
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Comment.objects.last().content, "test")
