@@ -1,14 +1,15 @@
 from django.core.exceptions import ValidationError
-from rest_framework import status
+from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.mixins import Response
-from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
+from rest_framework.viewsets import (GenericViewSet, ModelViewSet,
+                                     ReadOnlyModelViewSet)
 
-from .models import Comment, Movie
+from .models import Comment, FavouriteMovie, Movie
 from .serializers import (CommentCreateSerializer, CommentUpdateSerializer,
-                          CommentViewSerializer, MovieDetailSerializer,
-                          MovieListSerializer)
+                          CommentViewSerializer, FavouriteMovieSerializer,
+                          MovieDetailSerializer, MovieListSerializer)
 
 
 class MultipleSerializerMixin:
@@ -68,3 +69,17 @@ class CommentViewSet(MultipleSerializerMixin, ModelViewSet):
 
     def get_queryset(self):
         return Comment.objects.all()
+
+
+class FavouriteListCreateDeleteViewSet(mixins.ListModelMixin,
+                                       mixins.CreateModelMixin,
+                                       mixins.DestroyModelMixin,
+                                       GenericViewSet):
+
+    serializer_class = FavouriteMovieSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def get_queryset(self):
+        return FavouriteMovie.objects.filter(user=self.request.user).all()

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Comment, Movie, Subtitle
+from .models import Comment, FavouriteMovie, Movie, Subtitle
 
 
 class SubtitleListSerializer(serializers.ModelSerializer):
@@ -59,3 +59,12 @@ class CommentCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ["movie", "content"]
+
+
+class FavouriteMovieSerializer(serializers.ModelSerializer):
+
+    movie = MovieListSerializer()
+
+    class Meta:
+        model = FavouriteMovie
+        fields = ["movie"]

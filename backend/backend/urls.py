@@ -18,12 +18,14 @@ from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
 
-from movie.views import CommentViewSet, MovieViewSet
+from movie.views import (CommentViewSet, FavouriteListCreateDeleteViewSet,
+                         MovieViewSet)
 
 router = routers.SimpleRouter()
 
 router.register("movies", MovieViewSet, basename="movies")
 router.register("comments", CommentViewSet, basename="comments")
+router.register("favourite-movies", FavouriteListCreateDeleteViewSet, basename="favourite-movies")
 
 
 urlpatterns = [

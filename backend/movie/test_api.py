@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse, reverse_lazy
 from rest_framework.test import APITestCase
 
-from movie.models import Comment, Movie, Subtitle
+from movie.models import Comment, FavouriteMovie, Movie, Subtitle
 
 User = get_user_model()
 
@@ -166,3 +166,23 @@ class TestComment(MovieAPITestCase):
                                     {"movie": self.movie.id, "content": "test"})
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Comment.objects.last().content, "test")
+
+
+class TestFavouriteMovie(MovieAPITestCase):
+
+    def setUp(self) -> None:
+        self.favouriteList = []
+        self.favouriteList.append(FavouriteMovie.objects.create(user=self.user, movie=self.movie))
+        self.favouriteList.append(FavouriteMovie.objects.create(user=self.user, movie=Movie.objects.last()))
+
+    def test_list(self):
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("favourite-movies-list"))
+        response_content = response.json()['results']
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_content[0]['movie']['name'], self.favouriteList[0].movie.name)
+        self.assertEqual(response_content[0]['movie']['id'], self.favouriteList[0].movie.id)
+        self.assertEqual(response_content[1]['movie']['name'], self.favouriteList[1].movie.name)
+        self.assertEqual(response_content[1]['movie']['id'], self.favouriteList[1].movie.id)
