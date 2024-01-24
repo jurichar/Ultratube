@@ -68,3 +68,10 @@ class FavouriteMovieSerializer(serializers.ModelSerializer):
     class Meta:
         model = FavouriteMovie
         fields = ["movie"]
+
+
+class FavouriteMovieCreateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = FavouriteMovie
+        fields = ["movie"]

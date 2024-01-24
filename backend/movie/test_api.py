@@ -149,8 +149,10 @@ class TestComment(MovieAPITestCase):
             movie=self.movie,
             content="Lorem ipsum",
         )
+
         self.assertEqual(Comment.objects.all().count(), 3)
-        self.client.delete(reverse("comments-detail", args=[comment_to_delete.id]))
+        response = self.client.delete(reverse("comments-detail", args=[comment_to_delete.id]))
+        self.assertEqual(response.status_code, 204)
         self.assertEqual(Comment.objects.all().count(), 2)
 
     def test_patch(self):
@@ -171,11 +173,15 @@ class TestComment(MovieAPITestCase):
 class TestFavouriteMovie(MovieAPITestCase):
 
     def setUp(self) -> None:
+
+        self.client.force_login(self.user)
+
         self.favouriteList = []
         self.favouriteList.append(FavouriteMovie.objects.create(user=self.user, movie=self.movie))
         self.favouriteList.append(FavouriteMovie.objects.create(user=self.user, movie=Movie.objects.last()))
 
     def test_list(self):
+
         self.client.force_login(self.user)
 
         response = self.client.get(reverse("favourite-movies-list"))
@@ -186,3 +192,27 @@ class TestFavouriteMovie(MovieAPITestCase):
         self.assertEqual(response_content[0]['movie']['id'], self.favouriteList[0].movie.id)
         self.assertEqual(response_content[1]['movie']['name'], self.favouriteList[1].movie.name)
         self.assertEqual(response_content[1]['movie']['id'], self.favouriteList[1].movie.id)
+
+    def test_delete(self):
+
+        self.assertEqual(FavouriteMovie.objects.all().count(), 2)
+        response = self.client.delete(reverse("favourite-movies-detail", args=[self.favouriteList[0].id]))
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(FavouriteMovie.objects.all().count(), 1)
+
+    # TODO implement creates tests
+    def test_create(self):
+        new_movie = Movie.objects.create(
+            name="Pulp Fiction",
+            synopsis="Various interconnected stories of crime in Los Angeles.",
+            thumbnail_cover="pulp_fiction.jpg",
+            production_year=1994,
+            duration="2h34m",
+            imdb_rating=8.9,
+            peer=4,
+            casting=["John Travolta", "Samuel L. Jackson", "Uma Thurman"]
+        )
+
+        response = self.client.post(reverse("favourite-movies-list"), {"movie": new_movie.id})
+        self.assertEqual(response.status_code, 201)

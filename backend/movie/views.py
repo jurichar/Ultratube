@@ -8,8 +8,10 @@ from rest_framework.viewsets import (GenericViewSet, ModelViewSet,
 
 from .models import Comment, FavouriteMovie, Movie
 from .serializers import (CommentCreateSerializer, CommentUpdateSerializer,
-                          CommentViewSerializer, FavouriteMovieSerializer,
-                          MovieDetailSerializer, MovieListSerializer)
+                          CommentViewSerializer,
+                          FavouriteMovieCreateSerializer,
+                          FavouriteMovieSerializer, MovieDetailSerializer,
+                          MovieListSerializer)
 
 
 class MultipleSerializerMixin:
@@ -71,12 +73,14 @@ class CommentViewSet(MultipleSerializerMixin, ModelViewSet):
         return Comment.objects.all()
 
 
-class FavouriteListCreateDeleteViewSet(mixins.ListModelMixin,
+class FavouriteListCreateDeleteViewSet(MultipleSerializerMixin,
+                                       mixins.ListModelMixin,
                                        mixins.CreateModelMixin,
                                        mixins.DestroyModelMixin,
                                        GenericViewSet):
 
     serializer_class = FavouriteMovieSerializer
+    create_serializer_class = FavouriteMovieCreateSerializer
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
