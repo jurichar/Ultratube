@@ -29,25 +29,27 @@ export default function FormAuthenticate({ handleSubmit, nameForm, nameOtherAuth
         <ButtonCallToAction handleClick={handleSubmit} type="submit" width="md" name={nameForm} value={nameSubmit} colorHover={"bg-quinary"} Icon={null} />
       </form>
       <div className="flex gap-3 mt-4 justify-evenly">
-        <ButtonCallToAction
-          handleClick={handleSubmit}
-          type="button"
-          width="sm"
-          name="42"
-          colorHover="bg-quinary"
-          value={`${nameForm} `}
-          Icon={<img className="size-8" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/512px-42_Logo.svg.png" />}
-        />
-        <ButtonCallToAction
-          handleClick={handleSubmit}
-          type="button"
-          width="sm"
-          name="discord"
-          value={`${nameForm} `}
-          colorHover={"bg-discord"}
-          Icon={<FaDiscord className="size-8 text-black" />}
-        />
-        <ButtonCallToAction handleClick={handleSubmit} type="button" width="sm" name="github" value={`${nameForm} `} colorHover={"bg-github"} Icon={<FaGithub className="size-8  text-black" />} />
+        <Link
+          className={` w-full  flex  flex-row  gap-1 justify-center text-quinary  bg-gray-300 rounded text-body-md font-custom hover:bg-white p-2.5"} `}
+          to={`${import.meta.env.VITE_FT_URL}/authorize?client_id=${import.meta.env.VITE_FT_UID}&redirect_uri=${import.meta.env.VITE_FT_REDIRECT}&response_type=code`}
+        >
+          {" "}
+          <img className="size-8" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/512px-42_Logo.svg.png" />{" "}
+        </Link>
+        <Link
+          className={` w-full  flex flex-row flex-row  gap-1 justify-center text-quinary  bg-gray-300 rounded text-body-md font-custom hover:bg-discord p-2.5"} `}
+          to={`${import.meta.env.VITE_DISCORD_URL}/authorize?client_id=${import.meta.env.VITE_DISCORD_UID}&response_type=code&redirect_uri=${
+            import.meta.env.VITE_DISCORD_REDIRECT
+          }&scope=identify`}
+        >
+          <FaDiscord className="size-8" />
+        </Link>
+        <Link
+          className={` w-full  flex flex-row  gap-1 justify-center text-quinary  bg-gray-300 rounded text-body-md font-custom hover:bg-github p-2.5"} `}
+          to={`${import.meta.env.VITE_GITHUB_URL}/authorize?client_id=${import.meta.env.VITE_GITHUB_UID}&redirect_uri=${import.meta.env.VITE_GITHUB_REDIRECT}&response_type=code`}
+        >
+          <FaGithub className="size-8" />
+        </Link>
       </div>
       <div className="flex w-full gap-3 justify-center mt-4">
         <h3 className="text-quinary text-body-md">{nameOtherAuth}</h3>

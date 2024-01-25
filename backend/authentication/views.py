@@ -1,3 +1,5 @@
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.http import JsonResponse
 from django.http import Http404
 import requests
 
@@ -17,120 +19,6 @@ from rest_framework.authentication import SessionAuthentication
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
-
-
-def create_or_get_user(username="", password="", email="", firstname="", lastname=""):
-    user, created = User.objects.get_or_create(
-        username=username, email=email, first_name=firstname, last_name=lastname)
-    if created:
-        user.save()
-    return user
-
-
-def get_information_user_access_token(url, access_token):
-    headers = {
-        'Authorization': "Bearer " + access_token
-    }
-    information_user = requests.get(url, headers=headers)
-    return information_user
-
-
-def get_object_for_token(grant_type="authorization_code", code="", redirect_uri="", client_id="", client_secret="", scope="public"):
-    return {
-        'grant_type': grant_type,
-        'code': code,
-        'redirect_uri': redirect_uri,
-        'client_id': client_id,
-        'client_secret': client_secret,
-        'scope': scope
-    }
-
-
-def call_application_get_access_token(url, token_params):
-    response = requests.post(url, data=token_params)
-    if (response.status_code == 200):
-        return response
-    else:
-        return {'cant get information, the authentication fail , please try again'}
-
-
-def add_user_to_access_token(request, access_token):
-    update_token_url = 'http://localhost:8000/oauth/update-token/' + access_token + '/'
-    update_data = {
-        'user': request.user.pk,
-    }
-    csrf_token = request.COOKIES.get('csrftoken', '')
-    if len(csrf_token) == 0:
-        csrf_token = get_token(request)
-    headers = {
-        'Authorization': 'Bearer ' + access_token,
-        'X-CSRFToken': csrf_token,
-    }
-    modified_cookies = request.COOKIES.copy()
-    if 'sessionid' not in modified_cookies:
-        modified_cookies['sessionid'] = request.session.session_key
-    if 'csrftoken' not in modified_cookies:
-        modified_cookies['csrftoken'] = csrf_token
-    response = requests.put(
-        update_token_url, data=update_data, headers=headers, cookies=modified_cookies)
-    if response.status_code != 200:
-        raise response
-
-
-def create_access_token_api(request, client_id, client_secret):
-    try:
-        headers = {
-            "Content-Type": "application/x-www-form-urlencoded",
-            "Cache-Control": "no-cache",
-        }
-        data = {
-            'grant_type': 'client_credentials',
-            'client_id': client_id,
-            'client_secret': client_secret
-        }
-        response = requests.post(
-            'http://localhost:8000/o/token/', headers=headers, data=data)
-        if (response.status_code == 201 or response.status_code == 200):
-            try:
-                responseJson = response.json()
-                add_user_to_access_token(request, responseJson['access_token'])
-                return responseJson['access_token']
-            except Exception:
-                return "cant update token with te user"
-    except Exception:
-        return "Cant get token, client_id and secret are not matching"
-
-
-def authenticate_login_user(request, username, password=""):
-    try:
-        print('cc', request.user, username, password)
-        user = authenticate(request, username=username, password=password)
-        print('the user', user)
-        backend = 'authentication.custom_authenticate.CustomAuth'
-        if user is not None:
-            login(request, user, backend=backend)
-            request.session.save()
-        else:
-            raise "error user cant connect"
-
-    except Exception as e:
-        print(e)
-        raise e
-
-
-def get_or_create_access_token(request):
-    try:
-
-        token_api = AccessToken.objects.get(user=request.user.pk)
-        return token_api.token
-    except Exception:
-        try:
-            token_api = create_access_token_api(request,
-                                                settings.DJANGO_UID, settings.DJANGO_SECRET)
-            return token_api
-        except Exception as e:
-            print(e)
-            raise 'cant create access token'
 
 
 class UserRegister(APIView):
@@ -198,6 +86,11 @@ class UserLogin(APIView):
             return Response('user doesnt exist', status=status.HTTP_403_FORBIDDEN)
 
 
+@ensure_csrf_cookie
+def get_csrf_token(request):
+    return JsonResponse({'detail': 'CSRF token obtenu avec succès'})
+
+
 class UserLogout(APIView):
     authentication_classes = [OAuth2Authentication]
     permission_classes = [IsAuthenticated, TokenHasReadWriteScope]
@@ -215,50 +108,30 @@ class FortyTwoAuthView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        code = request.GET.get('code')
-        data_request = get_object_for_token(code=code, redirect_uri=settings.FORTYTWO_REDIRECT,
-                                            client_id=settings.FORTYTWO_KEY, client_secret=settings.FORTYTWO_SECRET)
-        token = call_application_get_access_token(
-            "https://api.intra.42.fr/oauth/token", data_request)
-        accessToken = token.json()['access_token']
-        user = get_information_user_access_token(
-            'https://api.intra.42.fr/v2/me', accessToken)
-        user = user.json()
-        user_created = create_or_get_user(
-            username=user['login'], email=user['email'], firstname=user['first_name'], lastname=user['last_name'])
-        user = authenticate(request, username=user_created.username)
-        backend = 'authentication.custom_authenticate.CustomAuth'
-        if user is not None:
-            login(request, user, backend=backend)
+        try:
+            code = request.GET.get('code')
+            data_request = get_object_for_token(code=code, redirect_uri=settings.FORTYTWO_REDIRECT,
+                                                client_id=settings.FORTYTWO_KEY, client_secret=settings.FORTYTWO_SECRET)
+            token = call_application_get_access_token(
+                "https://api.intra.42.fr/oauth/token", data_request)
+            accessToken = token.json()['access_token']
+            user = get_information_user_access_token(
+                'https://api.intra.42.fr/v2/me', accessToken)
+            user = user.json()
+            user_created = create_or_get_user(
+                username=user['login'], email=user['email'], firstname=user['first_name'], lastname=user['last_name'])
+
+            authenticate_login_user(request, username=user_created.username)
             request.session.save()
-            token_api = create_access_token_api(
-                settings.DJANGO_UID, settings.DJANGO_SECRET).json()
-            update_token_url = 'http://localhost:8000/oauth/update-token/' + \
-                token_api['access_token'] + '/'
-            update_data = {
-                'user': request.user.pk,
-            }
-            csrf_token = request.COOKIES.get('csrftoken', '')
-            if len(csrf_token) == 0:
-                csrf_token = get_token(request)
-            headers = {
-                'Authorization': 'Bearer ' + token_api['access_token'],
-                'X-CSRFToken': csrf_token,
-            }
-
-            modified_cookies = request.COOKIES.copy()
-            if 'sessionid' not in modified_cookies:
-                modified_cookies['sessionid'] = request.session.session_key
-            if 'csrftoken' not in modified_cookies:
-                modified_cookies['csrftoken'] = get_token(request)
-
-            response = requests.put(
-                update_token_url, data=update_data, headers=headers, cookies=modified_cookies)
+            token_api = get_or_create_access_token(request)
+        except Exception as e:
+            print('errpor', e)
+            return Response('cant create user ', status=status.HTTP_403_FORBIDDEN)
         frontend_redirect_url = request.GET.get(
             'state', 'http://localhost:3000/register')
         redirect_response = redirect(frontend_redirect_url)
         redirect_response.set_cookie(
-            'token', token_api['access_token'], path='/', domain='localhost', httponly=True, samesite='None', expires=None,)
+            'token', token_api, path='/', domain='localhost', httponly=True, samesite='None', expires=None,)
         return redirect_response
 
 
@@ -278,7 +151,6 @@ class AccessTokenDetail(APIView):
             raise Http404
 
     def put(self, request, token, format=None):
-        print(request.user, request.COOKIES)
         snippet = self.get_object(token)
         serializer = AccessTokenSerializer(
             snippet, data=request.data, partial=True)
@@ -295,3 +167,121 @@ class UserList(generics.ListAPIView):
     queryset = User.objects.all()
     required_scopes = ['read']
     serializer_class = UserModelSerializer
+
+
+# ----------------------------- utils.py -------------------------------
+
+# -----------------------------  OmniAuth strategy ---------------------
+
+def create_or_get_user(username="", password="", email="", firstname="", lastname=""):
+    user, created = User.objects.get_or_create(
+        username=username, email=email, first_name=firstname, last_name=lastname)
+    if created:
+        user.save()
+    return user
+
+
+def get_information_user_access_token(url, access_token):
+    headers = {
+        'Authorization': "Bearer " + access_token
+    }
+    information_user = requests.get(url, headers=headers)
+    return information_user
+
+
+def get_object_for_token(grant_type="authorization_code", code="", redirect_uri="", client_id="", client_secret="", scope="public"):
+    return {
+        'grant_type': grant_type,
+        'code': code,
+        'redirect_uri': redirect_uri,
+        'client_id': client_id,
+        'client_secret': client_secret,
+        'scope': scope
+    }
+
+
+def call_application_get_access_token(url, token_params):
+    response = requests.post(url, data=token_params)
+    if (response.status_code == 200):
+        return response
+    else:
+        return {'cant get information, the authentication fail , please try again'}
+
+
+# ----------------------------- utils.py -------------------------------
+# ----------------------------- REGULAR USER STRATEGY ------------------
+
+def authenticate_login_user(request, username, password=None):
+    try:
+        user = authenticate(request, username=username, password=password)
+        backend = 'authentication.custom_authenticate.CustomAuth'
+        if user is not None:
+            login(request, user, backend=backend)
+            request.session.save()
+
+    except Exception as e:
+        raise e
+
+# ----------------------------- utils.py -------------------------------
+# ----------------------------- TOKEN STRATEGY   -----------------------
+
+
+def get_or_create_access_token(request):
+    try:
+
+        token_api = AccessToken.objects.get(user=request.user.pk)
+        return token_api.token
+    except Exception:
+        try:
+            token_api = create_access_token_api(request,
+                                                settings.DJANGO_UID, settings.DJANGO_SECRET)
+            return token_api
+        except Exception as e:
+            raise 'cant create access token'
+
+
+def create_access_token_api(request, client_id, client_secret):
+    try:
+        headers = {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Cache-Control": "no-cache",
+        }
+        data = {
+            'grant_type': 'client_credentials',
+            'client_id': client_id,
+            'client_secret': client_secret
+        }
+        response = requests.post(
+            'http://localhost:8000/o/token/', headers=headers, data=data)
+        if (response.status_code == 201 or response.status_code == 200):
+            try:
+                responseJson = response.json()
+                add_user_to_access_token(request, responseJson['access_token'])
+                return responseJson['access_token']
+            except Exception:
+                return "cant update token with te user"
+    except Exception:
+        return "Cant get token, client_id and secret are not matching"
+
+
+def add_user_to_access_token(request, access_token):
+    update_token_url = 'http://localhost:8000/oauth/update-token/' + access_token + '/'
+    update_data = {
+        'user': request.user.pk,
+    }
+    csrf_token = request.COOKIES.get('csrftoken', '')
+    if len(csrf_token) == 0:
+        csrf_token = get_token(request)
+    headers = {
+        'Authorization': 'Bearer ' + access_token,
+        'X-CSRFToken': csrf_token,
+    }
+    modified_cookies = request.COOKIES.copy()
+    if 'sessionid' not in modified_cookies:
+        modified_cookies['sessionid'] = request.session.session_key
+    if 'csrftoken' not in modified_cookies:
+        modified_cookies['csrftoken'] = csrf_token
+    response = requests.put(
+        update_token_url, data=update_data, headers=headers, cookies=modified_cookies)
+    if response.status_code != 200:
+        raise response
