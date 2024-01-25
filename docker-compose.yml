@@ -27,7 +27,7 @@ services:
       - POSTGRES_PASSWORD=hypersecret
     depends_on:
       - db
-    restart: on-failure:10
+    tty: true
   frontend:
     build: ./frontend
     container_name: frontend
