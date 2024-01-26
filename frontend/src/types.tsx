@@ -19,12 +19,17 @@ export interface User {
   avatar: string;
 }
 export type FormInput = { name: string; value: string; placeholder: string; handleChange: (event: ChangeEvent<HTMLInputElement>) => void };
-export type AppAction = {
+export type ReducerAction = {
   type: string;
   name: string;
   value: string;
 };
-export interface ReducerType {
+export interface LoginType {
+  username: string;
+  password: string;
+}
+
+export interface RegisterType {
   username: string;
   firstName: string;
   lastName: string;

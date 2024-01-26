@@ -1,32 +1,21 @@
 import { ChangeEvent, MouseEvent, useReducer } from "react";
-// import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
 import FormAuthenticate from "../Global/FormAuthenticate/FormAuthenticate";
 import LogoComponent from "../Global/LogoComponent/LogoComponent";
 import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
-import { FormInput, AppAction, ReducerType } from "../../types";
+import { FormInput, RegisterType } from "../../types";
+import { reducer } from "./reducer";
+import { validateEmail } from "../../utils/validateEmail";
 
-function reducer(state: ReducerType, action: AppAction): ReducerType {
-  switch (action.type) {
-    case "change":
-      return {
-        ...state,
-        [action.name]: action.value,
-      };
-    default:
-      return state;
-      break;
-  }
-}
+const initialState: RegisterType = {
+  username: "",
+  firstName: "",
+  lastName: "",
+  email: "",
+  password: "",
+  password1: "",
+};
 
 export default function Register() {
-  const initialState: ReducerType = {
-    username: "",
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    password1: "",
-  };
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const handlePermission = () => {
@@ -46,30 +35,43 @@ export default function Register() {
     { name: "lastName", value: state.lastName, placeholder: "last name", handleChange },
     { name: "email", value: state.email, placeholder: "email", handleChange },
     { name: "password", value: state.password, placeholder: "password", handleChange },
-    { name: "password-1", value: state.password1, placeholder: "Repeat password", handleChange },
+    { name: "password1", value: state.password1, placeholder: "Repeat password", handleChange },
   ];
+
+  const is_valid_arg = ({ username, firstName, lastName, email, password, password1 }: RegisterType): boolean => {
+    if (username.length == 0 || firstName.length == 0 || lastName.length == 0 || email.length == 0 || password.length == 0 || password1.length == 0) return false;
+    if (password != password1) return false;
+    if (!validateEmail(email)) return false;
+    // if password enough secure
+    return true;
+  };
+
   const handleSubmit = (event: MouseEvent<HTMLButtonElement>, name: string) => {
     event.preventDefault();
     event.stopPropagation();
     if (name == "Register") {
-      // if not null
-      //tchek if input is correct
-      // if password == pssw1
-      // if email is good
-      createUser();
+      if (is_valid_arg({ ...state })) {
+        createUser();
+      } else {
+        console.log("cant create");
+      }
     }
   };
   async function createUser() {
-    await fetchWrapper("oauth/register/", {
-      method: "POST",
-      body: {
-        username: "test",
-        first_name: "lol",
-        last_name: "lol",
-        email: "lololo@lol.com",
-        password: "123",
-      },
-    });
+    try {
+      await fetchWrapper("oauth/register/", {
+        method: "POST",
+        body: {
+          username: state.username,
+          first_name: state.firstName,
+          last_name: state.lastName,
+          email: state.email,
+          password: state.password,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
   return (
     <div className="flex flex-col w-full">

@@ -2,43 +2,52 @@ import { ChangeEvent, MouseEvent, useReducer } from "react";
 // import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
 import FormAuthenticate from "../Global/FormAuthenticate/FormAuthenticate";
 import LogoComponent from "../Global/LogoComponent/LogoComponent";
-import { FormInput, AppAction } from "../../types";
+import { FormInput, LoginType } from "../../types";
+import { reducer } from "./reducer";
+import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
 
-interface ReducerType {
-  username: string;
-  password: string;
-}
-
-function reducer(state: ReducerType, action: AppAction): ReducerType {
-  switch (action.type) {
-    case "change":
-      return {
-        ...state,
-        [action.name]: action.value,
-      };
-    default:
-      return state;
-  }
-}
+const initialState: LoginType = {
+  username: "",
+  password: "",
+};
 
 export default function Login() {
-  const initialState: ReducerType = {
-    username: "",
-    password: "",
-  };
   const [state, dispatch] = useReducer(reducer, initialState);
   const handleChange = (event: ChangeEvent) => {
     dispatch({ type: "change", name: event.target.name, value: event.target.value });
+  };
+
+  const is_valid_arg = ({ username, password }: LoginType): boolean => {
+    if (username.length == 0 || password.length == 0) return false;
+    return true;
   };
 
   const handleSubmit = (event: MouseEvent<HTMLButtonElement>, name: string) => {
     event.preventDefault();
     console.log(event);
     if (name == "Login") {
+      if (is_valid_arg({ ...state })) {
+        login();
+      } else {
+        console.log("cant login");
+      }
       console.log("log in ");
     }
   };
 
+  const login = async () => {
+    try {
+      await fetchWrapper("oauth/login/", {
+        method: "POST",
+        body: {
+          username: state.username,
+          password: state.password,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const formInput: FormInput[] = [
     { name: "username", value: state.username, placeholder: "username", handleChange },
     { name: "password", value: state.password, placeholder: "password", handleChange },
