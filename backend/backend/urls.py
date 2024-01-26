@@ -14,21 +14,28 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from movie.views import (CommentViewSet, FavouriteListCreateDeleteViewSet,
+                         MovieViewSet)
+from rest_framework import routers
 from django.contrib import admin
-from django.urls import path, include, re_path
+from django.urls import include, path, include, re_path
 from authentication.models import User
 import oauth2_provider.views as oauth2_views
 
-# oauth2_endpoint_views = [
-#     path('authorize/', oauth2_views.AuthorizationView.as_view(), name="authorize"),
-#     path('token/', oauth2_views.TokenView.as_view(), name="token"),
-#     path('revoke-token/', oauth2_views.RevokeTokenView.as_view(), name="revoke-token"),
-# ]
 admin.autodiscover()
+
+
+router = routers.SimpleRouter()
+
+router.register("movies", MovieViewSet, basename="movies")
+router.register("comments", CommentViewSet, basename="comments")
+router.register("favourite-movies",
+                FavouriteListCreateDeleteViewSet, basename="favourite-movies")
 
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("oauth/", include('authentication.urls')),
     path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    path("api/", include(router.urls)),
 ]

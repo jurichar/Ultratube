@@ -1,3 +1,5 @@
+// src/router/routes.tsx
+
 import { createBrowserRouter } from "react-router-dom";
 import ErrorPage from "../Components/ErrorPage/ErrorPage";
 import Root from "../Components/Root/Root";
@@ -5,6 +7,7 @@ import Home from "../Components/Home/Home";
 import Login from "../Components/Login/Login";
 import Register from "../Components/Register/Register";
 import Profile from "../Components/Profile/Profile";
+import MoviePage from "../Components/MoviePage/MoviePage";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -26,6 +29,10 @@ export const router = createBrowserRouter([
       {
         path: "/profile",
         element: <Profile />,
+      },
+      {
+        path: "/movie/:id",
+        element: <MoviePage />,
       },
     ],
   },
