@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import User
 from django.core.management import BaseCommand
 
 from movie.models import Comment, Movie, Subtitle
