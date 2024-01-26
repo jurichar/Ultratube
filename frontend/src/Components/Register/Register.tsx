@@ -3,45 +3,14 @@ import { ChangeEvent, MouseEvent, useReducer } from "react";
 import FormAuthenticate from "../Global/FormAuthenticate/FormAuthenticate";
 import LogoComponent from "../Global/LogoComponent/LogoComponent";
 import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
+import { FormInput, AppAction, ReducerType } from "./type";
 
-export type FormInput = { name: string; value: string; placeholder: string; handleChange: (event: ChangeEvent<HTMLInputElement>) => void };
-type AppAction = {
-  type: string;
-  value: string;
-};
-interface ReducerType {
-  username: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  password1: string;
-}
 function reducer(state: ReducerType, action: AppAction) {
   switch (action.type) {
-    case "change-username":
+    case "change":
       return {
-        username: action.value,
-      };
-    case "change-firstname":
-      return {
-        firstName: action.value,
-      };
-    case "change-lastname":
-      return {
-        lastName: action.value,
-      };
-    case "change-email":
-      return {
-        email: action.value,
-      };
-    case "change-password":
-      return {
-        password: action.value,
-      };
-    case "change-password1":
-      return {
-        password1: action.value,
+        ...state,
+        [action.name]: action.value,
       };
     default:
       break;
@@ -50,40 +19,17 @@ function reducer(state: ReducerType, action: AppAction) {
 
 export default function Register() {
   const [state, dispatch] = useReducer(reducer, { username: "", firstName: "", lastName: "", email: "", password: "", password1: "" });
-  const handlePermission = () => {
-    fetchWrapper("oauth/user/", { method: "get" })
-      .then((data) => console.log(data))
-      .catch((error) => {
-        console.log(error);
-      });
-  };
+  // const handlePermission = () => {
+  //   fetchWrapper("oauth/user/", { method: "get" })
+  //     .then((data) => console.log(data))
+  //     .catch((error) => {
+  //       console.log(error);
+  //     });
+  // };
 
   const handleChange = (event: ChangeEvent) => {
-    const nameInput = event.target.name;
-    console.log(event.target.value);
-    console.log(nameInput);
-    switch (nameInput) {
-      case "username":
-        dispatch({ type: "change-username", value: event.target.value });
-        break;
-      case "firstName":
-        dispatch({ type: "change-firstName", value: event.target.value });
-        break;
-      case "lastName":
-        dispatch({ type: "change-lastName", value: event.target.value });
-        break;
-      case "email":
-        dispatch({ type: "change-email", value: event.target.value });
-        break;
-      case "password":
-        dispatch({ type: "change-password", value: event.target.value });
-        break;
-      case "password-1":
-        dispatch({ type: "change-password1", value: event.target.value });
-        break;
-    }
+    dispatch({ type: "change", name: event.target.name, value: event.target.value });
   };
-  console.log(state);
   const formInput: FormInput[] = [
     { name: "username", value: state.username, placeholder: "username", handleChange },
     { name: "firstName", value: state.firstName, placeholder: "first name", handleChange },
