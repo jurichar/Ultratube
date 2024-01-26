@@ -30,8 +30,8 @@ class Command(BaseCommand):
         except Application.DoesNotExist:
             try:
                 if superuser:
-                    Application.objects.create(name=settings.DJANGO_CLIENT_NAME,
-                                               client_id=settings.DJANGO_UID, client_secret=settings.DJANGO_SECRET, client_type=settings.DJANGO_CLIENT_TYPE, authorization_grant_type=settings.DJANGO_GRANT_AUTHORIZATION,  user=superuser)
+                    Application.objects.create(name=settings.DJANGO_CLIENT_NAME, client_id=settings.DJANGO_UID, client_secret=settings.DJANGO_SECRET,
+                                               client_type=settings.DJANGO_CLIENT_TYPE, authorization_grant_type=settings.DJANGO_GRANT_AUTHORIZATION,  user=superuser)
                     print("application ", application)
             except Exception:
                 print("cant create application please retry")

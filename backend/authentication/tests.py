@@ -14,10 +14,6 @@ data = {'username': 'testf', 'password': 'test',
 
 
 class AccountTests(APITestCase, URLPatternsTestCase):
-    urlpatterns = [
-        path("oauth/", include('authentication.urls')),
-        path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
-    ]
 
     def test_create_account(self):
         user = User.objects.create_user(username='testd', password='test')
@@ -39,8 +35,7 @@ class AccountTests(APITestCase, URLPatternsTestCase):
         self.assertEqual(User.objects.get(username='testf').username, 'testf')
 
     def test_login(self):
-        user = User.objects.create_user(username='testf', password='test')
-        print(User.objects.get(username='testf'))
+        User.objects.create_user(username='testf', password='test')
         self.assertEqual(User.objects.get(username='testf').username, 'testf')
         data_login = {'username': 'testf', 'password': 'test'}
         url = '/oauth/login/'
