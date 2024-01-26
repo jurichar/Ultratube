@@ -1,3 +1,5 @@
+import { ChangeEvent } from "react";
+
 export type FormInput = { name: string; value: string; placeholder: string; handleChange: (event: ChangeEvent<HTMLInputElement>) => void };
 export type AppAction = {
   type: string;

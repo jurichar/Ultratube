@@ -1,20 +1,39 @@
-import { ChangeEvent, MouseEvent } from "react";
+import { ChangeEvent, MouseEvent, useReducer } from "react";
 // import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
 import FormAuthenticate from "../Global/FormAuthenticate/FormAuthenticate";
 import LogoComponent from "../Global/LogoComponent/LogoComponent";
-import { FormInput } from "../Register/Register";
+import { FormInput, AppAction } from "../Register/type";
 
+interface ReducerType {
+  username: string;
+  password: string;
+}
+
+function reducer(state: ReducerType, action: AppAction) {
+  switch (action.type) {
+    case "change":
+      return {
+        ...state,
+        [action.name]: action.value,
+      };
+    default:
+      break;
+  }
+}
 export default function Login() {
+  const [state, dispatch] = useReducer(reducer, { username: "", password: "" });
   const handleChange = (event: ChangeEvent) => {
-    console.log("lol", event);
+    dispatch({ type: "change", name: event.target.name, value: event.target.value });
   };
-  const handleSubmit = (event: MouseEvent<HTMLButtonElement>) => {
+  const handleSubmit = (event: MouseEvent<HTMLButtonElement>, name: string) => {
     event.preventDefault();
     console.log(event);
+    if (name == "Login") {
+    }
   };
   const formInput: FormInput[] = [
-    { name: "username", value: "", placeholder: "username", handleChange },
-    { name: "password", value: "", placeholder: "password", handleChange },
+    { name: "username", value: state.username, placeholder: "username", handleChange },
+    { name: "password", value: state.password, placeholder: "password", handleChange },
   ];
   return (
     <div className="flex flex-col w-full">
@@ -32,28 +51,4 @@ export default function Login() {
       />
     </div>
   );
-  // return (
-  //   <div>
-  //     Register
-
-  //     <LogoComponent />
-  //     <a
-  //       href={`${import.meta.env.VITE_DISCORD_URL}/authorize?client_id=${import.meta.env.VITE_DISCORD_UID}&response_type=code&redirect_uri=${
-  //         import.meta.env.VITE_DISCORD_REDIRECT
-  //       }&scope=identify`}
-  //     >
-  //       log with discord
-  //     </a>
-  //     <a href={`${import.meta.env.VITE_FT_URL}/authorize?client_id=${import.meta.env.VITE_FT_UID}&redirect_uri=${import.meta.env.VITE_FT_REDIRECT}&response_type=code`}> log with 42</a>
-  //     <a href={`${import.meta.env.VITE_GITHUB_URL}/authorize?client_id=${import.meta.env.VITE_GITHUB_UID}&redirect_uri=${import.meta.env.VITE_GITHUB_REDIRECT}&response_type=code`}>
-  //       {" "}
-  //       log with github
-  //     </a>
-  //     <button style={{ backgroundColor: "red" }} onClick={handlePermission}>
-  //       {" "}
-  //       test if we have right
-  //     </button>
-  //     {/* <button onClick={auth42}> LOG with 0auth2 </button> */}
-  //   </div>
-  // );
 }

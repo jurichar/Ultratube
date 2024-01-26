@@ -1,6 +1,6 @@
 import React, { MouseEvent } from "react";
 import InputGlobal from "../InputGlobal/InputGlobal";
-import { FormInput } from "../../Register/Register";
+import { FormInput } from "../../Register/type";
 import ButtonCallToAction from "../ButtonCallToAction/ButtonCallToAction";
 import { FaGithub } from "react-icons/fa";
 import { FaDiscord } from "react-icons/fa";
@@ -26,7 +26,7 @@ export default function FormAuthenticate({ handleSubmit, nameForm, nameOtherAuth
             </React.Fragment>
           );
         })}
-        <ButtonCallToAction handleClick={handleSubmit} type="submit" width="md" name={nameForm} value={nameSubmit} colorHover={"bg-quinary"} Icon={null} />
+        <ButtonCallToAction handleClick={handleSubmit} type="submit" name={nameForm} value={nameSubmit} />
       </form>
       <div className="flex gap-3 mt-4 justify-evenly">
         <Link
@@ -37,7 +37,7 @@ export default function FormAuthenticate({ handleSubmit, nameForm, nameOtherAuth
           <img className="size-8" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/512px-42_Logo.svg.png" />{" "}
         </Link>
         <Link
-          className={` w-full  flex flex-row flex-row  gap-1 justify-center text-quinary  bg-gray-300 rounded text-body-md font-custom hover:bg-discord p-2.5"} `}
+          className={` w-full  flex flex-row   gap-1 justify-center text-quinary  bg-gray-300 rounded text-body-md font-custom hover:bg-discord p-2.5"} `}
           to={`${import.meta.env.VITE_DISCORD_URL}/authorize?client_id=${import.meta.env.VITE_DISCORD_UID}&response_type=code&redirect_uri=${
             import.meta.env.VITE_DISCORD_REDIRECT
           }&scope=identify`}
