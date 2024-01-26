@@ -1,5 +1,4 @@
 import { ChangeEvent, MouseEvent, useReducer } from "react";
-// import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
 import FormAuthenticate from "../Global/FormAuthenticate/FormAuthenticate";
 import LogoComponent from "../Global/LogoComponent/LogoComponent";
 import { FormInput, LoginType } from "../../types";

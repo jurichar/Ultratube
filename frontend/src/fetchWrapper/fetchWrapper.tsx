@@ -12,6 +12,7 @@ async function fetchWrapper<T>(url: string, { headers, method, params, body }: F
   const fullUrl = queryParams ? `${url}?${queryParams}` : url;
   const requestBody = body ? JSON.stringify(body) : undefined;
   console.log(requestBody);
+  console.log(headers);
   const response = await fetch("http://localhost:8000/" + fullUrl, {
     method,
     body: requestBody,
@@ -45,6 +46,7 @@ function useFetchQuery<T>(key: QueryKey, url: string, options: FetchOptions) {
   });
 }
 function useFetchMutation<T>(url: string, options: FetchOptions) {
+  console.log(options);
   const mutation = useMutation<T, Error, FetchOptions>(async (options: FetchOptions) => {
     return fetchWrapper<T>(url, options);
   });

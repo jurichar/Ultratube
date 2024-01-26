@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import logoMd from "../../../assets/logo-md.svg";
 import logoSm from "../../../assets/logo-sm.svg";
 
