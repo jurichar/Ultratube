@@ -18,10 +18,10 @@ class Command(BaseCommand):
 
         except UserModel.DoesNotExist:
             try:
-                superuser = UserModel.objects.create_superuser(
-                    username=settings.DJANGO_SUPERUSER_USERNAME, password=settings.DJANGO_SUPERUSER_PASSWORD)
-            except Exception as e:
-                print(e)
+                username = settings.DJANGO_SUPERUSER_USERNAME
+                password = settings.DJANGO_SUPERUSER_PASSWORD
+                superuser = UserModel.objects.create_superuser(username=username, password=password)
+            except Exception:
                 print('cant create super user please retry')
         try:
 
@@ -30,9 +30,12 @@ class Command(BaseCommand):
         except Application.DoesNotExist:
             try:
                 if superuser:
-                    Application.objects.create(name=settings.DJANGO_CLIENT_NAME, client_id=settings.DJANGO_UID, client_secret=settings.DJANGO_SECRET,
-                                               client_type=settings.DJANGO_CLIENT_TYPE, authorization_grant_type=settings.DJANGO_GRANT_AUTHORIZATION,  user=superuser)
-                    print("application ", application)
+                    name = settings.DJANGO_CLIENT_NAME
+                    uid = settings.DJANGO_UID
+                    secret = settings.DJANGO_SECRET
+                    cli_type = settings.DJANGO_CLIENT_TYPE
+                    grant_type = settings.DJANGO_GRANT_AUTHORIZATION
+                    Application.objects.create(name=name, client_id=uid, client_secret=secret, client_type=cli_type, authorization_grant_type=grant_type, user=superuser)
             except Exception:
                 print("cant create application please retry")
 
@@ -43,8 +46,7 @@ class Command(BaseCommand):
                     application = Application.objects.get(
                         name=settings.DJANGO_CLIENT_NAME)
                     if application is None:
-                        Application.objects.create(name=settings.DJANGO_CLIENT_NAME,
-                                                   client_id=settings.DJANGO_UID, client_secret=settings.DJANGO_SECRET, client_type=settings.DJANGO_CLIENT_TYPE, authorization_grant_type=settings.DJANGO_GRANT_AUTHORIZATION,  user=superuser)
+                        Application.objects.create(name=settings.DJANGO_CLIENT_NAME, client_id=settings.DJANGO_UID, client_secret=settings.DJANGO_SECRET, client_type=settings.DJANGO_CLIENT_TYPE, authorization_grant_type=settings.DJANGO_GRANT_AUTHORIZATION, user=superuser)
         except Exception as e:
             print("error", str(e))
 

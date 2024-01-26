@@ -1,12 +1,10 @@
 from django.utils import timezone
 import json
 from django.conf import settings
-from django.urls import include, path
 from rest_framework.test import APITestCase, URLPatternsTestCase
 from oauth2_provider.models import AccessToken, Application
 from .models import User
 from rest_framework import status
-from rest_framework.test import APITestCase
 
 
 data = {'username': 'testf', 'password': 'test',
@@ -68,7 +66,7 @@ class AccountTests(APITestCase, URLPatternsTestCase):
         user = User.objects.create_superuser(
             username='test', password='test')
         application = Application.objects.create(name=settings.DJANGO_CLIENT_NAME,
-                                                 client_id=settings.DJANGO_UID, client_secret=settings.DJANGO_SECRET, client_type=settings.DJANGO_CLIENT_TYPE, authorization_grant_type=settings.DJANGO_GRANT_AUTHORIZATION,  user=user)
+                                                 client_id=settings.DJANGO_UID, client_secret=settings.DJANGO_SECRET, client_type=settings.DJANGO_CLIENT_TYPE, authorization_grant_type=settings.DJANGO_GRANT_AUTHORIZATION, user=user)
         datenow = timezone.now()
         expiry_date = datenow + timezone.timedelta(days=7)
         access_token = AccessToken.objects.create(

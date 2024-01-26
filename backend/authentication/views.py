@@ -236,7 +236,7 @@ def get_or_create_access_token(request):
             token_api = create_access_token_api(request,
                                                 settings.DJANGO_UID, settings.DJANGO_SECRET)
             return token_api
-        except Exception as e:
+        except Exception:
             raise 'cant create access token'
 
 
