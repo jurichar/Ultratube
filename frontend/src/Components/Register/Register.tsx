@@ -3,9 +3,9 @@ import { ChangeEvent, MouseEvent, useReducer } from "react";
 import FormAuthenticate from "../Global/FormAuthenticate/FormAuthenticate";
 import LogoComponent from "../Global/LogoComponent/LogoComponent";
 import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
-import { FormInput, AppAction, ReducerType } from "./type";
+import { FormInput, AppAction, ReducerType } from "../../types";
 
-function reducer(state: ReducerType, action: AppAction) {
+function reducer(state: ReducerType, action: AppAction): ReducerType {
   switch (action.type) {
     case "change":
       return {
@@ -13,19 +13,29 @@ function reducer(state: ReducerType, action: AppAction) {
         [action.name]: action.value,
       };
     default:
+      return state;
       break;
   }
 }
 
 export default function Register() {
-  const [state, dispatch] = useReducer(reducer, { username: "", firstName: "", lastName: "", email: "", password: "", password1: "" });
-  // const handlePermission = () => {
-  //   fetchWrapper("oauth/user/", { method: "get" })
-  //     .then((data) => console.log(data))
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  // };
+  const initialState: ReducerType = {
+    username: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    password1: "",
+  };
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  const handlePermission = () => {
+    fetchWrapper("oauth/user/", { method: "get" })
+      .then((data) => console.log(data))
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   const handleChange = (event: ChangeEvent) => {
     dispatch({ type: "change", name: event.target.name, value: event.target.value });

@@ -2,14 +2,14 @@ import { ChangeEvent, MouseEvent, useReducer } from "react";
 // import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
 import FormAuthenticate from "../Global/FormAuthenticate/FormAuthenticate";
 import LogoComponent from "../Global/LogoComponent/LogoComponent";
-import { FormInput, AppAction } from "../Register/type";
+import { FormInput, AppAction } from "../../types";
 
 interface ReducerType {
   username: string;
   password: string;
 }
 
-function reducer(state: ReducerType, action: AppAction) {
+function reducer(state: ReducerType, action: AppAction): ReducerType {
   switch (action.type) {
     case "change":
       return {
@@ -17,14 +17,20 @@ function reducer(state: ReducerType, action: AppAction) {
         [action.name]: action.value,
       };
     default:
-      break;
+      return state;
   }
 }
+
 export default function Login() {
-  const [state, dispatch] = useReducer(reducer, { username: "", password: "" });
+  const initialState: ReducerType = {
+    username: "",
+    password: "",
+  };
+  const [state, dispatch] = useReducer(reducer, initialState);
   const handleChange = (event: ChangeEvent) => {
     dispatch({ type: "change", name: event.target.name, value: event.target.value });
   };
+
   const handleSubmit = (event: MouseEvent<HTMLButtonElement>, name: string) => {
     event.preventDefault();
     console.log(event);
@@ -32,6 +38,7 @@ export default function Login() {
       console.log("log in ");
     }
   };
+
   const formInput: FormInput[] = [
     { name: "username", value: state.username, placeholder: "username", handleChange },
     { name: "password", value: state.password, placeholder: "password", handleChange },

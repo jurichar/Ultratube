@@ -22,7 +22,11 @@ class AccountTests(APITestCase, URLPatternsTestCase):
     def test_create_account(self):
         user = User.objects.create_user(username='testd', password='test')
         Application.objects.create(name=settings.DJANGO_CLIENT_NAME,
-                                   client_id=settings.DJANGO_UID, client_secret=settings.DJANGO_SECRET, client_type=settings.DJANGO_CLIENT_TYPE, authorization_grant_type=settings.DJANGO_GRANT_AUTHORIZATION,  user=user)
+                                   client_id=settings.DJANGO_UID,
+                                   client_secret=settings.DJANGO_SECRET,
+                                   client_type=settings.DJANGO_CLIENT_TYPE,
+                                   authorization_grant_type=settings.DJANGO_GRANT_AUTHORIZATION,
+                                   user=user)
         url = 'http://localhost:8000/oauth/register/'
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)

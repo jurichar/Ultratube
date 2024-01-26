@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path
 from .views import AccessTokenDetail, DiscordAuthView, FortyTwoAuthView, UserList, UserLogin, UserLogout, UserRegister, get_csrf_token
 from rest_framework.urlpatterns import format_suffix_patterns
 

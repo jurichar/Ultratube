@@ -167,9 +167,10 @@ class Command(BaseCommand):
         Comment.objects.all().delete()
         Subtitle.objects.all().delete()
         Movie.objects.all().delete()
-        User.objects.all().delete()
+        UserModel.objects.all().delete()
 
-        user = UserModel.objects.create_superuser(ADMIN_ID, "admin@hypertube.com", ADMIN_PASSWORD)
+        user = UserModel.objects.create_superuser(
+            ADMIN_ID, "admin@hypertube.com", ADMIN_PASSWORD)
 
         for movie_data in MOVIES:
             movie = Movie.objects.create(

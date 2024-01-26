@@ -18,9 +18,7 @@ from movie.views import (CommentViewSet, FavouriteListCreateDeleteViewSet,
                          MovieViewSet)
 from rest_framework import routers
 from django.contrib import admin
-from django.urls import include, path, include, re_path
-from authentication.models import User
-import oauth2_provider.views as oauth2_views
+from django.urls import include, path
 
 admin.autodiscover()
 
