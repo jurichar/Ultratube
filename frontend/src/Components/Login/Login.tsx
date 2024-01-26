@@ -29,6 +29,7 @@ export default function Login() {
     event.preventDefault();
     console.log(event);
     if (name == "Login") {
+      console.log("log in ");
     }
   };
   const formInput: FormInput[] = [
