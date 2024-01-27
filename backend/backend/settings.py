@@ -14,7 +14,6 @@ import os
 from pathlib import Path
 import environ
 
-pouet = 1
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -39,9 +38,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework_swagger",
+    "oauth2_provider",
     "rest_framework",
     "corsheaders",
-    "oauth2_provider",
     "movie",
     "authentication",
 ]
@@ -103,8 +102,8 @@ CORS_ALLOW_HEADERS = [
 ]
 
 MIDDLEWARE = [
-    "backend.middleware.TokenCookieMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "backend.middleware.TokenCookieMiddleware",
     "oauth2_provider.middleware.OAuth2TokenMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
