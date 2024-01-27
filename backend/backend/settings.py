@@ -36,10 +36,10 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework_swagger",
-    # "oauth2_provider",
+    "oauth2_provider",
     "corsheaders",
-    # "authentication",
-    # "movie",
+    "authentication",
+    "movie",
 ]
 DISCORD_KEY = os.environ.get("AUTH_DISCORD_KEY")
 DISCORD_SECRET = os.environ.get("AUTH_DISCORD_SECRET")
