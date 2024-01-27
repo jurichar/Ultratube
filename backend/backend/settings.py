@@ -12,8 +12,10 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
-pouet = 1
+# Load environment variables from .env file
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -27,11 +29,6 @@ SECRET_KEY = "django-insecure-&(ab8zxcll5f(5y$6+58juu*ph=r893nt&+fnsr!7l9qp4egpw
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
-
-
-# Application definition
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -39,21 +36,73 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "rest_framework_swagger",
     "rest_framework",
+    "rest_framework_swagger",
+    "oauth2_provider",
+    "corsheaders",
+    "authentication",
     "movie",
+]
+DISCORD_KEY = os.getenv("AUTH_DISCORD_KEY")
+DISCORD_SECRET = os.getenv("AUTH_DISCORD_SECRET")
+DISCORD_REDIRECT = os.getenv("AUTH_DISCORD_REDIRECT_API")
+FORTYTWO_KEY = os.getenv("AUTH42_UID")
+FORTYTWO_SECRET = os.getenv("AUTH42_SECRET")
+FORTYTWO_REDIRECT = os.getenv("AUTH42_REDIRECT_API")
+GITHUB_KEY = os.getenv("AUTH_GITHUB_KEY")
+GITHUB_SECRET = os.getenv("AUTH_GITHUB_SECRET")
+GITHUB_REDIRECT = os.getenv("AUTH_GITHUB_REDIRECT_API")
+DJANGO_UID = os.getenv("DJANGO_AUTH_UID")
+DJANGO_SECRET = os.getenv("DJANGO_AUTH_SECRET")
+DJANGO_CLIENT_NAME = os.getenv("DJANGO_CLIENT_NAME")
+DJANGO_CLIENT_TYPE = os.getenv("DJANGO_CLIENT_TYPE")
+DJANGO_GRANT_AUTHORIZATION = os.getenv("DJANGO_GRANT_AUTHORIZATION")
+DJANGO_SUPERUSER_USERNAME = os.getenv("DJANGO_SUPERUSER_USERNAME")
+DJANGO_SUPERUSER_PASSWORD = os.getenv("DJANGO_SUPERUSER_PASSWORD")
+AUTHENTICATION_BACKENDS = (
+    "django.contrib.auth.backends.ModelBackend",
+    "oauth2_provider.backends.OAuth2Backend",
+    "authentication.custom_authenticate.CustomAuth",
+)
+AUTH_USER_MODEL = "authentication.User"
+
+OAUTH2_PROVIDER = {
+    "SCOPES": {
+        "read": "Read scope",
+        "write": "Write scope",
+        "groups": "Access to your groups",
+    }
+}
+
+
+LOGIN_URL = "/admin/login/"
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+    "credentials",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "backend.middleware.TokenCookieMiddleware",
+    "oauth2_provider.middleware.OAuth2TokenMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
 ]
 
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
 ROOT_URLCONF = "backend.urls"
 
 TEMPLATES = [
@@ -74,16 +123,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "backend.wsgi.application"
 
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get('POSTGRES_NAME'),
-        "USER": os.environ.get('POSTGRES_USER'),
-        "PASSWORD": os.environ.get('POSTGRES_PASSWORD'),
+        "NAME": os.environ.get("POSTGRES_NAME"),
+        "USER": os.environ.get("POSTGRES_USER"),
+        "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
         "HOST": "db",
         "PORT": 5432,
     }
@@ -93,9 +141,9 @@ if os.environ.get("GITHUB_WORKFLOW", None):
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": 'github_actions',
-            "USER": 'postgres',
-            "PASSWORD": 'postgres',
+            "NAME": "github_actions",
+            "USER": "postgres",
+            "PASSWORD": "postgres",
             "HOST": "127.0.0.1",
             "PORT": 5432,
         }
@@ -120,7 +168,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+CORS_ALLOW_CREDENTIALS = True
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
@@ -131,6 +179,12 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
+
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = None
+CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ALLOW_CREDENTIALS = True
 
 
 # Static files (CSS, JavaScript, Images)
@@ -144,8 +198,15 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Pagination
-
 REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 10
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.SessionAuthentication",
+        "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "oauth2_provider.contrib.rest_framework.TokenHasReadWriteScope",
+        "rest_framework.permissions.IsAuthenticated",
+    ),
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 10,
 }

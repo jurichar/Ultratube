@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import User
 from django.core.management import BaseCommand
 
 from movie.models import Comment, Movie, Subtitle
@@ -25,7 +24,7 @@ MOVIES = [
             {
                 "location": "subtitles/inception_spanish.srt",
                 "language": "SP",
-            }
+            },
         ],
         "comments": [
             {
@@ -36,7 +35,7 @@ MOVIES = [
             },
             {
                 "content": "The concept of dreams within dreams was mind-blowing. Nolan at his best!"
-            }
+            },
         ],
     },
     {
@@ -57,18 +56,12 @@ MOVIES = [
             {
                 "location": "subtitles/the_dark_knight_french.srt",
                 "language": "FR",
-            }
+            },
         ],
         "comments": [
-            {
-                "content": "Heath Ledger's Joker is iconic. Chilling performance!"
-            },
-            {
-                "content": "Christian Bale nailed it as Batman. Dark and intense."
-            },
-            {
-                "content": "The plot twists and turns kept me on the edge of my seat."
-            }
+            {"content": "Heath Ledger's Joker is iconic. Chilling performance!"},
+            {"content": "Christian Bale nailed it as Batman. Dark and intense."},
+            {"content": "The plot twists and turns kept me on the edge of my seat."},
         ],
     },
     {
@@ -83,15 +76,11 @@ MOVIES = [
         "casting": ["John Travolta", "Samuel L. Jackson", "Uma Thurman"],
         "available_subtitles": [],
         "comments": [
-            {
-                "content": "Tarantino's storytelling is unmatched. A cult classic!"
-            },
+            {"content": "Tarantino's storytelling is unmatched. A cult classic!"},
             {
                 "content": "The dialogue, the characters, the music – a film like no other."
             },
-            {
-                "content": "Samuel L. Jackson's Ezekiel 25:17 speech is legendary."
-            }
+            {"content": "Samuel L. Jackson's Ezekiel 25:17 speech is legendary."},
         ],
     },
     {
@@ -115,17 +104,10 @@ MOVIES = [
             },
         ],
         "comments": [
-            {
-                "content": "A tale of hope and redemption. Tim Robbins was phenomenal."
-            },
-            {
-                "content": "Morgan Freeman's narration adds so much depth to the story."
-            },
-            {
-                "content": "One of those movies that stays with you long after it ends"
-            }
+            {"content": "A tale of hope and redemption. Tim Robbins was phenomenal."},
+            {"content": "Morgan Freeman's narration adds so much depth to the story."},
+            {"content": "One of those movies that stays with you long after it ends"},
         ],
-
     },
     {
         "name": "Forrest Gump",
@@ -141,16 +123,16 @@ MOVIES = [
             {
                 "location": "subtitles/forrest_gump_english.srt",
                 "language": "EN",
-                "movie_id": 4
+                "movie_id": 4,
             },
             {
                 "location": "subtitles/forrest_gump_spanish.srt",
                 "language": "SP",
-                "movie_id": 4
+                "movie_id": 4,
             },
         ],
-        "comments": []
-    }
+        "comments": [],
+    },
 ]
 
 ADMIN_ID = "hyperadmin"
@@ -158,7 +140,6 @@ ADMIN_PASSWORD = "hypersecret"
 
 
 class Command(BaseCommand):
-
     help = "Initialize project for local development"
 
     def handle(self, *args, **kwargs):
@@ -167,34 +148,34 @@ class Command(BaseCommand):
         Comment.objects.all().delete()
         Subtitle.objects.all().delete()
         Movie.objects.all().delete()
-        User.objects.all().delete()
+        UserModel.objects.all().delete()
 
-        user = UserModel.objects.create_superuser(ADMIN_ID, "admin@hypertube.com", ADMIN_PASSWORD)
+        user = UserModel.objects.create_superuser(
+            ADMIN_ID, "admin@hypertube.com", ADMIN_PASSWORD
+        )
 
         for movie_data in MOVIES:
             movie = Movie.objects.create(
-                name=movie_data['name'],
-                synopsis=movie_data['synopsis'],
-                thumbnail_cover=movie_data['thumbnail_cover'],
-                production_year=movie_data['production_year'],
-                duration=movie_data['duration'],
-                genre=movie_data['genre'],
-                imdb_rating=movie_data['imdb_rating'],
-                peer=movie_data['peer'],
-                casting=movie_data['casting'],
+                name=movie_data["name"],
+                synopsis=movie_data["synopsis"],
+                thumbnail_cover=movie_data["thumbnail_cover"],
+                production_year=movie_data["production_year"],
+                duration=movie_data["duration"],
+                genre=movie_data["genre"],
+                imdb_rating=movie_data["imdb_rating"],
+                peer=movie_data["peer"],
+                casting=movie_data["casting"],
             )
-            for available_subtitles_data in movie_data['available_subtitles']:
+            for available_subtitles_data in movie_data["available_subtitles"]:
                 Subtitle.objects.create(
-                    location=available_subtitles_data['location'],
-                    language=available_subtitles_data['language'],
-                    movie=movie
+                    location=available_subtitles_data["location"],
+                    language=available_subtitles_data["language"],
+                    movie=movie,
                 )
 
-            for comment in movie_data['comments']:
+            for comment in movie_data["comments"]:
                 Comment.objects.create(
-                    author=user,
-                    movie=movie,
-                    content=comment['content']
+                    author=user, movie=movie, content=comment["content"]
                 )
 
         self.stdout.write(self.style.SUCCESS("All done !"))
