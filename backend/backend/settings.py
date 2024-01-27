@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os
 from pathlib import Path
 
-pouet = 1
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -81,9 +80,9 @@ WSGI_APPLICATION = "backend.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get('POSTGRES_NAME'),
-        "USER": os.environ.get('POSTGRES_USER'),
-        "PASSWORD": os.environ.get('POSTGRES_PASSWORD'),
+        "NAME": os.environ.get("POSTGRES_NAME"),
+        "USER": os.environ.get("POSTGRES_USER"),
+        "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
         "HOST": "db",
         "PORT": 5432,
     }
@@ -93,9 +92,9 @@ if os.environ.get("GITHUB_WORKFLOW", None):
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": 'github_actions',
-            "USER": 'postgres',
-            "PASSWORD": 'postgres',
+            "NAME": "github_actions",
+            "USER": "postgres",
+            "PASSWORD": "postgres",
             "HOST": "127.0.0.1",
             "PORT": 5432,
         }
@@ -146,6 +145,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Pagination
 
 REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 10
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 10,
 }
