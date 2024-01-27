@@ -27,26 +27,24 @@ SECRET_KEY = "django-insecure-&(ab8zxcll5f(5y$6+58juu*ph=r893nt&+fnsr!7l9qp4egpw
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-env = environ.Env(
-    DEBUG=(bool, False)
-)
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-DISCORD_KEY = env('AUTH_DISCORD_KEY')
-DISCORD_SECRET = env('AUTH_DISCORD_SECRET')
-DISCORD_REDIRECT = env('AUTH_DISCORD_REDIRECT_API')
-FORTYTWO_KEY = env('AUTH42_UID')
-FORTYTWO_SECRET = env('AUTH42_SECRET')
-FORTYTWO_REDIRECT = env('AUTH42_REDIRECT_API')
-GITHUB_KEY = env('AUTH_GITHUB_KEY')
-GITHUB_SECRET = env('AUTH_GITHUB_SECRET')
-GITHUB_REDIRECT = env('AUTH_GITHUB_REDIRECT_API')
-DJANGO_UID = env('DJANGO_AUTH_UID')
-DJANGO_SECRET = env('DJANGO_AUTH_SECRET')
-DJANGO_CLIENT_NAME = env('DJANGO_CLIENT_NAME')
-DJANGO_CLIENT_TYPE = env('DJANGO_CLIENT_TYPE')
-DJANGO_GRANT_AUTHORIZATION = env('DJANGO_GRANT_AUTHORIZATION')
-DJANGO_SUPERUSER_USERNAME = env('DJANGO_SUPERUSER_USERNAME')
-DJANGO_SUPERUSER_PASSWORD = env('DJANGO_SUPERUSER_PASSWORD')
+env = environ.Env(DEBUG=(bool, False))
+environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
+DISCORD_KEY = env("AUTH_DISCORD_KEY")
+DISCORD_SECRET = env("AUTH_DISCORD_SECRET")
+DISCORD_REDIRECT = env("AUTH_DISCORD_REDIRECT_API")
+FORTYTWO_KEY = env("AUTH42_UID")
+FORTYTWO_SECRET = env("AUTH42_SECRET")
+FORTYTWO_REDIRECT = env("AUTH42_REDIRECT_API")
+GITHUB_KEY = env("AUTH_GITHUB_KEY")
+GITHUB_SECRET = env("AUTH_GITHUB_SECRET")
+GITHUB_REDIRECT = env("AUTH_GITHUB_REDIRECT_API")
+DJANGO_UID = env("DJANGO_AUTH_UID")
+DJANGO_SECRET = env("DJANGO_AUTH_SECRET")
+DJANGO_CLIENT_NAME = env("DJANGO_CLIENT_NAME")
+DJANGO_CLIENT_TYPE = env("DJANGO_CLIENT_TYPE")
+DJANGO_GRANT_AUTHORIZATION = env("DJANGO_GRANT_AUTHORIZATION")
+DJANGO_SUPERUSER_USERNAME = env("DJANGO_SUPERUSER_USERNAME")
+DJANGO_SUPERUSER_PASSWORD = env("DJANGO_SUPERUSER_PASSWORD")
 
 
 INSTALLED_APPS = [
@@ -57,51 +55,55 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework_swagger",
+    "rest_framework",
+    "corsheaders",
+    "oauth2_provider",
+    "authentication",
     "movie",
-    'corsheaders',
-    'rest_framework',
-    'authentication',
-    'oauth2_provider',
 ]
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
     "oauth2_provider.backends.OAuth2Backend",
-    "authentication.custom_authenticate.CustomAuth"
+    "authentication.custom_authenticate.CustomAuth",
 )
-AUTH_USER_MODEL = 'authentication.User'
+AUTH_USER_MODEL = "authentication.User"
 
 OAUTH2_PROVIDER = {
-    'SCOPES': {'read': 'Read scope', 'write': 'Write scope', 'groups': 'Access to your groups'}
+    "SCOPES": {
+        "read": "Read scope",
+        "write": "Write scope",
+        "groups": "Access to your groups",
+    }
 }
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.SessionAuthentication",
-        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+        "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
     ),
-    'DEFAULT_PERMISSION_CLASSES': (
+    "DEFAULT_PERMISSION_CLASSES": (
         "oauth2_provider.contrib.rest_framework.TokenHasReadWriteScope",
-        'rest_framework.permissions.IsAuthenticated',
-    )
+        "rest_framework.permissions.IsAuthenticated",
+    ),
 }
 
-LOGIN_URL = '/admin/login/'
+LOGIN_URL = "/admin/login/"
 
 CORS_ALLOW_HEADERS = [
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
-    'credentials',
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+    "credentials",
 ]
 
 MIDDLEWARE = [
-    'backend.middleware.TokenCookieMiddleware',
+    "backend.middleware.TokenCookieMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "oauth2_provider.middleware.OAuth2TokenMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -109,10 +111,10 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    'corsheaders.middleware.CorsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
 ]
 
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
 ROOT_URLCONF = "backend.urls"
 
 TEMPLATES = [
@@ -139,9 +141,9 @@ WSGI_APPLICATION = "backend.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get('POSTGRES_NAME'),
-        "USER": os.environ.get('POSTGRES_USER'),
-        "PASSWORD": os.environ.get('POSTGRES_PASSWORD'),
+        "NAME": os.environ.get("POSTGRES_NAME"),
+        "USER": os.environ.get("POSTGRES_USER"),
+        "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
         "HOST": "db",
         "PORT": 5432,
     }
@@ -151,9 +153,9 @@ if os.environ.get("GITHUB_WORKFLOW", None):
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": 'github_actions',
-            "USER": 'postgres',
-            "PASSWORD": 'postgres',
+            "NAME": "github_actions",
+            "USER": "postgres",
+            "PASSWORD": "postgres",
             "HOST": "127.0.0.1",
             "PORT": 5432,
         }
@@ -210,6 +212,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Pagination
 
 REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 10
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 10,
 }
