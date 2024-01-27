@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "authentication",
-    "movie",
+    # "movie",
 ]
 DISCORD_KEY = env("AUTH_DISCORD_KEY")
 DISCORD_SECRET = env("AUTH_DISCORD_SECRET")
