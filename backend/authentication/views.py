@@ -25,10 +25,6 @@ from oauth2_provider.contrib.rest_framework import (
     OAuth2Authentication,
     TokenHasReadWriteScope,
 )
-from oauth2_provider.contrib.rest_framework import (
-    OAuth2Authentication,
-    TokenHasReadWriteScope,
-)
 from rest_framework.authentication import SessionAuthentication
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import csrf_exempt

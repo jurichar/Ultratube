@@ -1,6 +1,6 @@
 from django.urls import include, path
 from .views import AccessTokenDetail, DiscordAuthView, FortyTwoAuthView
-from .views import UserList, UserLogin, UserLogout, UserRegister, UserViewSet
+from .views import UserLogin, UserLogout, UserRegister, UserViewSet
 from .views import get_csrf_token
 from rest_framework.urlpatterns import format_suffix_patterns
 from rest_framework import routers
@@ -15,7 +15,6 @@ urlpatterns = [
     path("login/", UserLogin.as_view(), name="login"),
     path("logout/", UserLogout.as_view(), name="logout"),
     path("", include(router.urls)),
-    # path("user/", UserList.as_view(), name="user-list"),
     path("get-csrf-token/", get_csrf_token, name="get-csrf-token"),
     path("update-token/<str:token>/", AccessTokenDetail.as_view(), name="token-api"),
 ]

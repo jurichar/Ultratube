@@ -1,5 +1,3 @@
-from dataclasses import field, fields
-from pyexpat import model
 from .models import User
 from rest_framework import serializers
 from oauth2_provider.models import AccessToken
