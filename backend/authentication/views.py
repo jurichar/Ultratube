@@ -14,13 +14,17 @@ from .serializer import (
     UserPatchSerializer,
 )
 from .models import User
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.conf import settings
 from rest_framework import generics
 from oauth2_provider.models import AccessToken
+from oauth2_provider.contrib.rest_framework import (
+    OAuth2Authentication,
+    TokenHasReadWriteScope,
+)
 from oauth2_provider.contrib.rest_framework import (
     OAuth2Authentication,
     TokenHasReadWriteScope,
@@ -252,7 +256,7 @@ class UserViewSet(MultipleSerializerMixin, viewsets.ReadOnlyModelViewSet):
     update_serializer_class = UserPatchSerializer
 
     def partial_update(self, request, *args, **kwargs):
-        instance = self.queryset.get(pk=kwargs.get("pk"))
+        instance = get_object_or_404(User, pk=kwargs.get("pk"))
         serializer = self.update_serializer_class(
             instance, data=request.data, partial=True
         )

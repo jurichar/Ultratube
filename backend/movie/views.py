@@ -3,25 +3,26 @@ from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.mixins import Response
-from rest_framework.viewsets import (GenericViewSet, ModelViewSet,
-                                     ReadOnlyModelViewSet)
-
+from rest_framework.viewsets import GenericViewSet, ModelViewSet, ReadOnlyModelViewSet
+from rest_framework.permissions import AllowAny
 from .models import Comment, FavouriteMovie, Movie
-from .serializers import (CommentCreateSerializer, CommentUpdateSerializer,
-                          CommentViewSerializer,
-                          FavouriteMovieCreateSerializer,
-                          FavouriteMovieSerializer, MovieDetailSerializer,
-                          MovieListSerializer)
+from .serializers import (
+    CommentCreateSerializer,
+    CommentUpdateSerializer,
+    CommentViewSerializer,
+    FavouriteMovieCreateSerializer,
+    FavouriteMovieSerializer,
+    MovieDetailSerializer,
+    MovieListSerializer,
+)
 
 
 class MultipleSerializerMixin:
-
     detail_serializer_class = None
     update_serializer_class = None
     create_serializer_class = None
 
     def get_serializer_class(self):
-
         opt = {
             "retrieve": self.detail_serializer_class,
             "partial_update": self.update_serializer_class,
@@ -33,7 +34,7 @@ class MultipleSerializerMixin:
 
 
 class MovieViewSet(MultipleSerializerMixin, ReadOnlyModelViewSet):
-
+    permission_classes = [AllowAny]
     serializer_class = MovieListSerializer
     detail_serializer_class = MovieDetailSerializer
 
@@ -48,7 +49,9 @@ class MovieViewSet(MultipleSerializerMixin, ReadOnlyModelViewSet):
             serializer = CommentViewSerializer(comments, many=True)
             return Response(serializer.data)
         elif request.method == "POST":
-            comment = Comment(author=request.user, movie=movie, content=request.POST.get("content"))
+            comment = Comment(
+                author=request.user, movie=movie, content=request.POST.get("content")
+            )
             serializer = CommentCreateSerializer(comment)
             try:
                 comment.full_clean()
@@ -59,9 +62,8 @@ class MovieViewSet(MultipleSerializerMixin, ReadOnlyModelViewSet):
 
 
 class CommentViewSet(MultipleSerializerMixin, ModelViewSet):
-
     http_method_names = ["get", "post", "patch", "delete"]
-
+    permission_classes = [AllowAny]
     serializer_class = CommentViewSerializer
     update_serializer_class = CommentUpdateSerializer
     create_serializer_class = CommentCreateSerializer
@@ -73,12 +75,14 @@ class CommentViewSet(MultipleSerializerMixin, ModelViewSet):
         return Comment.objects.all()
 
 
-class FavouriteListCreateDeleteViewSet(MultipleSerializerMixin,
-                                       mixins.ListModelMixin,
-                                       mixins.CreateModelMixin,
-                                       mixins.DestroyModelMixin,
-                                       GenericViewSet):
-
+class FavouriteListCreateDeleteViewSet(
+    MultipleSerializerMixin,
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    GenericViewSet,
+):
+    permission_classes = [AllowAny]
     serializer_class = FavouriteMovieSerializer
     create_serializer_class = FavouriteMovieCreateSerializer
 
