@@ -21,11 +21,11 @@ class AccountTests(APITestCase):
         user = User.objects.create_user(username="testd", password="test")
         print(settings.DJANGO_UID)
         Application.objects.create(
-            name=settings.DJANGO_CLIENT_NAME,
-            client_id=settings.DJANGO_UID,
-            client_secret=settings.DJANGO_SECRET,
-            client_type=settings.DJANGO_CLIENT_TYPE,
-            authorization_grant_type=settings.DJANGO_GRANT_AUTHORIZATION,
+            name="test",
+            client_id="ddddddddd",
+            client_secret="ddddddddddddddd",
+            client_type="confidential",
+            authorization_grant_type="client-credentials",
             user=user,
         )
         url = "http://localhost:8000/oauth/register/"
@@ -75,11 +75,11 @@ class AccountTests(APITestCase):
     def test_logout(self):
         user = User.objects.create_superuser(username="test", password="test")
         application = Application.objects.create(
-            name=settings.DJANGO_CLIENT_NAME,
-            client_id=settings.DJANGO_UID,
-            client_secret=settings.DJANGO_SECRET,
-            client_type=settings.DJANGO_CLIENT_TYPE,
-            authorization_grant_type=settings.DJANGO_GRANT_AUTHORIZATION,
+            name="test",
+            client_id="ddddddddd",
+            client_secret="ddddddddddddddd",
+            client_type="confidential",
+            authorization_grant_type="client-credentials",
             user=user,
         )
         datenow = timezone.now()
