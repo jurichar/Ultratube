@@ -29,6 +29,22 @@ SECRET_KEY = "django-insecure-&(ab8zxcll5f(5y$6+58juu*ph=r893nt&+fnsr!7l9qp4egpw
 DEBUG = True
 env = environ.Env(DEBUG=(bool, False))
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
+
+
+INSTALLED_APPS = [
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "rest_framework_swagger",
+    "rest_framework",
+    "corsheaders",
+    "oauth2_provider",
+    "movie",
+    "authentication",
+]
 DISCORD_KEY = env("AUTH_DISCORD_KEY")
 DISCORD_SECRET = env("AUTH_DISCORD_SECRET")
 DISCORD_REDIRECT = env("AUTH_DISCORD_REDIRECT_API")
@@ -45,22 +61,6 @@ DJANGO_CLIENT_TYPE = env("DJANGO_CLIENT_TYPE")
 DJANGO_GRANT_AUTHORIZATION = env("DJANGO_GRANT_AUTHORIZATION")
 DJANGO_SUPERUSER_USERNAME = env("DJANGO_SUPERUSER_USERNAME")
 DJANGO_SUPERUSER_PASSWORD = env("DJANGO_SUPERUSER_PASSWORD")
-
-
-INSTALLED_APPS = [
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
-    "rest_framework_swagger",
-    "rest_framework",
-    "corsheaders",
-    "oauth2_provider",
-    "authentication",
-    "movie",
-]
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
     "oauth2_provider.backends.OAuth2Backend",
