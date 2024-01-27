@@ -64,7 +64,7 @@ AUTHENTICATION_BACKENDS = (
     "oauth2_provider.backends.OAuth2Backend",
     "authentication.custom_authenticate.CustomAuth",
 )
-AUTH_USER_MODEL = "authentication.User"
+# AUTH_USER_MODEL = "authentication.User"
 
 OAUTH2_PROVIDER = {
     "SCOPES": {
