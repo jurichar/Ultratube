@@ -41,8 +41,8 @@ INSTALLED_APPS = [
     "oauth2_provider",
     "rest_framework",
     "corsheaders",
-    "movie",
     "authentication",
+    "movie",
 ]
 DISCORD_KEY = env("AUTH_DISCORD_KEY")
 DISCORD_SECRET = env("AUTH_DISCORD_SECRET")
