@@ -8,6 +8,7 @@ distlib==0.3.8
 Django==5.0.1
 django-rest-swagger==2.2.0
 djangorestframework==3.14.0
+environ==1.0
 filelock==3.13.1
 flake8==7.0.0
 identify==2.5.33
@@ -26,11 +27,8 @@ pyflakes==3.2.0
 pytz==2023.3.post1
 PyYAML==6.0.1
 requests==2.31.0
-setuptools==69.0.3
 simplejson==3.19.2
 sqlparse==0.4.4
 uritemplate==4.1.1
 urllib3==2.1.0
 virtualenv==20.25.0
-wheel==0.42.0
-environ==1.0
