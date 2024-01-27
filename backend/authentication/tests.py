@@ -1,6 +1,5 @@
 from django.utils import timezone
 import json
-from django.conf import settings
 from rest_framework.test import APITestCase
 from oauth2_provider.models import AccessToken, Application
 from .models import User
