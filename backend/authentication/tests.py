@@ -19,6 +19,7 @@ data = {
 class AccountTests(APITestCase):
     def test_create_account(self):
         user = User.objects.create_user(username="testd", password="test")
+        print(settings.DJANGO_UID)
         Application.objects.create(
             name=settings.DJANGO_CLIENT_NAME,
             client_id=settings.DJANGO_UID,

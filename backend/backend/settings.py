@@ -12,7 +12,10 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
+# Load environment variables from .env file
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,7 +28,6 @@ SECRET_KEY = "django-insecure-&(ab8zxcll5f(5y$6+58juu*ph=r893nt&+fnsr!7l9qp4egpw
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -41,22 +43,22 @@ INSTALLED_APPS = [
     "authentication",
     "movie",
 ]
-DISCORD_KEY = os.environ.get("AUTH_DISCORD_KEY")
-DISCORD_SECRET = os.environ.get("AUTH_DISCORD_SECRET")
-DISCORD_REDIRECT = os.environ.get("AUTH_DISCORD_REDIRECT_API")
-FORTYTWO_KEY = os.environ.get("AUTH42_UID")
-FORTYTWO_SECRET = os.environ.get("AUTH42_SECRET")
-FORTYTWO_REDIRECT = os.environ.get("AUTH42_REDIRECT_API")
-GITHUB_KEY = os.environ.get("AUTH_GITHUB_KEY")
-GITHUB_SECRET = os.environ.get("AUTH_GITHUB_SECRET")
-GITHUB_REDIRECT = os.environ.get("AUTH_GITHUB_REDIRECT_API")
-DJANGO_UID = os.environ.get("DJANGO_AUTH_UID")
-DJANGO_SECRET = os.environ.get("DJANGO_AUTH_SECRET")
-DJANGO_CLIENT_NAME = os.environ.get("DJANGO_CLIENT_NAME")
-DJANGO_CLIENT_TYPE = os.environ.get("DJANGO_CLIENT_TYPE")
-DJANGO_GRANT_AUTHORIZATION = os.environ.get("DJANGO_GRANT_AUTHORIZATION")
-DJANGO_SUPERUSER_USERNAME = os.environ.get("DJANGO_SUPERUSER_USERNAME")
-DJANGO_SUPERUSER_PASSWORD = os.environ.get("DJANGO_SUPERUSER_PASSWORD")
+DISCORD_KEY = os.getenv("AUTH_DISCORD_KEY")
+DISCORD_SECRET = os.getenv("AUTH_DISCORD_SECRET")
+DISCORD_REDIRECT = os.getenv("AUTH_DISCORD_REDIRECT_API")
+FORTYTWO_KEY = os.getenv("AUTH42_UID")
+FORTYTWO_SECRET = os.getenv("AUTH42_SECRET")
+FORTYTWO_REDIRECT = os.getenv("AUTH42_REDIRECT_API")
+GITHUB_KEY = os.getenv("AUTH_GITHUB_KEY")
+GITHUB_SECRET = os.getenv("AUTH_GITHUB_SECRET")
+GITHUB_REDIRECT = os.getenv("AUTH_GITHUB_REDIRECT_API")
+DJANGO_UID = os.getenv("DJANGO_AUTH_UID")
+DJANGO_SECRET = os.getenv("DJANGO_AUTH_SECRET")
+DJANGO_CLIENT_NAME = os.getenv("DJANGO_CLIENT_NAME")
+DJANGO_CLIENT_TYPE = os.getenv("DJANGO_CLIENT_TYPE")
+DJANGO_GRANT_AUTHORIZATION = os.getenv("DJANGO_GRANT_AUTHORIZATION")
+DJANGO_SUPERUSER_USERNAME = os.getenv("DJANGO_SUPERUSER_USERNAME")
+DJANGO_SUPERUSER_PASSWORD = os.getenv("DJANGO_SUPERUSER_PASSWORD")
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
     "oauth2_provider.backends.OAuth2Backend",
