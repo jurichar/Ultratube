@@ -75,16 +75,6 @@ OAUTH2_PROVIDER = {
     }
 }
 
-REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework.authentication.SessionAuthentication",
-        "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
-    ),
-    "DEFAULT_PERMISSION_CLASSES": (
-        "oauth2_provider.contrib.rest_framework.TokenHasReadWriteScope",
-        "rest_framework.permissions.IsAuthenticated",
-    ),
-}
 
 LOGIN_URL = "/admin/login/"
 
@@ -209,8 +199,15 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Pagination
-
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.SessionAuthentication",
+        "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "oauth2_provider.contrib.rest_framework.TokenHasReadWriteScope",
+        "rest_framework.permissions.IsAuthenticated",
+    ),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 10,
 }
