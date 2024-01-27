@@ -12,11 +12,13 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 import os
 from pathlib import Path
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+env = environ.Env(DEBUG=(bool, False))
+environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
@@ -45,6 +47,27 @@ INSTALLED_APPS = [
 ]
 
 AUTH_USER_MODEL = "authentication.User"
+DISCORD_KEY = env("AUTH_DISCORD_KEY")
+DISCORD_SECRET = env("AUTH_DISCORD_SECRET")
+DISCORD_REDIRECT = env("AUTH_DISCORD_REDIRECT_API")
+FORTYTWO_KEY = env("AUTH42_UID")
+FORTYTWO_SECRET = env("AUTH42_SECRET")
+FORTYTWO_REDIRECT = env("AUTH42_REDIRECT_API")
+GITHUB_KEY = env("AUTH_GITHUB_KEY")
+GITHUB_SECRET = env("AUTH_GITHUB_SECRET")
+GITHUB_REDIRECT = env("AUTH_GITHUB_REDIRECT_API")
+DJANGO_UID = env("DJANGO_AUTH_UID")
+DJANGO_SECRET = env("DJANGO_AUTH_SECRET")
+DJANGO_CLIENT_NAME = env("DJANGO_CLIENT_NAME")
+DJANGO_CLIENT_TYPE = env("DJANGO_CLIENT_TYPE")
+DJANGO_GRANT_AUTHORIZATION = env("DJANGO_GRANT_AUTHORIZATION")
+DJANGO_SUPERUSER_USERNAME = env("DJANGO_SUPERUSER_USERNAME")
+DJANGO_SUPERUSER_PASSWORD = env("DJANGO_SUPERUSER_PASSWORD")
+AUTHENTICATION_BACKENDS = (
+    "django.contrib.auth.backends.ModelBackend",
+    "oauth2_provider.backends.OAuth2Backend",
+    "authentication.custom_authenticate.CustomAuth",
+)
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
