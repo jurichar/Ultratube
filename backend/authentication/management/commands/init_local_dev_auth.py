@@ -16,7 +16,7 @@ class Command(BaseCommand):
                 username=settings.DJANGO_SUPERUSER_USERNAME
             )
 
-        except UserModel.DoesNotExist:
+        except:
             try:
                 username = settings.DJANGO_SUPERUSER_USERNAME
                 password = settings.DJANGO_SUPERUSER_PASSWORD
@@ -27,7 +27,7 @@ class Command(BaseCommand):
                 print("cant create super user please retry")
         try:
             application = Application.objects.get(name=settings.DJANGO_CLIENT_NAME)
-        except Application.DoesNotExist:
+        except:
             try:
                 if superuser:
                     name = settings.DJANGO_CLIENT_NAME
