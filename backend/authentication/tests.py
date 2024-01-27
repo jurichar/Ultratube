@@ -1,6 +1,5 @@
 from django.utils import timezone
 import json
-from django.conf import settings
 from rest_framework.test import APITestCase
 from oauth2_provider.models import AccessToken, Application
 from .models import User
@@ -19,7 +18,6 @@ data = {
 class AccountTests(APITestCase):
     def test_create_account(self):
         user = User.objects.create_user(username="testd", password="test")
-        print(settings.DJANGO_UID)
         Application.objects.create(
             name="test",
             client_id="ddddddddd",
@@ -101,4 +99,5 @@ class AccountTests(APITestCase):
             "http://localhost:8000/oauth/logout/", **custom_header
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
         # self.assertIn('csrftoken', response.cookies)

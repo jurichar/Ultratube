@@ -2,12 +2,19 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.http import JsonResponse
 from django.http import Http404
 import requests
-
+from rest_framework import viewsets
 from django.contrib.auth import authenticate, login
 
-from .serializer import AccessTokenSerializer, UserLoginSerializer, UserModelSerializer
+from .serializer import (
+    AccessTokenSerializer,
+    UserDetailSerializer,
+    UserListSerializer,
+    UserLoginSerializer,
+    UserModelSerializer,
+    UserPatchSerializer,
+)
 from .models import User
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -219,6 +226,39 @@ class AccessTokenDetail(APIView):
         return Response(
             serializer.errors,
         )
+
+
+class MultipleSerializerMixin:
+    detail_serializer_class = UserDetailSerializer
+    partial_update_serializer_class = UserPatchSerializer
+
+    def get_serializer_class(self):
+        opt = {
+            "retrieve": self.detail_serializer_class,
+            "partial_update": self.update_serializer_class,
+            "update": self.update_serializer_class,
+        }.get(self.action, super().get_serializer_class())
+
+        return super().get_serializer_class() if not opt else opt
+
+
+class UserViewSet(MultipleSerializerMixin, viewsets.ReadOnlyModelViewSet):
+    authentication_classes = [OAuth2Authentication]
+    permission_classes = [IsAuthenticated, TokenHasReadWriteScope]
+
+    queryset = User.objects.all()
+    serializer_class = UserListSerializer
+    detail_serializer_class = UserDetailSerializer
+    update_serializer_class = UserPatchSerializer
+
+    def partial_update(self, request, *args, **kwargs):
+        instance = get_object_or_404(User, pk=kwargs.get("pk"))
+        serializer = self.update_serializer_class(
+            instance, data=request.data, partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response("update successful")
 
 
 class UserList(generics.ListAPIView):
