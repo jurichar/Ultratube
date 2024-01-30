@@ -4,8 +4,11 @@ import Users from "../../utils/users.json";
 import { User } from "../../types";
 import { useState } from "react";
 import ImagePopup from "./ImagePopup";
+import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
+import { useNavigate } from "react-router-dom";
 
 export default function Profile() {
+  const navigate = useNavigate();
   const user: User = Users[0];
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -20,13 +23,12 @@ export default function Profile() {
   });
 
   const handleDisconnect = async () => {
-    console.log("disconnect");
-    // try {
-    //   const reponselogout = await fetchWrapper("oauth/logout", { method: "POST" });
-    //   console.log(reponselogout);
-    // } catch (error) {
-    //   console.log(error);
-    // }
+    try {
+      await fetchWrapper("oauth/logout/", { method: "POST" });
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleImageEdit = () => {

@@ -1,14 +1,18 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { fetchWrapper } from "../fetchWrapper/fetchWrapper";
 
 type UserData = {
   userId: string;
-  name: string;
-  nickName: string;
+  username: string;
   email: string;
+  first_name: string;
+  last_name: string;
 };
 
 interface ContextProps {
   readonly userData: UserData | null;
+  authenticate: boolean;
+  setAuthenticate: (authenticate: boolean) => void;
   readonly setUserData: (userData: UserData) => void;
   readonly loadUserData: () => Promise<void>;
 }
@@ -25,23 +29,51 @@ export interface Props {
 const UserContext = React.createContext<ContextProps>({
   userData: null,
   setUserData: () => null,
+  authenticate: false,
+  setAuthenticate: () => false,
   loadUserData: async () => {},
 });
 
 const ContextProvider: React.FC<Props> = ({ children }) => {
   const [userData, setUserData] = React.useState<UserData | null>(null);
+  const [authenticate, setAuthenticate] = useState<boolean>(false);
 
   const loadUserData = async () => {
-    console.log("load");
+    try {
+      const responseCurrentUser = await fetchWrapper("oauth/", { method: "GET" });
+      setUserData(responseCurrentUser);
+      return responseCurrentUser;
+    } catch (error) {
+      console.log(error);
+      setUserData(null);
+      return null;
+    }
   };
+
+  useEffect(() => {
+    console.log(userData);
+  }, [userData]);
+
+  useEffect(() => {
+    loadUserData();
+    console.log("return");
+    return () => {
+      console.log("return");
+    };
+  }, []);
 
   const value = {
     userData,
     setUserData,
     loadUserData,
+    authenticate,
+    setAuthenticate,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };
 
-export { UserContext, ContextProvider };
+export const useAuth = () => {
+  return useContext(UserContext);
+};
+export default ContextProvider;

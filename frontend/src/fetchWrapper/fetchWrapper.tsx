@@ -23,7 +23,6 @@ async function fetchWrapper<T>(url: string, { headers, method, params, body }: F
   });
 
   if (!response.ok) {
-    console.log(response);
     throw new Error(`HTTP error! Status: ${response.status} `);
   }
 

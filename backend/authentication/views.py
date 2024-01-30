@@ -152,6 +152,16 @@ class UserLogout(APIView):
             )
 
 
+class CurrentUser(APIView):
+    authentication_classes = [OAuth2Authentication]
+    permission_classes = [IsAuthenticated, TokenHasReadWriteScope]
+
+    def get(self, request):
+        current_user = get_object_or_404(User, pk=request.user.pk)
+        user = UserModelSerializer(current_user)
+        return Response(user.data)
+
+
 class FortyTwoAuthView(APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
