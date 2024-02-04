@@ -33,7 +33,7 @@ export const router = createBrowserRouter([
       {
         path: "/:id",
         element: <MoviePage />,
-      }
+      },
     ],
   },
 ]);
