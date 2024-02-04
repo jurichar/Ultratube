@@ -16,7 +16,6 @@ export default function ProtectedRoute({ children }) {
   async function checkAUth() {
     const userData = await loadUserData();
     setLoading(false);
-    console.log("here", userData);
     if (userData == null) {
       return navigate("/login");
     }

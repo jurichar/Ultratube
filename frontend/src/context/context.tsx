@@ -1,12 +1,14 @@
 import React, { useContext, useEffect, useState } from "react";
 import { fetchWrapper } from "../fetchWrapper/fetchWrapper";
 
-type UserData = {
+export type UserData = {
   userId: string;
   username: string;
   email: string;
   first_name: string;
   last_name: string;
+  avatar: string;
+  omniauth?: boolean;
 };
 
 interface ContextProps {
@@ -26,6 +28,7 @@ export interface Props {
  *  const context = React.useContext(UserContext)
  *  context.userData.nickName
  */
+
 const UserContext = React.createContext<ContextProps>({
   userData: null,
   setUserData: () => null,
@@ -41,25 +44,17 @@ const ContextProvider: React.FC<Props> = ({ children }) => {
   const loadUserData = async () => {
     try {
       const responseCurrentUser = await fetchWrapper("oauth/", { method: "GET" });
-      setUserData(responseCurrentUser);
+      setUserData(responseCurrentUser as UserData);
       return responseCurrentUser;
     } catch (error) {
-      console.log(error);
       setUserData(null);
       return null;
     }
   };
 
   useEffect(() => {
-    console.log(userData);
-  }, [userData]);
-
-  useEffect(() => {
     loadUserData();
-    console.log("return");
-    return () => {
-      console.log("return");
-    };
+    return () => {};
   }, []);
 
   const value = {

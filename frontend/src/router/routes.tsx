@@ -8,10 +8,10 @@ import Login from "../Components/Login/Login";
 import Register from "../Components/Register/Register";
 import Profile from "../Components/Profile/Profile";
 import MoviePage from "../Components/MoviePage/MoviePage";
-import { useAuth } from "../context/context";
-import { useContext } from "react";
 import ProtectedRoute from "./protectedRoutes";
 import UnAuthenticateRoutes from "./UnAuthenticateRoutes";
+import { fetchWrapper } from "../fetchWrapper/fetchWrapper";
+import { UserData } from "../types";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -40,6 +40,17 @@ export const router = createBrowserRouter([
       },
       {
         path: "/profile",
+        element: (
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/profile/:id",
+        loader: async ({ params }): Promise<UserData> => {
+          return await fetchWrapper(`oauth/users/${params.id}/`, { method: "GET" });
+        },
         element: (
           <ProtectedRoute>
             <Profile />
