@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/context";
-import { redirect } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
 export default function UnAuthenticateRoutes({ children }) {

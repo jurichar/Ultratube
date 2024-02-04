@@ -1,6 +1,6 @@
 // src/router/routes.tsx
 
-import { LoaderFunctionArgs, createBrowserRouter, redirect } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import ErrorPage from "../Components/ErrorPage/ErrorPage";
 import Root from "../Components/Root/Root";
 import Home from "../Components/Home/Home";
