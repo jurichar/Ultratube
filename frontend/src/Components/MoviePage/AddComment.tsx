@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const AddComment = () => {
+  const { t } = useTranslation();
   const [comment, setComment] = useState('');
   const textAreaRef = React.useRef<HTMLTextAreaElement>(null);
 
@@ -24,7 +26,7 @@ const AddComment = () => {
         value={comment}
         onChange={handleCommentChange}
         className="w-full h-20 outline-none p-4 bg-tertiary border-b border-quaternary text-quaternary focus:text-quinary placeholder:text-quaternary focus:border-quinary transition-all"
-        placeholder="Add a comment"
+        placeholder={t('addComment')}
         ref={textAreaRef}
         style={{ overflow: 'hidden', resize: 'none' }}
       />

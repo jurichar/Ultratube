@@ -4,8 +4,10 @@ import Users from "../../utils/users.json";
 import { User } from "../../types";
 import { useState } from "react";
 import ImagePopup from "./ImagePopup";
+import { useTranslation } from 'react-i18next';
 
 export default function Profile() {
+  const { t } = useTranslation();
   const user: User = Users[0];
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -36,7 +38,6 @@ export default function Profile() {
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!checkFormValidity()) return;
-    console.log("Form submitted");
   };
 
   const togglePasswordVisibility = () => {
@@ -104,7 +105,7 @@ export default function Profile() {
 
   return (
     <div className="w-full p-6 gap-10 overflow-y-auto flex flex-col items-center justify-around">
-      <h1 className="text-quinary text-heading-lg">Edit profile</h1>
+      <h1 className="text-quinary text-heading-lg">{t('edit')}</h1>
       <button
         className="w-32 h-32 rounded-full relative transition-all transform hover:scale-105 outline outline-transparent outline-4 hover:outline-white "
         style={{
@@ -118,13 +119,13 @@ export default function Profile() {
       </button>
       {showImagePopup && <ImagePopup user={user} setShowImagePopup={setShowImagePopup} setSelectedImage={setSelectedImage} />}
       <div className="w-full rounded p-6 flex flex-col items-center gap-6 bg-tertiary">
-        <h2 className="text-quinary mb-4 text-heading-md">Personal Information</h2>
+        <h2 className="text-quinary mb-4 text-heading-md">{t('personalInfo')}</h2>
         <form className="w-full flex flex-col gap-4 justify-center items-center" onSubmit={handleFormSubmit}>
           <input
             name="name"
             className="w-full h-12 outline-none px-4 bg-tertiary border-b border-quaternary text-quaternary focus:text-quinary placeholder:text-quaternary focus:border-quinary transition-all"
             type="text"
-            placeholder="Name"
+            placeholder={t('name')}
             defaultValue={user.name}
             onChange={handleChange}
           />
@@ -132,7 +133,7 @@ export default function Profile() {
             name="Email"
             className="w-full h-12 outline-none px-4 bg-tertiary border-b border-quaternary text-quaternary focus:text-quinary placeholder:text-quaternary focus:border-quinary transition-all"
             type="text"
-            placeholder="Email"
+            placeholder={t('email')}
             autoComplete="username"
             defaultValue={user.email}
             onChange={handleChange}
@@ -142,7 +143,7 @@ export default function Profile() {
               name="currentPassword"
               className="w-full outline-none bg-tertiary text-quaternary focus:text-quinary placeholder:text-quaternary focus:border-quinary transition-all"
               type={showPassword ? "text" : "password"}
-              placeholder="Password"
+              placeholder={t('password')}
               autoComplete="current-password"
               onChange={handleChange}
             />
@@ -155,7 +156,7 @@ export default function Profile() {
               name="newPassword"
               className="w-full outline-none bg-tertiary text-quaternary focus:text-quinary placeholder:text-quaternary focus:border-quinary transition-all"
               type={showNewPassword ? "text" : "password"}
-              placeholder="New Password"
+              placeholder={t('newPassword')}
               autoComplete="new-password"
               onChange={handleChange}
             />
@@ -164,12 +165,12 @@ export default function Profile() {
             </button>
           </div>
           <button className="w-32 h-12 transition-all bg-quaternary text-quinary rounded-full hover:bg-quinary hover:text-tertiary" type="submit">
-            Save
+            {t('save')}
           </button>
         </form>
       </div>
       <button className="w-32 h-12 transition-all  text-quinary rounded-full hover:bg-secondary" onClick={handleDisconnect}>
-        Disconnect
+        {t('disconnect')}
       </button>
     </div>
   );

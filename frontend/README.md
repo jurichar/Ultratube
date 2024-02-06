@@ -31,12 +31,7 @@ export default {
 
 ## TODO
 
-- [ ] Add responsive design
-- [ ] Add translations
-- [ ] Add tests
 - [ ] Connect the backend
 - [ ] Add loader
-- [ ] Add check password strength
-- [ ] Add change lang button on the navbar
 - [ ] Link to fav page
 - [ ] Add fav page

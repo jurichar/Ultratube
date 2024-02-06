@@ -27,6 +27,11 @@ export default function Navbar({ user }: NavbarProps) {
                 <select className="w-16 h-9 bg-cover bg-no-repeat bg-center transition-all" onChange={changeLanguage}>
                     <option value="en">EN</option>
                     <option value="fr">FR</option>
+                    <option value="es">ES</option>
+                    <option value="de">DE</option>
+                    <option value="it">IT</option>
+                    <option value="jp">JP</option>
+                    <option value="ru">RU</option>
                 </select>
                 <NavLink to="/disconnect">
                     <div className="w-16 h-9 bg-[url('./src/assets/exit.svg')] bg-cover bg-no-repeat bg-center transition-all">

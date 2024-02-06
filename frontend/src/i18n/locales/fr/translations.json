@@ -1,3 +1,26 @@
 {
-  "title": "Titre"
+  "title": "Titre",
+  "trending": "Tendance",
+  "recommended": "Recommandé pour vous",
+  "play": "Lire",
+  "search": "Rechercher des films, émissions, et plus",
+  "comment": "Commentaire",
+  "comments": "Commentaires",
+  "addComment": "Ajouter un commentaire",
+  "noComments": "Aucun commentaire pour le moment",
+  "name": "Nom",
+  "date": "Date",
+  "email": "E-mail",
+  "login": "Se connecter",
+  "logout": "Se déconnecter",
+  "disconnect": "Déconnexion",
+  "register": "S'inscrire",
+  "password": "Mot de passe",
+  "newPassword": "Nouveau mot de passe",
+  "confirmPassword": "Confirmer le mot de passe",
+  "personalInfo": "Informations personnelles",
+  "save": "Enregistrer",
+  "edit": "Modifier",
+  "chooseAvatar": "Choisir un avatar",
+  "close": "Fermer"
 }
