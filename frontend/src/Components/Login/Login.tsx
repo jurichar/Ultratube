@@ -1,4 +1,4 @@
-import { ChangeEvent, MouseEvent, useReducer } from "react";
+import { MouseEvent, useReducer } from "react";
 import FormAuthenticate from "../Global/FormAuthenticate/FormAuthenticate";
 import LogoComponent from "../Global/LogoComponent/LogoComponent";
 import { FormInput, LoginType } from "../../types";
@@ -12,7 +12,7 @@ const initialState: LoginType = {
 
 export default function Login() {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const handleChange = (event: ChangeEvent) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     dispatch({ type: "change", name: event.target.name, value: event.target.value });
   };
 

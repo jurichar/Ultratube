@@ -1,4 +1,4 @@
-import { ChangeEvent, MouseEvent, useReducer } from "react";
+import { MouseEvent, useReducer } from "react";
 import FormAuthenticate from "../Global/FormAuthenticate/FormAuthenticate";
 import LogoComponent from "../Global/LogoComponent/LogoComponent";
 import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
@@ -26,7 +26,7 @@ export default function Register() {
       });
   };
 
-  const handleChange = (event: ChangeEvent) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     dispatch({ type: "change", name: event.target.name, value: event.target.value });
   };
   const formInput: FormInput[] = [
