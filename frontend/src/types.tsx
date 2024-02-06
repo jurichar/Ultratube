@@ -67,7 +67,7 @@ type ReactText = string | number;
 type ReactChild = ReactElement | ReactText;
 
 interface ReactNodeArray extends Array<ReactNode> {}
-type ReactFragment = Record<string, never> | ReactNodeArray;
+type ReactFragment = ReactNodeArray;
 type ReactNode = ReactChild | ReactFragment | ReactPortal | boolean | null | undefined;
 
 export type Props = {

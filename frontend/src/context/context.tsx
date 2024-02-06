@@ -46,11 +46,10 @@ const ContextProvider: React.FC<Props> = ({ children }) => {
       const responseCurrentUser = await fetchWrapper("oauth/", { method: "GET" });
       setUserData(responseCurrentUser as UserData);
       setReload(false);
-      return responseCurrentUser;
     } catch (error) {
       setReload(false);
       setUserData(null);
-      return null;
+      // return null
     }
   };
 

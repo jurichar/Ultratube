@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/useAuth";
 import { useNavigate } from "react-router-dom";
+import { Props } from "../types";
 
-export default function UnAuthenticateRoutes({ children }) {
+export default function UnAuthenticateRoutes({ children }: Props) {
   const { userData, reload } = useAuth();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -18,7 +19,6 @@ export default function UnAuthenticateRoutes({ children }) {
       }
     }
   }, [reload, userData, navigate]);
-
   if (!loading) {
     return <>{children}</>;
   }
