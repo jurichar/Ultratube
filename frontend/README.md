@@ -36,8 +36,6 @@ export default {
 - [ ] Add tests
 - [ ] Connect the backend
 - [ ] Add loader
-- [ ] Add reset password page
-- [ ] Add forgot password page
 - [ ] Add check password strength
 - [ ] Add change lang button on the navbar
 - [ ] Link to fav page

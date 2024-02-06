@@ -59,11 +59,16 @@ export default function ResetPasswordPage() {
   };
 
   const checkPasswordValidity = () => {
-    return password.length >= 8;
+    // add more checks here
+    let valid = true;
+    if (password.length < 8) valid = false;
+    if (!password.match(/[\W_]/)) valid = false;
+    if (!password.match(/[A-Z]/)) valid = false;
+    return valid;
   }
 
   const checkConfirmPasswordValidity = () => {
-    return password.length >= 8 && password === confirmPassword;
+    return password === confirmPassword;
   }
 
   return (

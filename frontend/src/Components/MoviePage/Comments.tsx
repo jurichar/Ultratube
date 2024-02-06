@@ -25,7 +25,7 @@ const Comments: React.FC<CommentsProps> = ({ movieId }) => {
     <div className="w-full h-auto flex flex-col justify-center items-center text-quaternary">
       <h1 className="text-4xl font-bold">Comments</h1>
       <AddComment />
-      <div className='p-4 flex flex-col gap-4 justify-between items-center'>
+      <div className='p-4 flex flex-col gap-4 justify-between items-start'>
         {comments.length > 0 ? (
           comments.map((comment) => (
             <div key={comment.id} className="p-2 bg-tertiary bg-opacity-50 rounded">
