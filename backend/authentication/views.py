@@ -217,6 +217,52 @@ class FortyTwoAuthView(APIView):
 
 
 class DiscordAuthView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        code = request.GET.get("code")
+        try:
+            response = call_discord_get_access_token(
+                url="https://discord.com/api/v10/oauth2/token",
+                code=code,
+                client_id=settings.DISCORD_KEY,
+                client_secret=settings.DISCORD_SECRET,
+                redirect_uri=settings.DISCORD_REDIRECT,
+            )
+            user = get_info_user_access_token_json(
+                "https://discord.com/api/v10/users/@me", response["access_token"]
+            )
+            user_created = create_or_get_user(
+                username=user["username"],
+                email=user["email"],
+                firstname="",
+                lastname="",
+            )
+            authenticate_login_user(request, username=user_created.username)
+            request.session.save()
+            token_api = get_or_create_access_token(request)
+            frontend_redirect_url = request.GET.get(
+                "state", "http://localhost:3000/register"
+            )
+            redirect_response = redirect(frontend_redirect_url)
+            redirect_response.set_cookie(
+                "token",
+                token_api,
+                path="/",
+                domain="localhost",
+                httponly=True,
+                samesite="None",
+                expires=None,
+            )
+            return redirect_response
+        except Exception as e:
+            print(e)
+            return Response("cant create user ", status=status.HTTP_403_FORBIDDEN)
+
+
+class GithubAUthView(APIView):
+    permission_classes = [AllowAny]
+
     def get(self, request):
         code = request.GET.get("code")
         return Response({"code": code})
@@ -321,6 +367,8 @@ def create_or_get_user(username="", password="", email="", firstname="", lastnam
         user.user_permissions.add(permission)
         user.omniauth = True
         user.save()
+    if user is None:
+        return User.DoesNotExist
     return user
 
 
@@ -328,6 +376,13 @@ def get_information_user_access_token(url, access_token):
     headers = {"Authorization": "Bearer " + access_token}
     information_user = requests.get(url, headers=headers)
     return information_user
+
+
+def get_info_user_access_token_json(url, access_token):
+    headers = {"Authorization": "Bearer " + access_token}
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    return response.json()
 
 
 def get_object_for_token(
@@ -349,11 +404,33 @@ def get_object_for_token(
 
 
 def call_application_get_access_token(url, token_params):
-    response = requests.post(url, data=token_params)
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+    response = requests.post(
+        url,
+        data=token_params,
+        headers=headers,
+    )
     if response.status_code == 200:
         return response
     else:
         return {"cant get information, the authentication fail , please try again"}
+
+
+def call_discord_get_access_token(url, code, client_id, client_secret, redirect_uri):
+    data = {
+        "grant_type": "authorization_code",
+        "code": code,
+        "redirect_uri": redirect_uri,
+    }
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+    r = requests.post(
+        url,
+        data=data,
+        headers=headers,
+        auth=(client_id, client_secret),
+    )
+    r.raise_for_status()
+    return r.json()
 
 
 # ----------------------------- utils.py -------------------------------
