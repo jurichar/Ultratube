@@ -1,24 +1,24 @@
-import { useEffect, useState } from "react";
-import { useAuth } from "../context/context";
+import { useCallback, useEffect, useState } from "react";
+import { useAuth } from "../context/useAuth";
 import { useNavigate } from "react-router-dom";
 
 export default function ProtectedRoute({ children }) {
-  const { loadUserData } = useAuth();
-  const [loading, setLoading] = useState(true);
+  const { userData, reload } = useAuth();
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     setLoading(true);
-    checkAUth();
-  }, []);
-
-  async function checkAUth() {
-    const userData = await loadUserData();
-    setLoading(false);
-    if (userData == null) {
-      return navigate("/login");
+    if (userData && "username" in userData && "email" in userData && "omniauth" in userData) {
+      setLoading(false);
+    } else {
+      if (!userData && !reload) {
+        setLoading(false);
+        return navigate("/login");
+      }
     }
-  }
+  }, [reload, userData, navigate]);
+
   if (!loading) {
     return <>{children}</>;
   }

@@ -14,6 +14,7 @@ export type UserData = {
 interface ContextProps {
   readonly userData: UserData | null;
   authenticate: boolean;
+  reload: boolean;
   setAuthenticate: (authenticate: boolean) => void;
   readonly setUserData: (userData: UserData) => void;
   readonly loadUserData: () => Promise<void>;
@@ -29,9 +30,10 @@ export interface Props {
  *  context.userData.nickName
  */
 
-const UserContext = React.createContext<ContextProps>({
+export const UserContext = React.createContext<ContextProps>({
   userData: null,
   setUserData: () => null,
+  reload: true,
   authenticate: false,
   setAuthenticate: () => false,
   loadUserData: async () => {},
@@ -40,19 +42,22 @@ const UserContext = React.createContext<ContextProps>({
 const ContextProvider: React.FC<Props> = ({ children }) => {
   const [userData, setUserData] = React.useState<UserData | null>(null);
   const [authenticate, setAuthenticate] = useState<boolean>(false);
-
+  const [reload, setReload] = useState<boolean>(true);
   const loadUserData = async () => {
     try {
       const responseCurrentUser = await fetchWrapper("oauth/", { method: "GET" });
       setUserData(responseCurrentUser as UserData);
+      setReload(false);
       return responseCurrentUser;
     } catch (error) {
+      setReload(false);
       setUserData(null);
       return null;
     }
   };
 
   useEffect(() => {
+    setReload(true);
     loadUserData();
     return () => {};
   }, []);
@@ -61,6 +66,7 @@ const ContextProvider: React.FC<Props> = ({ children }) => {
     userData,
     setUserData,
     loadUserData,
+    reload,
     authenticate,
     setAuthenticate,
   };
@@ -68,7 +74,4 @@ const ContextProvider: React.FC<Props> = ({ children }) => {
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };
 
-export const useAuth = () => {
-  return useContext(UserContext);
-};
 export default ContextProvider;

@@ -1,7 +1,7 @@
 // frontend/src/Components/Navbar/Navbar.tsx
 
 import { NavLink } from "react-router-dom";
-import { useAuth } from "../../context/context";
+import { useAuth } from "../../context/useAuth";
 
 export default function Navbar() {
   const { userData } = useAuth();

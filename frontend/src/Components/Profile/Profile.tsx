@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import ImagePopup from "./ImagePopup";
 import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
 import { useLoaderData, useNavigate, useParams } from "react-router-dom";
-import { useAuth } from "../../context/context";
+import { useAuth } from "../../context/useAuth";
 import { ProfileForm, UserData, UserPatchInterface } from "../../types";
 import { validateEmail } from "../../utils/validateEmail";
 import { notify } from "../../utils/notifyToast";
@@ -30,36 +30,31 @@ export default function Profile() {
     password: "",
   });
 
-  const initialize_data = () => {
-    if (Object.keys(param).length == 0) {
-      if (userData != null && "username" in userData) {
-        setUser(userData);
-        setOurProfile(true);
-        setFormData({ ...formData });
-        if ("id" in userData) {
-          if (!isNaN(Number(userData.id))) {
-            setIdUser(userData.id as number);
+  useEffect(() => {
+    const initialize_data = () => {
+      if (userLoader) {
+        setUser(userLoader as UserData);
+        setOurProfile(false);
+        if (param && "id" in param) {
+          if (!isNaN(Number(param.id))) {
+            setIdUser(Number(param.id));
+          }
+        }
+      } else {
+        if (userData) {
+          setOurProfile(true);
+          setUser(userData);
+          if ("id" in userData) {
+            if (!isNaN(Number(userData.id))) {
+              setIdUser(Number(userData.id));
+            }
           }
         }
       }
-    } else {
-      setUser(userLoader as UserData);
-      if ("id" in param) {
-        if (!isNaN(Number(param.id))) {
-          setIdUser(Number(param.id));
-        }
-      }
-    }
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    initialize_data();
-    return () => {
-      setUser({ username: "", email: "", first_name: "", last_name: "", avatar: "" });
-      setIdUser(0);
     };
-  }, [param]);
+    initialize_data();
+    setLoading(false);
+  }, [userLoader, userData, param]);
 
   if (loading) {
     return <div className="bg-red-600 text-white">loading</div>;
