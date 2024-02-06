@@ -7,8 +7,10 @@ import SearchBar from "../SearchBar/SearchBar";
 import data from "../../utils/movies.json";
 import dataTrending from "../../utils/trending.json";
 import { Movie } from "../../types";
+import { useTranslation } from "react-i18next";
 
 export default function Home() {
+  const { t, i18n } = useTranslation();
   const [moviesTrending, setMoviesTrending] = useState<Movie[]>([]);
   const [movies, setMovies] = useState<Movie[]>([]);
 

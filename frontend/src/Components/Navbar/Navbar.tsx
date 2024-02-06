@@ -2,12 +2,19 @@
 
 import { NavLink } from "react-router-dom";
 import { User } from "../../types";
+import { useTranslation } from "react-i18next";
 
 interface NavbarProps {
     user: User;
 }
 
 export default function Navbar({ user }: NavbarProps) {
+    const { i18n } = useTranslation();
+
+    const changeLanguage = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const lang = e.target.value;
+        i18n.changeLanguage(lang);
+    }
 
     return (
         <nav className="z-50 bg-tertiary fixed top-0 w-full h-14 flex justify-between items-center px-4 md:flex-col md:w-24 md:h-[calc(100vh-4rem)] md:top-8 md:py-8 md:rounded">
@@ -17,6 +24,10 @@ export default function Navbar({ user }: NavbarProps) {
                 </svg>
             </NavLink>
             <div className="flex flex-row gap-4 justify-center items-center md:flex-col">
+                <select className="w-16 h-9 bg-cover bg-no-repeat bg-center transition-all" onChange={changeLanguage}>
+                    <option value="en">EN</option>
+                    <option value="fr">FR</option>
+                </select>
                 <NavLink to="/disconnect">
                     <div className="w-16 h-9 bg-[url('./src/assets/exit.svg')] bg-cover bg-no-repeat bg-center transition-all">
                         <div className="w-16 h-9 bg-[url('./src/assets/exit-hover.svg')] bg-cover bg-no-repeat bg-center opacity-0 hover:opacity-50 transition-all">

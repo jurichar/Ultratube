@@ -59,7 +59,6 @@ export default function ResetPasswordPage() {
   };
 
   const checkPasswordValidity = () => {
-    // add more checks here
     let valid = true;
     if (password.length < 8) valid = false;
     if (!password.match(/[\W_]/)) valid = false;

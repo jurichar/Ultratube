@@ -87,11 +87,15 @@ export default function Profile() {
   }
 
   const checkCurrentPasswordValidity = () => {
-    return formData.currentPassword.length >= 8;
+    return formData.currentPassword === user.password;
   }
 
   const checkNewPasswordValidity = () => {
-    return formData.newPassword.length >= 8 && formData.currentPassword !== formData.newPassword;
+    let valid = true;
+    if (formData.newPassword.length < 8) valid = false;
+    if (formData.newPassword.match(/[\W_]/)) valid = false;
+    if (formData.newPassword.match(/[A-Z]/)) valid = false;
+    return valid;
   }
 
   const checkEmailValidity = () => {
