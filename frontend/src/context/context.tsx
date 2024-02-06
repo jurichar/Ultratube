@@ -1,5 +1,6 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { fetchWrapper } from "../fetchWrapper/fetchWrapper";
+import { Props } from "../types";
 
 export type UserData = {
   userId: string;
@@ -20,9 +21,6 @@ interface ContextProps {
   readonly loadUserData: () => Promise<void>;
 }
 
-export interface Props {
-  children: React.ReactNode;
-}
 /**
  *  store that is shared with every components
  *  How to use :

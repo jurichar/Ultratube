@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../context/useAuth";
 import { useNavigate } from "react-router-dom";
+import { Props } from "../types";
 
-export default function ProtectedRoute({ children }) {
+export default function ProtectedRoute({ children }: Props) {
   const { userData, reload } = useAuth();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();

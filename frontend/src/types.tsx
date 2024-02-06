@@ -1,6 +1,6 @@
 // frontend/src/types.tsx
 
-import { ChangeEvent } from "react";
+import { ChangeEvent, ReactElement, ReactPortal } from "react";
 
 export interface Movie {
   id: string;
@@ -63,3 +63,13 @@ export type NotifyType = {
 export interface UserPatchInterface extends ProfileForm {
   avatar?: string;
 }
+type ReactText = string | number;
+type ReactChild = ReactElement | ReactText;
+
+interface ReactNodeArray extends Array<ReactNode> {}
+type ReactFragment = Record<string, never> | ReactNodeArray;
+type ReactNode = ReactChild | ReactFragment | ReactPortal | boolean | null | undefined;
+
+export type Props = {
+  children: ReactNode;
+};
