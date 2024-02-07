@@ -255,8 +255,7 @@ class DiscordAuthView(APIView):
                 expires=None,
             )
             return redirect_response
-        except Exception as e:
-            print(e)
+        except Exception:
             return Response("cant create user ", status=status.HTTP_403_FORBIDDEN)
 
 
@@ -265,7 +264,41 @@ class GithubAUthView(APIView):
 
     def get(self, request):
         code = request.GET.get("code")
-        return Response({"code": code})
+        try:
+            access_token = call_github_get_access_token(
+                url="https://github.com/login/oauth/access_token",
+                code=code,
+                client_id=settings.GITHUB_KEY,
+                client_secret=settings.GITHUB_SECRET,
+            )
+            user = get_info_user_access_token_json(
+                "https://api.github.com/user", access_token=access_token["access_token"]
+            )
+            user_created = create_or_get_user(
+                username=user["login"],
+                email="",
+                firstname=user["name"],
+                lastname="",
+            )
+            authenticate_login_user(request, username=user_created.username)
+            request.session.save()
+            token_api = get_or_create_access_token(request)
+            frontend_redirect_url = request.GET.get(
+                "state", "http://localhost:3000/register"
+            )
+            redirect_response = redirect(frontend_redirect_url)
+            redirect_response.set_cookie(
+                "token",
+                token_api,
+                path="/",
+                domain="localhost",
+                httponly=True,
+                samesite="None",
+                expires=None,
+            )
+            return redirect_response
+        except Exception:
+            return Response("cant create user ", status=status.HTTP_403_FORBIDDEN)
 
 
 class AccessTokenDetail(APIView):
@@ -431,6 +464,22 @@ def call_discord_get_access_token(url, code, client_id, client_secret, redirect_
     )
     r.raise_for_status()
     return r.json()
+
+
+def call_github_get_access_token(url, code, client_id, client_secret):
+    headers = {"Accept": "application/json"}
+    data = {
+        "client_id": client_id,
+        "client_secret": client_secret,
+        "code": code,
+    }
+    response = requests.post(
+        url,
+        data=data,
+        headers=headers,
+    )
+    response.raise_for_status()
+    return response.json()
 
 
 # ----------------------------- utils.py -------------------------------
