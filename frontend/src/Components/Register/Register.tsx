@@ -5,6 +5,7 @@ import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
 import { FormInput, RegisterType } from "../../types";
 import { reducer } from "./reducer";
 import { validateEmail } from "../../utils/validateEmail";
+import { useNavigate } from "react-router-dom";
 
 const initialState: RegisterType = {
   username: "",
@@ -17,6 +18,7 @@ const initialState: RegisterType = {
 
 export default function Register() {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const navigate = useNavigate();
 
   const handlePermission = () => {
     fetchWrapper("oauth/user/", { method: "get" })
@@ -46,12 +48,13 @@ export default function Register() {
     return true;
   };
 
-  const handleSubmit = (event: MouseEvent<HTMLButtonElement>, name: string) => {
+  const handleSubmit = async (event: MouseEvent<HTMLButtonElement>, name: string) => {
     event.preventDefault();
     event.stopPropagation();
     if (name == "Register") {
       if (is_valid_arg({ ...state })) {
-        createUser();
+        await createUser();
+        navigate("/profile");
       } else {
         console.log("cant create");
       }

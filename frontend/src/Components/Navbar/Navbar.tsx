@@ -1,14 +1,14 @@
 // frontend/src/Components/Navbar/Navbar.tsx
 
 import { NavLink } from "react-router-dom";
+import { useAuth } from "../../context/useAuth";
 import { User } from "../../types";
 import { useTranslation } from "react-i18next";
 
-interface NavbarProps {
-    user: User;
-}
 
-export default function Navbar({ user }: NavbarProps) {
+
+export default function Navbar() {
+    const { userData } = useAuth();
     const { i18n } = useTranslation();
 
     const changeLanguage = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -41,7 +41,7 @@ export default function Navbar({ user }: NavbarProps) {
                 </NavLink>
                 <NavLink to="/profile">
                     <div className={`w-10 h-10 bg-cover bg-no-repeat bg-center transition-all transform hover:scale-105 outline outline-transparent outline-2 hover:outline-white rounded-full`} style={{
-                        backgroundImage: `url(${user.avatar})`,
+                        backgroundImage: `url(${userData?.avatar})`,
                     }}>
                     </div>
                 </NavLink>

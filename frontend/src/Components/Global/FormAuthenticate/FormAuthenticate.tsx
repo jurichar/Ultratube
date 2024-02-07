@@ -40,7 +40,7 @@ export default function FormAuthenticate({ handleSubmit, nameForm, nameOtherAuth
           className={` w-full  flex flex-row   gap-1 justify-center text-quinary  bg-gray-300 rounded text-body-md font-custom hover:bg-discord p-2.5"} `}
           to={`${import.meta.env.VITE_DISCORD_URL}/authorize?client_id=${import.meta.env.VITE_DISCORD_UID}&response_type=code&redirect_uri=${
             import.meta.env.VITE_DISCORD_REDIRECT
-          }&scope=identify`}
+          }&scope=identify+email`}
         >
           <FaDiscord className="size-8" />
         </Link>
