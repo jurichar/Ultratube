@@ -2,9 +2,10 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.http import JsonResponse
 from django.http import Http404
 import requests
+from .sendEmail import sendEmail
 from rest_framework import viewsets
 from django.contrib.auth import authenticate, login
-
+import copy
 from .serializer import (
     AccessTokenSerializer,
     UserDetailSerializer,
@@ -29,6 +30,8 @@ from rest_framework.authentication import SessionAuthentication
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.models import Permission
 
 
 class UserRegister(APIView):
@@ -107,8 +110,9 @@ class UserLogin(APIView):
                 if not request.session.session_key:
                     request.session.save()
                 access_token = get_or_create_access_token(request)
-
-                print(serializer.data)
+                # sendEmail(
+                #     subject="bjr", message="hello", mailReceiver=request.data["email"]
+                # )
                 response = Response(
                     {"data": serializer.data, "ACCESTOKEN": access_token}
                 )
@@ -150,6 +154,16 @@ class UserLogout(APIView):
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+class CurrentUser(APIView):
+    authentication_classes = [OAuth2Authentication]
+    permission_classes = [IsAuthenticated, TokenHasReadWriteScope]
+
+    def get(self, request):
+        current_user = get_object_or_404(User, pk=request.user.pk)
+        user = UserModelSerializer(current_user)
+        return Response(user.data)
 
 
 class FortyTwoAuthView(APIView):
@@ -242,7 +256,7 @@ class MultipleSerializerMixin:
         return super().get_serializer_class() if not opt else opt
 
 
-class UserViewSet(MultipleSerializerMixin, viewsets.ReadOnlyModelViewSet):
+class UserViewSet(MultipleSerializerMixin, viewsets.ModelViewSet):
     authentication_classes = [OAuth2Authentication]
     permission_classes = [IsAuthenticated, TokenHasReadWriteScope]
 
@@ -252,10 +266,21 @@ class UserViewSet(MultipleSerializerMixin, viewsets.ReadOnlyModelViewSet):
     update_serializer_class = UserPatchSerializer
 
     def partial_update(self, request, *args, **kwargs):
+
         instance = get_object_or_404(User, pk=kwargs.get("pk"))
-        serializer = self.update_serializer_class(
-            instance, data=request.data, partial=True
-        )
+        if request.user.has_perm("authentication.omniauth") and request.user.omniauth:
+            data_parsed = copy.deepcopy(request.data)
+            if "username" in data_parsed:
+                del data_parsed["username"]
+            if "password" in data_parsed:
+                del data_parsed["password"]
+            serializer = self.update_serializer_class(
+                instance, data=data_parsed, partial=True
+            )
+        else:
+            serializer = self.update_serializer_class(
+                instance, data=request.data, partial=True
+            )
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response("update successful")
@@ -269,6 +294,16 @@ class UserList(generics.ListAPIView):
     serializer_class = UserModelSerializer
 
 
+class sendEmailAPI(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        print(request.GET.get("email"))
+        sendEmail(subject="cc", message="cc", mailReceiver=request.GET.get("email"))
+
+        return Response("ok")
+
+
 # ----------------------------- utils.py -------------------------------
 
 # -----------------------------  OmniAuth strategy ---------------------
@@ -279,6 +314,12 @@ def create_or_get_user(username="", password="", email="", firstname="", lastnam
         username=username, email=email, first_name=firstname, last_name=lastname
     )
     if created:
+        content_type = ContentType.objects.get_for_model(User)
+        permission = Permission.objects.get(
+            content_type=content_type, codename="omniauth"
+        )
+        user.user_permissions.add(permission)
+        user.omniauth = True
         user.save()
     return user
 

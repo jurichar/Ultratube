@@ -1,9 +1,10 @@
-import { ChangeEvent, MouseEvent, useReducer } from "react";
+import { MouseEvent, useReducer } from "react";
 import FormAuthenticate from "../Global/FormAuthenticate/FormAuthenticate";
 import LogoComponent from "../Global/LogoComponent/LogoComponent";
 import { FormInput, LoginType } from "../../types";
 import { reducer } from "./reducer";
 import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
+import { useNavigate } from "react-router-dom";
 
 const initialState: LoginType = {
   username: "",
@@ -12,7 +13,8 @@ const initialState: LoginType = {
 
 export default function Login() {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const handleChange = (event: ChangeEvent) => {
+  const navigate = useNavigate();
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     dispatch({ type: "change", name: event.target.name, value: event.target.value });
   };
 
@@ -21,12 +23,13 @@ export default function Login() {
     return true;
   };
 
-  const handleSubmit = (event: MouseEvent<HTMLButtonElement>, name: string) => {
+  const handleSubmit = async (event: MouseEvent<HTMLButtonElement>, name: string) => {
     event.preventDefault();
     console.log(event);
     if (name == "Login") {
       if (is_valid_arg({ ...state })) {
-        login();
+        await login();
+        navigate("/profile");
       } else {
         console.log("cant login");
       }

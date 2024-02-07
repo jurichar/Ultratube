@@ -94,7 +94,8 @@ class UserActionTest(APITestCase):
         )
         self.assertEqual(response_detail.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            json.loads(response_detail.content), {"username": "test", "email": ""}
+            json.loads(response_detail.content),
+            {"username": "test", "email": "", "avatar": ""},
         )
 
     def test_user_detail_unauth(self):
@@ -126,7 +127,8 @@ class UserActionTest(APITestCase):
             "http://localhost:8000/oauth/users/" + str(user.pk) + "/", **custom_header
         )
         self.assertEqual(response_detail.status_code, status.HTTP_200_OK)
-        self.assertEqual(json.loads(response_detail.content), data)
+        data_cmp = {"username": "lol", "email": "ccc@hotmail.com", "avatar": ""}
+        self.assertEqual(json.loads(response_detail.content), data_cmp)
 
     def test_user_patch_unauth(self):
         data = {"username": "lol", "email": "ccc@hotmail.com"}
