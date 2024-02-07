@@ -1,5 +1,11 @@
 from django.urls import include, path
-from .views import AccessTokenDetail, DiscordAuthView, FortyTwoAuthView, sendEmailAPI
+from .views import (
+    AccessTokenDetail,
+    DiscordAuthView,
+    FortyTwoAuthView,
+    GithubAUthView,
+    sendEmailAPI,
+)
 from .views import UserLogin, UserLogout, UserRegister, UserViewSet
 from .views import get_csrf_token, CurrentUser
 from rest_framework.urlpatterns import format_suffix_patterns
@@ -10,6 +16,7 @@ router.register("users", UserViewSet, basename="user")
 
 urlpatterns = [
     path("callback/", DiscordAuthView.as_view(), name="token-generator"),
+    path("github/callback/", GithubAUthView.as_view(), name="github-generator"),
     path("42/callback/", FortyTwoAuthView.as_view(), name="42-generator"),
     path("register/", UserRegister.as_view(), name="register"),
     path("login/", UserLogin.as_view(), name="login"),
