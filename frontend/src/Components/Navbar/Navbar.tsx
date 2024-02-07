@@ -2,10 +2,7 @@
 
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../context/useAuth";
-import { User } from "../../types";
 import { useTranslation } from "react-i18next";
-
-
 
 export default function Navbar() {
     const { userData } = useAuth();

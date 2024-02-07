@@ -126,37 +126,6 @@ export default function Profile() {
     }
   };
 
-  const checkFormValidity = () => {
-    let valid = true;
-    let message = "";
-    if (!checkNameValidity()) valid = false; message += "Name must be at least 3 characters long.\n";
-    if (!checkEmailValidity()) valid = false; message += "Email must be valid.\n";
-    if (!checkCurrentPasswordValidity()) valid = false; message += "Current password must be at least 8 characters long.\n";
-    if (!checkNewPasswordValidity()) valid = false; message += "New password must be at least 8 characters long and different from current password.\n";
-    if (!valid) alert(message);
-    return valid;
-  }
-
-  const checkNameValidity = () => {
-    return formData.name.length >= 3;
-  }
-
-  const checkCurrentPasswordValidity = () => {
-    return formData.currentPassword === user.password;
-  }
-
-  const checkNewPasswordValidity = () => {
-    let valid = true;
-    if (formData.newPassword.length < 8) valid = false;
-    if (formData.newPassword.match(/[\W_]/)) valid = false;
-    if (formData.newPassword.match(/[A-Z]/)) valid = false;
-    return valid;
-  }
-
-  const checkEmailValidity = () => {
-    return formData.email.includes("@") && formData.email.includes(".");
-  }
-
   return (
     <div className="w-full p-6 gap-10 overflow-y-auto flex flex-col items-center justify-around">
       <h1 className="text-quinary text-heading-lg">{t('edit')}</h1>
@@ -171,7 +140,12 @@ export default function Profile() {
       >
         <img className="absolute -right-1 -bottom-1 h-12 w-12" src="https://static-assets.bamgrid.com/product/disneyplus/images/edit.0a8445c2cff0e80361b2e66906aaeca0.svg" alt="edit-svg" />
       </button>
-      {showImagePopup && <ImagePopup user={user} setShowImagePopup={setShowImagePopup} setSelectedImage={setSelectedImage} />}
+      {showImagePopup && (
+        <ImagePopup
+          user={user}
+          setShowImagePopup={setShowImagePopup}
+          setSelectedImage={setSelectedImage} />
+      )}
       <div className="w-full rounded p-6 flex flex-col items-center gap-6 bg-tertiary">
         <h2 className="text-quinary mb-4 text-heading-md">{t('personalInfo')}</h2>
         <form className="w-full flex flex-col gap-4 justify-center items-center" onSubmit={handleFormSubmit}>

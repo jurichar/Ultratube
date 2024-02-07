@@ -1,6 +1,6 @@
 // src/Components/Profile/ImagePopup.tsx
 
-import { User } from "../../types";
+import { UserData } from "../../types";
 import { useTranslation } from "react-i18next";
 
 // all images in assets/images/*.svg
@@ -20,7 +20,7 @@ const ImagesUrl = [
 ];
 
 interface ImagePopupProps {
-  user: User;
+  user: UserData;
   setShowImagePopup: React.Dispatch<React.SetStateAction<boolean>>;
   setSelectedImage: React.Dispatch<React.SetStateAction<string>>;
 }
