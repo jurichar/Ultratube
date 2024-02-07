@@ -1,6 +1,6 @@
 // src/Components/Profile/ImagePopup.tsx
 
-import { User } from "../../types";
+import { UserData } from "../../types";
 
 // all images in assets/images/*.svg
 const ImagesUrl = [
@@ -13,7 +13,7 @@ const ImagesUrl = [
 ];
 
 interface ImagePopupProps {
-  user: User;
+  user: UserData;
   setShowImagePopup: React.Dispatch<React.SetStateAction<boolean>>;
   setSelectedImage: React.Dispatch<React.SetStateAction<string>>;
 }
@@ -30,19 +30,10 @@ const ImagePopup: React.FC<ImagePopupProps> = ({ setShowImagePopup, setSelectedI
         <h1 className="text-quinary text-heading-md">Choose your avatar</h1>
         <div className="w-full h-80 flex flex-wrap justify-center items-center gap-6 overflow-y-auto">
           {ImagesUrl.map((imageUrl, index) => (
-            <img
-              key={index}
-              src={imageUrl}
-              alt={`Avatar ${index + 1}`}
-              className="w-16 h-16 cursor-pointer"
-              onClick={() => handleImageClick(imageUrl)}
-            />
+            <img key={index} src={imageUrl} alt={`Avatar ${index + 1}`} className="w-16 h-16 cursor-pointer" onClick={() => handleImageClick(imageUrl)} />
           ))}
         </div>
-        <button
-          className="w-32 h-12 transition-all bg-quaternary text-quinary rounded-full hover:bg-quinary hover:text-tertiary"
-          onClick={() => setShowImagePopup(false)}
-        >
+        <button className="w-32 h-12 transition-all bg-quaternary text-quinary rounded-full hover:bg-quinary hover:text-tertiary" onClick={() => setShowImagePopup(false)}>
           Close
         </button>
       </div>
