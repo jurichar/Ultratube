@@ -18,7 +18,24 @@ export interface User {
   password: string;
   avatar: string;
 }
-export type FormInput = { name: string; value: string; placeholder: string; handleChange: (event: ChangeEvent<HTMLInputElement>) => void };
+
+export interface Comment {
+  id: string;
+  user_id: string;
+  movie_id: string;
+  content: string;
+  date: string;
+  user?: User;
+  movie?: Movie;
+}
+
+export type FormInput = {
+  name: string;
+  value: string;
+  placeholder: string;
+  handleChange: (event: ChangeEvent<HTMLInputElement>) => void
+};
+
 export type ReducerAction = {
   type: string;
   name: string;

@@ -4,6 +4,7 @@ import BookmarkIcon from "./BookmarkIcon";
 import { Movie } from "../../types";
 import { useState } from "react";
 import Loading from "../Loading/Loading";
+import { NavLink } from "react-router-dom";
 interface MovieCardProps {
     movie: Movie;
 }
@@ -15,25 +16,21 @@ export default function MovieCard({ movie }: MovieCardProps) {
         setLoading(false);
     }
 
-    const handleMovieClick = () => {
-        window.location.href = `/movie/${movie.id}`;
-    };
-
     return (
         <div className="flex flex-col">
-            <div className="flex-shrink-0 mb-2 w-40 h-28 flex justify-end rounded relative"
+            <NavLink className="flex-shrink-0 mb-2 w-40 h-28 flex justify-end rounded relative md:w-[17.5rem] md:h-[10.875rem]"
                 style={{
                     backgroundImage: `url(${movie.image})`,
                     backgroundSize: "cover",
                     backgroundPosition: "center"
-                }}>
+                }}
+                to={`/${movie.id}`}>
                 {loading && <Loading />}
-                <button className="transition-all z-10 opacity-0 w-full h-full bg-tertiary hover:opacity-50 rounded flex justify-center items-center"
-                    onClick={handleMovieClick}>
+                <button className="transition-all z-10 opacity-0 w-full h-full bg-tertiary hover:opacity-50 rounded flex justify-center items-center">
                     Play
                 </button>
                 <BookmarkIcon />
-            </div>
+            </NavLink>
             <div className="flex flex-row items-center gap-2">
                 <span className="text-quinary text-xs">{movie.release}</span>
                 <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10" fill="none">
@@ -48,6 +45,6 @@ export default function MovieCard({ movie }: MovieCardProps) {
                 onLoad={handleImageLoad}
                 style={{ display: "none" }}
             />
-        </div>
+        </div >
     );
 }

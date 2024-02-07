@@ -4,6 +4,7 @@ import BookmarkIcon from "./BookmarkIcon";
 import { Movie } from "../../types";
 import { useState } from "react";
 import Loading from "../Loading/Loading";
+import { NavLink } from "react-router-dom";
 
 interface MovieCardProps {
     movie: Movie;
@@ -16,20 +17,16 @@ export default function MovieCardTrending({ movie }: MovieCardProps) {
         setLoading(false);
     }
 
-    const handleMovieClick = () => {
-        window.location.href = `/movie/${movie.id}`;
-    };
-
     return (
-        <div className="flex-shrink-0 w-60 h-32 rounded flex flex-col justify-between relative"
+        <NavLink className="flex-shrink-0 w-60 h-32 rounded flex flex-col justify-between relative md:w-[29.375rem] md:h-[14.375rem]"
             style={{
                 backgroundImage: `url(${movie.image})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center"
-            }}>
+            }}
+            to={`/${movie.id}`}>
             {loading && <Loading />}
-            <button className="z-10 opacity-0 w-full h-full bg-tertiary hover:opacity-50 rounded flex justify-center items-center transition-all"
-                onClick={handleMovieClick}>
+            <button className="z-10 opacity-0 w-full h-full bg-tertiary hover:opacity-50 rounded flex justify-center items-center transition-all">
                 Play
             </button>
             <BookmarkIcon />
@@ -50,6 +47,6 @@ export default function MovieCardTrending({ movie }: MovieCardProps) {
                     style={{ display: "none" }}
                 />
             </div>
-        </div >
+        </NavLink >
     );
 }

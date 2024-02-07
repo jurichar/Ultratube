@@ -4,7 +4,7 @@ interface FetchOptions {
   headers?: Record<string, string>;
   method: string;
   params?: Record<string, string>;
-  body?: Record<string, string>;
+  body?: object;
 }
 
 async function fetchWrapper<T>(url: string, { headers, method, params, body }: FetchOptions): Promise<T> {

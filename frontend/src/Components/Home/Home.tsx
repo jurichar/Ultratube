@@ -7,8 +7,10 @@ import SearchBar from "../SearchBar/SearchBar";
 import data from "../../utils/movies.json";
 import dataTrending from "../../utils/trending.json";
 import { Movie } from "../../types";
+import { useTranslation } from "react-i18next";
 
 export default function Home() {
+  const { t } = useTranslation();
   const [moviesTrending, setMoviesTrending] = useState<Movie[]>([]);
   const [movies, setMovies] = useState<Movie[]>([]);
 
@@ -25,10 +27,10 @@ export default function Home() {
   }
 
   return (
-    <div className="w-full h-max text-quinary p-4 flex flex-col items-center justify-around gap-6">
+    <div className="w-full h-max text-quinary p-4 flex flex-col items-center justify-around gap-6 md:p-0 md:pl-9">
       <SearchBar onSearch={handleSearch} />
       <div className="w-full h-full flex flex-col gap-4 ">
-        <span>Trending</span>
+        <span>{t('trending')}</span>
         <div className="overflow-x-auto w-full flex flex-row gap-4">
           {moviesTrending.map((movie) => (
             <MovieCardTrending key={movie.id} movie={movie} />
@@ -36,7 +38,7 @@ export default function Home() {
         </div>
       </div >
       <div className="w-full h-full flex flex-col gap-4 ">
-        <span>Recommended for you</span>
+        <span>{t('recommended')}</span>
         <div className="flex flex-row flex-wrap gap-5">
           {movies.map((movie) => (
             <MovieCard key={movie.id} movie={movie} />
