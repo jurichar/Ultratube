@@ -2,22 +2,23 @@
 
 import BookmarkIcon from "./BookmarkIcon";
 import { Movie } from "../../types";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Loading from "../Loading/Loading";
+import { useNavigate } from "react-router-dom";
 interface MovieCardProps {
   movie: Movie;
 }
 
 export default function MovieCard({ movie }: MovieCardProps) {
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
   const handleImageLoad = () => {
     setLoading(false);
   };
 
   const handleMovieClick = () => {
-    window.location.href = `/movie/${movie.id}`;
-    // add navigate with props to have information
-    // redirect btw
+    navigate(`/movie/${movie.id}`, { state: { movie: movie } });
   };
 
   return (
@@ -50,6 +51,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
         <span className="text-quaternary text-xs ">Movie</span>
       </div>
       <span className="text-quinary">{movie.title.length > 14 ? movie.title.slice(0, 14) + "..." : movie.title}</span>
+      {movie.rating > 0.0 && <span>rating {movie.rating}</span>}
       <img src={movie.image} alt={movie.title} onLoad={handleImageLoad} style={{ display: "none" }} />
     </div>
   );

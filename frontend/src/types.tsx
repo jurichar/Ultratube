@@ -8,7 +8,13 @@ export interface Movie {
   release: string;
   image: string;
   synopsis: string;
+  rating: number;
+  imdb_link: string;
+  summary: string;
+  language: string;
   trailer: string;
+  genres: Array<string>;
+  length: number;
 }
 
 export interface User {
@@ -63,6 +69,13 @@ export type NotifyType = {
 export interface UserPatchInterface extends ProfileForm {
   avatar?: string;
 }
+export type crewUser = {
+  character: string;
+  known_for_department: string;
+  name: string;
+  profile_path: string;
+};
+
 type ReactText = string | number;
 type ReactChild = ReactElement | ReactText;
 
