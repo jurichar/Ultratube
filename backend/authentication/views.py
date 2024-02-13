@@ -69,7 +69,7 @@ class UserRegister(APIView):
                     path="/",
                     domain="localhost",
                     httponly=True,
-                    samesite="None",
+                    samesite="Lax",
                     expires=None,
                 )
             response_serializer.set_cookie(
@@ -78,7 +78,7 @@ class UserRegister(APIView):
                 path="/",
                 domain="localhost",
                 httponly=True,
-                samesite="None",
+                samesite="Lax",
                 expires=None,
             )
             return response_serializer
@@ -122,7 +122,7 @@ class UserLogin(APIView):
                     path="/",
                     domain="localhost",
                     httponly=True,
-                    samesite="None",
+                    samesite="Lax",
                     expires=None,
                 )
                 return response
@@ -210,7 +210,7 @@ class FortyTwoAuthView(APIView):
             path="/",
             domain="localhost",
             httponly=True,
-            samesite="None",
+            samesite="Lax",
             expires=None,
         )
         return redirect_response
@@ -251,7 +251,7 @@ class DiscordAuthView(APIView):
                 path="/",
                 domain="localhost",
                 httponly=True,
-                samesite="None",
+                samesite="Lax",
                 expires=None,
             )
             return redirect_response
@@ -293,7 +293,7 @@ class GithubAUthView(APIView):
                 path="/",
                 domain="localhost",
                 httponly=True,
-                samesite="None",
+                samesite="Lax",
                 expires=None,
             )
             return redirect_response
