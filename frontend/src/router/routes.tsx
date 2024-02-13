@@ -14,6 +14,7 @@ import ProtectedRoute from "./protectedRoutes";
 import UnAuthenticateRoutes from "./UnAuthenticateRoutes";
 import { fetchWrapper } from "../fetchWrapper/fetchWrapper";
 import { UserData } from "../types";
+import Bookmarks from "../Components/Bookmarks/Bookmarks";
 
 export const router = createBrowserRouter([
   {
@@ -61,16 +62,36 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: "/bookmarks",
+        element: (
+          <ProtectedRoute>
+            <Bookmarks />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: "/:id",
-        element: <MoviePage />,
+        element: (
+          <ProtectedRoute>
+            <MoviePage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/forget-password",
-        element: <ForgetPasswordPage />,
+        element: (
+          <UnAuthenticateRoutes>
+            <ForgetPasswordPage />
+          </UnAuthenticateRoutes >
+        )
       },
       {
         path: "/reset-password",
-        element: <ResetPasswordPage />,
+        element: (
+          <UnAuthenticateRoutes>
+            <ResetPasswordPage />
+          </UnAuthenticateRoutes>
+        )
       }
     ],
   },

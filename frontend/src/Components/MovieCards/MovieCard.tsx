@@ -18,7 +18,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
 
     return (
         <div className="flex flex-col">
-            <NavLink className="flex-shrink-0 mb-2 w-40 h-28 flex justify-end rounded relative md:w-[17.5rem] md:h-[10.875rem]"
+            <NavLink className="flex-shrink-0 mb-2 h-28 flex justify-end rounded relative md:h-[10.875rem]"
                 style={{
                     backgroundImage: `url(${movie.image})`,
                     backgroundSize: "cover",
