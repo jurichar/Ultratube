@@ -5,7 +5,7 @@ import { ChangeEvent, ReactElement, ReactPortal } from "react";
 export interface Movie {
   id: string;
   title: string;
-  release: string;
+  year: number;
   image: string;
   synopsis: string;
   rating: number;

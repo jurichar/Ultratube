@@ -1,14 +1,13 @@
 // frontend/src/Components/Home/Home.tsx
 
-import { useEffect, useRef, useState } from "react";
-import MovieCard from "../MovieCards/MovieCard";
+import { useEffect, useState } from "react";
 import MovieCardTrending from "../MovieCards/MovieCardTrending";
 import SearchBar from "../SearchBar/SearchBar";
 import { Movie } from "../../types";
+import RecommendedMovie from "./RecommendedMovie/RecommendedMovie";
 
 export default function Home() {
   const [moviesTrending, setMoviesTrending] = useState<Movie[]>([]);
-  const [movies, setMovies] = useState<Movie[]>([]);
   const [page, setPage] = useState<number>(2);
 
   function handleSearch(search: string) {
@@ -74,36 +73,6 @@ export default function Home() {
     return () => {};
   }, []);
 
-  async function get_all_movies() {
-    const res = await fetch(`https://yts.mx/api/v2/list_movies.json?sort=like_count&page=${page}&limit=50`, { method: "GET" });
-    const responsejson = await res.json();
-    if ("movies" in responsejson.data) {
-      const arrayTrending = responsejson.data.movies.map((elem) => {
-        return {
-          id: elem.id,
-          title: elem.title,
-          release: elem.year,
-          image: elem.medium_cover_image,
-          synopsis: elem.synopsis,
-          trailer: elem.yt_trailer_code,
-          imdb_link: elem.imdb_code,
-          genres: elem.genres,
-          language: elem.language,
-          rating: elem.rating,
-          summary: elem.summary,
-          length: elem.runtime,
-        };
-      });
-      const tmp_movies: Movie[] = structuredClone(movies);
-      Array.prototype.push.apply(tmp_movies, arrayTrending);
-      setMovies(tmp_movies);
-    }
-  }
-
-  useEffect(() => {
-    get_all_movies();
-  }, [page]);
-
   return (
     <div className="w-full h-max text-quinary p-4 flex flex-col items-center justify-around gap-6">
       <SearchBar onSearch={handleSearch} />
@@ -115,14 +84,7 @@ export default function Home() {
           ))}
         </div>
       </div>
-      <div className="w-full h-full flex flex-col gap-4 ">
-        <span>Recommended for you</span>
-        <div className="flex  flex-row flex-wrap gap-5">
-          {movies.map((movie) => (
-            <MovieCard key={movie.id} movie={movie} />
-          ))}
-        </div>
-      </div>
+      <RecommendedMovie page={page} />
     </div>
   );
 }

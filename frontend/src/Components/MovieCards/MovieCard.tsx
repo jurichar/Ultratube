@@ -5,6 +5,7 @@ import { Movie } from "../../types";
 import { useState } from "react";
 import Loading from "../Loading/Loading";
 import { useNavigate } from "react-router-dom";
+import { FaStar } from "react-icons/fa";
 interface MovieCardProps {
   movie: Movie;
 }
@@ -38,7 +39,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
         <BookmarkIcon />
       </div>
       <div className="flex flex-row items-center gap-2">
-        <span className="text-quinary text-xs">{movie.release}</span>
+        <span className="text-quinary text-xs">{movie.year}</span>
         <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10" fill="none">
           <path
             opacity="0.75"
@@ -49,9 +50,14 @@ export default function MovieCard({ movie }: MovieCardProps) {
           />
         </svg>
         <span className="text-quaternary text-xs ">Movie</span>
+        <span className="text-quinary text-xs">{movie.length}min</span>
       </div>
       <span className="text-quinary">{movie.title.length > 14 ? movie.title.slice(0, 14) + "..." : movie.title}</span>
-      {movie.rating > 0.0 && <span>rating {movie.rating}</span>}
+      {movie.rating > 0.0 && (
+        <div className="flex flex-row  items-center">
+          {movie.rating} <FaStar />
+        </div>
+      )}
       <img src={movie.image} alt={movie.title} onLoad={handleImageLoad} style={{ display: "none" }} />
     </div>
   );

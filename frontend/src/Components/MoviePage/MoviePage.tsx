@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { Movie, crewUser } from "../../types";
-import CardCrew from "./CardCrew/CardCrew";
+import MemberMovie from "./MemberMovie/MemberMovie";
+import CommentSection from "./CommentSection/CommentSection";
+import TrailerSection from "../Global/TrailerSection/TrailerSection";
 
 export default function MoviePage() {
   const { id } = useParams<{ id: string }>();
@@ -28,7 +30,7 @@ export default function MoviePage() {
               .then((res) => res.json())
               .then((json) => {
                 if ("credits" in json && "cast" in json["credits"]) {
-                  const cast = json["credits"]["cast"].map((elem) => {
+                  const cast = json["credits"]["cast"].map((elem: crewUser) => {
                     return {
                       character: elem.character,
                       known_for_department: elem.known_for_department,
@@ -39,10 +41,10 @@ export default function MoviePage() {
                   setCast(cast);
                 }
                 if ("credits" in json && "crew" in json["credits"]) {
-                  const crew = json["credits"]["crew"].map((elem) => {
+                  const crew = json["credits"]["crew"].map((elem: crewUser) => {
                     return {
                       character: "",
-                      known_for_department: elem.known_for_department,
+                      known_for_department: elem?.known_for_department,
                       name: elem.name,
                       profile_path: elem.profile_path && "https://image.tmdb.org/t/p/w138_and_h175_face/" + elem.profile_path,
                     };
@@ -62,13 +64,11 @@ export default function MoviePage() {
       if (movie?.imdb_link) {
         getImdb_info(movie.imdb_link);
       }
-      // then show information on the movie page !
-      console.log(movie);
       setMovie(movie);
     }
     return () => {
-      setMovie();
-      setCrew();
+      setMovie(undefined);
+      setCrew(undefined);
     };
   }, [id, state]);
 
@@ -78,57 +78,31 @@ export default function MoviePage() {
         <div className="w-full h-full bg-cover bg-center bg-no-repeat opacity-30 absolute" style={{ backgroundImage: `url(${movie?.image})` }}></div>
         <h1 className="text-4xl font-bold opacity-100">{movie?.title}</h1>
         <h2 className="text-2xl">{movie?.release}</h2>
-        {movie?.rating > 0.0 && <h3>imb rating : {movie?.rating} /10 </h3>}
+        {movie && movie?.rating > 0.0 && <h3>imb rating : {movie?.rating} /10 </h3>}
         <h3> {movie?.length} minutes</h3>
       </div>
-      {movie?.summary && (
-        <div className="w-4/5 flex flex-col  gap-6 justify-center items-center">
+      {movie?.summary ? (
+        <div className="w-8/12 flex flex-col  gap-6 justify-center items-center">
           <h1 className="text-4xl font-bold text-white">Summary</h1>
           <span className="text-white text-center">{movie?.summary}</span>
         </div>
+      ) : (
+        movie?.synopsis && (
+          <div className="w-8/12 flex flex-col  gap-6 justify-center items-center">
+            <h1 className="text-4xl font-bold text-white">Synopsis</h1>
+            <span className="text-white text-center">{movie?.synopsis}</span>
+          </div>
+        )
       )}
-      {movie?.trailer && (
-        <div className=" w-full flex flex-col  gap-6 justify-center items-center">
-          <h1 className="text-4xl font-bold text-white">Trailer</h1>
-          <iframe
-            className="w-full aspect-video"
-            src={`https://www.youtube.com/embed/${movie.trailer}`}
-            title="YouTube video player"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-          ></iframe>
-        </div>
-      )}
+      {movie?.trailer && <TrailerSection linkEmbed={movie.trailer} />}
 
       <h1 className="text-4xl font-bold text-white">Movie</h1>
-      <div className="w-full h-auto w-auto bg-secondary">
+      <div className="w-10/12 h-auto  bg-secondary">
         <iframe className="w-full aspect-video" src="https://moacloud.com/iframe/FavoXpQrbD" allowFullScreen></iframe>
       </div>
       <h4 className="text-quinary"> genres : {movie?.genres?.join(",")}</h4>
-      {(cast && cast?.length) > 0 && (
-        <div className=" w-full">
-          <h1 className="text-4xl font-bold text-center mb-8 text-white">Cast</h1>
-          <ul className="flex w-full overflow-scroll flex-row gap-4 ">
-            {cast?.map((elem, index) => (
-              <CardCrew key={index} {...elem} />
-            ))}
-          </ul>
-        </div>
-      )}
-      {(crew && crew?.length) > 0 && (
-        <div className=" w-full">
-          <h1 className="text-4xl font-bold text-center mb-8 text-white">Crew</h1>
-          <ul className="flex w-full overflow-scroll flex-row gap-4 ">
-            {crew?.map((elem, index) => (
-              <CardCrew key={index} {...elem} />
-            ))}
-          </ul>
-        </div>
-      )}
-      {/* movie comments */}
-      <div className="w-full h-1/4 flex flex-col justify-center items-center">
-        <h1 className="text-4xl font-bold text-white">Comments</h1>
-      </div>
+      <MemberMovie crew={crew} cast={cast} />
+      <CommentSection />
     </div>
   );
 }
