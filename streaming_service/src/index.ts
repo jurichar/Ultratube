@@ -1,5 +1,1 @@
-import * as fs from "fs";
-
-fs;
-
-console.log("Hello world");
+console.log("Hello world!");
