@@ -8,7 +8,7 @@ import RecommendedMovie from "./RecommendedMovie/RecommendedMovie";
 
 export default function Home() {
   const [moviesTrending, setMoviesTrending] = useState<Movie[]>([]);
-  const [page, setPage] = useState<number>(2);
+  const [page, setPage] = useState<number>(1);
 
   function handleSearch(search: string) {
     const filteredMovies = movies.filter((movie) => {
@@ -84,7 +84,7 @@ export default function Home() {
           ))}
         </div>
       </div>
-      <RecommendedMovie page={page} />
+      <RecommendedMovie page={page} setPage={setPage} />
     </div>
   );
 }

@@ -86,3 +86,17 @@ type ReactNode = ReactChild | ReactFragment | ReactPortal | boolean | null | und
 export type Props = {
   children: ReactNode;
 };
+
+export type objectFilter = {
+  id: number;
+  name: string;
+  placeholder?: string;
+};
+
+export type filter = {
+  rating: number;
+  genre: string;
+  min_year_release: number;
+  duration: string | "all" | "u_60" | "60-120" | "a_120";
+  name: string;
+};
