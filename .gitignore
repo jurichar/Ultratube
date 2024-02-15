@@ -346,3 +346,7 @@ sketch
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/react,django,python,visualstudiocode,macos,linux
+
+# streaming_torrent specific
+
+streaming_service/torrents
