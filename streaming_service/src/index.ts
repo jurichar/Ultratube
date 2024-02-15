@@ -1,10 +1,9 @@
 import Fastify, { FastifyInstance } from "fastify";
-import { downloadTorrent, getDecodedTorrentFile } from "./ft_torrent.js";
-
-/* Api routes needed
- * post : download movie
- * get: stream movie
- */
+import {
+  downloadTorrent,
+  getDecodedTorrentFile,
+  deleteTorrent,
+} from "./ft_torrent.js";
 
 const fastify: FastifyInstance = Fastify({
   logger: true,
@@ -23,16 +22,17 @@ fastify.post("/download-torrent", async (request, reply) => {
 
     // call download .torrent handler
     const torrentPath = downloadTorrent(torrentUrl);
-    getDecodedTorrentFile(torrentPath);
     // decode .torrent
+    const torrentMetaData = getDecodedTorrentFile(torrentPath);
     // parse .torrent
     // connect to peers
     // download movie
     // then stream it
     // delete .torrent file
+    deleteTorrent(torrentPath);
     // save movie path in db
 
-    reply.code(200).send({ torrent: torrentPath });
+    reply.code(200).send({ torrent: torrentMetaData });
   } catch (error) {
     console.error(`Error when downloading torrent: ${error}`);
     reply.code(500).send("Internal server error");
