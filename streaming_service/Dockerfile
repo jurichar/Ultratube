@@ -5,7 +5,8 @@ WORKDIR /app
 COPY . .
 
 RUN npm install \
-  && npm run build
+  && npm run build \
+  && mkdir -p /app/torrents
 
 EXPOSE 8001
 
