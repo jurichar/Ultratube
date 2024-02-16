@@ -13,6 +13,10 @@ interface TorrentDownloadBody {
   torrentUrl: string;
 }
 
+fastify.get("/ping", async (_request, reply) => {
+  reply.code(200).send({ pong: "pong" });
+});
+
 fastify.post("/download-torrent", async (request, reply) => {
   try {
     const { torrentUrl }: TorrentDownloadBody =
@@ -41,7 +45,10 @@ fastify.post("/download-torrent", async (request, reply) => {
 
 const start = async () => {
   try {
-    await fastify.listen({ port: 8001 });
+    await fastify.listen({
+      host: process.env.ADDRESS,
+      port: parseInt(process.env.PORT, 10),
+    });
   } catch (error) {
     fastify.log.error(`Error: ${error}`);
   }

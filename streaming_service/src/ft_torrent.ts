@@ -44,7 +44,6 @@ export function getDecodedTorrentFile(torrentPath: string) {
   const torrent = fs.readFileSync(torrentPath);
 
   const decodedTorrent = convertUint8ArrayToString(bencode.decode(torrent));
-  console.log(decodedTorrent);
   return decodedTorrent;
 }
 

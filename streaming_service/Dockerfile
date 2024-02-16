@@ -9,4 +9,6 @@ RUN npm install \
 
 EXPOSE 8001
 
-ENTRYPOINT ["npm", "run", "start"]
+ENV ADDRESS=0.0.0.0 PORT=8001
+
+CMD ["npm", "run", "dev"]
