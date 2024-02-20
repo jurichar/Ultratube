@@ -9,12 +9,14 @@ export interface Movie {
   image: string;
   synopsis: string;
   rating: number;
-  imdb_link: string;
-  summary: string;
+  t_imdb_id?: string;
+  imdb_link?: string;
+  summary?: string;
   language: string;
-  trailer: string;
+  trailer?: string;
   genres: Array<string>;
   length: number;
+  torrent?: string;
 }
 
 export interface User {

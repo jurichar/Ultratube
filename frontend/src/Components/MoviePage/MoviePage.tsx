@@ -11,61 +11,75 @@ export default function MoviePage() {
   const [movie, setMovie] = useState<Movie>();
   const [crew, setCrew] = useState<crewUser[]>();
   const [cast, setCast] = useState<crewUser[]>();
+  const options = {
+    method: "GET",
+    headers: {
+      accept: "application/json",
+      Authorization: `Bearer  ${import.meta.env.VITE_TIMDB_ACCESS_KEY}`,
+    },
+  };
 
-  async function getImdb_info(link: string) {
-    const options = {
-      method: "GET",
-      headers: {
-        accept: "application/json",
-        Authorization: `Bearer  ${import.meta.env.VITE_TIMDB_ACCESS_KEY}`,
-      },
-    };
-    fetch(`https://api.themoviedb.org/3/find/${link}?external_source=imdb_id`, options)
+  async function getImdb_info(id_timdb: string) {
+    fetch(`https://api.themoviedb.org/3/movie/${id_timdb}?append_to_response=credits&language=en-US`, options)
       .then((res) => res.json())
       .then((json) => {
-        if ("movie_results" in json && json["movie_results"].length > 0) {
-          if ("id" in json["movie_results"][0]) {
-            const id_timdb = json["movie_results"][0].id;
-            fetch(`https://api.themoviedb.org/3/movie/${id_timdb}?append_to_response=credits&language=en-US`, options)
-              .then((res) => res.json())
-              .then((json) => {
-                if ("credits" in json && "cast" in json["credits"]) {
-                  const cast = json["credits"]["cast"].map((elem: crewUser) => {
-                    return {
-                      character: elem.character,
-                      known_for_department: elem.known_for_department,
-                      name: elem.name,
-                      profile_path: elem.profile_path && "https://image.tmdb.org/t/p/w138_and_h175_face/" + elem.profile_path,
-                    };
-                  });
-                  setCast(cast);
-                }
-                if ("credits" in json && "crew" in json["credits"]) {
-                  const crew = json["credits"]["crew"].map((elem: crewUser) => {
-                    return {
-                      character: "",
-                      known_for_department: elem?.known_for_department,
-                      name: elem.name,
-                      profile_path: elem.profile_path && "https://image.tmdb.org/t/p/w138_and_h175_face/" + elem.profile_path,
-                    };
-                  });
-                  setCrew(crew);
-                }
-              })
-              .catch((err) => console.error("error:" + err));
-          }
+        if ("credits" in json && "cast" in json["credits"]) {
+          const cast = json["credits"]["cast"].map((elem: crewUser) => {
+            return {
+              character: elem.character,
+              known_for_department: elem.known_for_department,
+              name: elem.name,
+              profile_path: elem.profile_path && "https://image.tmdb.org/t/p/w138_and_h175_face/" + elem.profile_path,
+            };
+          });
+          setCast(cast);
+        }
+        if ("credits" in json && "crew" in json["credits"]) {
+          const crew = json["credits"]["crew"].map((elem: crewUser) => {
+            return {
+              character: "",
+              known_for_department: elem?.known_for_department,
+              name: elem.name,
+              profile_path: elem.profile_path && "https://image.tmdb.org/t/p/w138_and_h175_face/" + elem.profile_path,
+            };
+          });
+          setCrew(crew);
         }
       })
       .catch((err) => console.error("error:" + err));
   }
-  useEffect(() => {
-    if (id) {
-      const { movie } = state;
-      if (movie?.imdb_link) {
-        getImdb_info(movie.imdb_link);
+
+  const get_timdb_id = async (imdb_link: string) => {
+    let id_timdb = "";
+    try {
+      const response = await fetch(`https://api.themoviedb.org/3/find/${imdb_link}?external_source=imdb_id`, options);
+      const json = await response.json();
+      if ("movie_results" in json && json["movie_results"].length > 0) {
+        if ("id" in json["movie_results"][0]) {
+          id_timdb = json["movie_results"][0].id;
+          return id_timdb;
+        }
       }
-      setMovie(movie);
+    } catch (error) {
+      console.log(error);
     }
+  };
+
+  useEffect(() => {
+    const { movieProps } = state;
+
+    async function getAsyncTimdb() {
+      if (movieProps?.imdb_link) {
+        const timdb_id = await get_timdb_id(movieProps?.imdb_link);
+        if (timdb_id) {
+          getImdb_info(timdb_id);
+        }
+      } else if (movieProps?.t_imdb_id) {
+        getImdb_info(movieProps?.t_imdb_id);
+      }
+    }
+    getAsyncTimdb();
+    setMovie(movieProps);
     return () => {
       setMovie(undefined);
       setCrew(undefined);

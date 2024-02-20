@@ -5,16 +5,18 @@ import MovieCardTrending from "../MovieCards/MovieCardTrending";
 import SearchBar from "../SearchBar/SearchBar";
 import { Movie } from "../../types";
 import RecommendedMovie from "./RecommendedMovie/RecommendedMovie";
+import SearchResult from "../SearchResult/SearchResult";
 
 export default function Home() {
   const [moviesTrending, setMoviesTrending] = useState<Movie[]>([]);
+  const [showSearch, setShowSearch] = useState(false);
   const [page, setPage] = useState<number>(1);
 
   function handleSearch(search: string) {
-    const filteredMovies = movies.filter((movie) => {
-      return movie.title.toLowerCase().includes(search.toLowerCase());
-    });
-    setMovies(filteredMovies);
+    // const filteredMovies = mov.filter((movie) => {
+    //   return movie.title.toLowerCase().includes(search.toLowerCase());
+    // });
+    // setMovies(filteredMovies);
   }
 
   async function get_trending_movie() {
@@ -23,7 +25,6 @@ export default function Home() {
       const all_movies_json = await all_movies_res.json();
       if ("movies" in all_movies_json.data) {
         const arrayTrending = all_movies_json.data.movies.map((elem) => {
-          console.log(elem);
           return {
             id: elem.id,
             title: elem.title,
@@ -73,18 +74,28 @@ export default function Home() {
     return () => {};
   }, []);
 
+  useEffect(() => {
+    if (showSearch) {
+      setPage(1);
+    }
+  }, [showSearch]);
+
   return (
     <div className="w-full h-max text-quinary p-4 flex flex-col items-center justify-around gap-6">
-      <SearchBar onSearch={handleSearch} />
-      <div className="w-full h-full flex flex-col gap-4 ">
-        <span>Trending</span>
-        <div className="overflow-x-auto w-full flex flex-row gap-4">
-          {moviesTrending.map((movie) => (
-            <MovieCardTrending key={movie.id} movie={movie} />
-          ))}
-        </div>
-      </div>
-      <RecommendedMovie page={page} setPage={setPage} />
+      <SearchBar onSearch={handleSearch} setShowSearch={setShowSearch} showSearch={showSearch} />
+      {!showSearch && (
+        <>
+          <div className="w-full h-full flex flex-col gap-4 ">
+            <span>Trending</span>
+            <div className="overflow-x-auto w-full flex flex-row gap-4">
+              {moviesTrending.map((movie) => (
+                <MovieCardTrending key={movie.id} movie={movie} />
+              ))}
+            </div>
+          </div>
+          <RecommendedMovie page={page} setPage={setPage} />
+        </>
+      )}
     </div>
   );
 }

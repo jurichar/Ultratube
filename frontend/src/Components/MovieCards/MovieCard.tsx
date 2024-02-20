@@ -19,7 +19,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
   };
 
   const handleMovieClick = () => {
-    navigate(`/movie/${movie.id}`, { state: { movie: movie } });
+    navigate(`/movie/${movie.id}`, { state: { movieProps: movie } });
   };
 
   return (
