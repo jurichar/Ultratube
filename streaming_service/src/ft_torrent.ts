@@ -2,6 +2,18 @@ import * as fs from "fs";
 import https from "https";
 import bencode from "bencode";
 import * as ttypes from "./ft_torrent_types.js";
+import { createHash } from "node:crypto";
+
+function generateInfoHash(torrentPath: string): string {
+  const torrent = fs.readFileSync(torrentPath);
+  const toHash = bencode.decode(torrent);
+
+  return createHash("sha1").update(bencode.encode(toHash)).digest("hex");
+}
+
+function generatePeerId(): string {
+  return createHash("sha1").update(Date.now().toString()).digest("hex");
+}
 
 function generatePath(torrentUrl: string): string {
   const splitedUrl: string[] = torrentUrl.split("/");
@@ -92,8 +104,6 @@ export function getDecodedTorrentFile(torrentPath: string) {
   const decodedTorrent = normalizeTorrentMeta(
     convertUint8ArrayToString(bencode.decode(torrent)),
   );
-
-  // const decodedTorrent = convertUint8ArrayToString(bencode.decode(torrent));
 
   return decodedTorrent;
 }
