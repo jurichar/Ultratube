@@ -31,3 +31,20 @@ export interface TorrentMeta {
   creationDate?: number;
   encoding?: string;
 }
+
+interface Peer {
+  peerId: string;
+  ip: string;
+  port: number;
+}
+
+interface TrackerResponse {
+  failureReason?: string;
+  warningMessage?: string;
+  interval: number;
+  intervalMin: number;
+  trackerId?: string;
+  complete: number;
+  incomplete: number;
+  peers: Peer[];
+}
