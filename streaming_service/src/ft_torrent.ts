@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import https from "https";
-import http from "http";
 import bencode from "bencode";
+import * as ttypes from "./ft_torrent_types.js";
 
 function generatePath(torrentUrl: string): string {
   const splitedUrl: string[] = torrentUrl.split("/");
@@ -10,10 +10,11 @@ function generatePath(torrentUrl: string): string {
 
 export function downloadTorrent(torrentUrl: string): string {
   const path = generatePath(torrentUrl);
-  https.get(torrentUrl, (res: http.IncomingMessage) => {
+  https.get(torrentUrl, (res) => {
     if (res.statusCode !== 200) {
       console.error(`Error: ${res.statusCode} `);
     }
+
     const filePath = fs.createWriteStream(path);
     res.pipe(filePath);
     filePath.on("finish", () => {
@@ -25,7 +26,7 @@ export function downloadTorrent(torrentUrl: string): string {
   return path;
 }
 
-function convertUint8ArrayToString(data) {
+function convertUint8ArrayToString(data: unknown) {
   if (Array.isArray(data)) {
     return data.map(convertUint8ArrayToString);
   } else if (data instanceof Uint8Array) {
@@ -40,10 +41,60 @@ function convertUint8ArrayToString(data) {
   return data;
 }
 
+function normalizeTorrentMeta(decodedTorrent): ttypes.TorrentMeta {
+  const torrentMetaData = {} as ttypes.TorrentMeta;
+  const info = {} as ttypes.Info;
+
+  // Determine if the .torrent file have one or multiples files
+  if (Object.prototype.hasOwnProperty.call(decodedTorrent?.info, "length")) {
+    const file: ttypes.SingleFileMode = {
+      name: decodedTorrent?.info?.name,
+      length: decodedTorrent?.info?.length,
+      md5sum: decodedTorrent?.info?.md5sum,
+    };
+
+    info.file = file;
+  } else if (
+    Object.prototype.hasOwnProperty.call(decodedTorrent?.info, "files")
+  ) {
+    const file: ttypes.MultiFileMode = {
+      name: decodedTorrent?.info?.name,
+      files: decodedTorrent?.info?.files.map((rawFile) => ({
+        length: rawFile?.length,
+        path: rawFile?.length,
+        md5sum: rawFile?.md5sum,
+      })),
+    };
+    info.file = file;
+  } else {
+    throw new Error("Torrent type unhandled");
+  }
+
+  info.pieceLength = decodedTorrent?.info["piece length"];
+  info.pieces = decodedTorrent?.info?.pieces;
+  info.private =
+    parseInt(decodedTorrent?.info?.private, 10) === 1 ? true : false;
+
+  torrentMetaData.announce = decodedTorrent.announce;
+  torrentMetaData.announceList = decodedTorrent["announce-list"];
+  torrentMetaData.createdBy = decodedTorrent["created by"];
+  torrentMetaData.creationDate = decodedTorrent["creation date"];
+  torrentMetaData.encoding = decodedTorrent?.encoding;
+  torrentMetaData.comment = decodedTorrent?.comment;
+  torrentMetaData.info = info;
+
+  return torrentMetaData;
+}
+
 export function getDecodedTorrentFile(torrentPath: string) {
   const torrent = fs.readFileSync(torrentPath);
 
-  const decodedTorrent = convertUint8ArrayToString(bencode.decode(torrent));
+  const decodedTorrent = normalizeTorrentMeta(
+    convertUint8ArrayToString(bencode.decode(torrent)),
+  );
+
+  // const decodedTorrent = convertUint8ArrayToString(bencode.decode(torrent));
+
   return decodedTorrent;
 }
 

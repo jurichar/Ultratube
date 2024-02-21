@@ -1,9 +1,5 @@
 import Fastify, { FastifyInstance } from "fastify";
-import {
-  downloadTorrent,
-  getDecodedTorrentFile,
-  deleteTorrent,
-} from "./ft_torrent.js";
+import { downloadTorrent, getDecodedTorrentFile } from "./ft_torrent.js";
 
 const fastify: FastifyInstance = Fastify({
   logger: true,
@@ -33,21 +29,21 @@ fastify.post("/download-torrent", async (request, reply) => {
     // download movie
     // then stream it
     // delete .torrent file
-    deleteTorrent(torrentPath);
+    // deleteTorrent(torrentPath);
     // save movie path in db
 
     reply.code(200).send({ torrent: torrentMetaData });
   } catch (error) {
     console.error(`Error when downloading torrent: ${error}`);
-    reply.code(500).send("Internal server error");
+    reply.code(404).send("Torrent is currently unavailable");
   }
 });
 
 const start = async () => {
   try {
     await fastify.listen({
-      host: process.env.ADDRESS,
-      port: parseInt(process.env.PORT, 10),
+      host: "0.0.0.0",
+      port: 8001,
     });
   } catch (error) {
     fastify.log.error(`Error: ${error}`);

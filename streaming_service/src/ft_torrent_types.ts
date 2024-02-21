@@ -1,22 +1,28 @@
-interface InfoFile {
+interface File {
+  path: string[] | string;
   length: number;
-  path: string;
   md5sum?: string;
 }
 
-interface InfoMultiFiles {
-  path: string;
-  files: InfoFile[];
+export interface SingleFileMode {
+  name: string;
+  length: number;
+  md5sum?: string;
 }
 
-interface Info {
-  files: InfoFile | InfoMultiFiles;
+export interface MultiFileMode {
   name: string;
+  files: File[];
+}
+
+export interface Info {
   pieceLength: number;
   pieces: string;
+  private?: boolean;
+  file: SingleFileMode | MultiFileMode;
 }
 
-interface TorrentMeta {
+export interface TorrentMeta {
   announce: string;
   announceList?: string[];
   comment?: string;
