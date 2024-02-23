@@ -24,7 +24,7 @@ export interface Info {
 
 export interface TorrentMeta {
   announce: string;
-  announceList?: string[];
+  announceList?: string[][];
   comment?: string;
   createdBy?: string;
   info: Info;

@@ -1,5 +1,10 @@
 import Fastify, { FastifyInstance } from "fastify";
-import { downloadTorrent, getDecodedTorrentFile } from "./ft_torrent.js";
+import {
+  deleteTorrent,
+  downloadTorrent,
+  getDecodedTorrentFile,
+  queryTracker,
+} from "./ft_torrent.js";
 
 const fastify: FastifyInstance = Fastify({
   logger: true,
@@ -27,8 +32,11 @@ fastify.post("/download-torrent", async (request, reply) => {
     // parse .torrent
     // connect to peers
     // download movie
+    // const movie = await queryTracker(torrentPath, torrentMetaData);
+    // console.log(movie);
     // then stream it
     // delete .torrent file
+    // deleteTorrent(torrentPath);
     // deleteTorrent(torrentPath);
     // save movie path in db
 

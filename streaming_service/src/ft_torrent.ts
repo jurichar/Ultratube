@@ -2,17 +2,57 @@ import * as fs from "fs";
 import https from "https";
 import bencode from "bencode";
 import * as ttypes from "./ft_torrent_types.js";
-import { createHash } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 
 function generateInfoHash(torrentPath: string): string {
   const torrent = fs.readFileSync(torrentPath);
   const toHash = bencode.decode(torrent);
 
-  return createHash("sha1").update(bencode.encode(toHash)).digest("hex");
+  return encodeURIComponent(
+    createHash("sha1").update(bencode.encode(toHash)).digest("hex"),
+  );
 }
 
 function generatePeerId(): string {
-  return createHash("sha1").update(Date.now().toString()).digest("hex");
+  const peerId = "-FT1000-" + randomBytes(12).toString("hex");
+  return encodeURIComponent(createHash("sha1").update(peerId).digest("hex"));
+}
+
+function filterNonHtppTrackers(trackers: string[][]): string[][] {
+  const httpTrackers: string[][] = [];
+
+  for (let i = 0; i < trackers.length; i++) {
+    const tracker: string[] = trackers[i].filter((t: string) =>
+      t.startsWith("http"),
+    );
+    if (tracker.length > 0) {
+      httpTrackers.push(tracker);
+    }
+  }
+
+  return httpTrackers;
+}
+
+export async function queryTracker(
+  torrentPath: string,
+  torrentMetaData: ttypes.TorrentMeta,
+) {
+  const infoHash = generateInfoHash(torrentPath);
+  const peerId = generatePeerId();
+  const ports: number[] = [];
+
+  for (let i = 6881; i < 6889; i++) {
+    ports.push(i);
+  }
+
+  const uploaded = 0;
+  const downloaded = 0;
+  const left = torrentMetaData.info.pieces.length;
+  const query = `${torrentMetaData.announce}?peer_id=${peerId}&info_hash=${infoHash}&port=${ports[0]}&uploaded=${uploaded}&downloaded=${downloaded}&left=${left}`;
+
+  console.log(`Querying: ${query}`);
+  const response = await fetch(query);
+  return response.text();
 }
 
 function generatePath(torrentUrl: string): string {
@@ -89,6 +129,11 @@ function normalizeTorrentMeta(decodedTorrent): ttypes.TorrentMeta {
 
   torrentMetaData.announce = decodedTorrent.announce;
   torrentMetaData.announceList = decodedTorrent["announce-list"];
+
+  torrentMetaData.announceList = filterNonHtppTrackers(
+    torrentMetaData.announceList,
+  );
+
   torrentMetaData.createdBy = decodedTorrent["created by"];
   torrentMetaData.creationDate = decodedTorrent["creation date"];
   torrentMetaData.encoding = decodedTorrent?.encoding;
