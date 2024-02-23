@@ -3,8 +3,7 @@ import {
   deleteTorrent,
   downloadTorrent,
   getDecodedTorrentFile,
-  queryTracker,
-} from "./ft_torrent.js";
+} from "./torrentMetaParser.js";
 
 const fastify: FastifyInstance = Fastify({
   logger: true,
@@ -36,8 +35,7 @@ fastify.post("/download-torrent", async (request, reply) => {
     // console.log(movie);
     // then stream it
     // delete .torrent file
-    // deleteTorrent(torrentPath);
-    // deleteTorrent(torrentPath);
+    deleteTorrent(torrentPath);
     // save movie path in db
 
     reply.code(200).send({ torrent: torrentMetaData });
