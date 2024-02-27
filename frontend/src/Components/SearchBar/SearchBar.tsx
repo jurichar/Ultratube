@@ -10,16 +10,7 @@ interface SearchBarProps {
   showSearch: boolean;
 }
 
-export type TorrentMovieTrailer = {
-  result: [{ key: string }];
-};
-export type ApiTorrentMovie = {
-  category: string;
-  name: string;
-  videos?: TorrentMovieTrailer[];
-  torrent?: string;
-};
-const SearchBar = ({ onSearch, setShowSearch, showSearch, cancelSearch }: SearchBarProps) => {
+const SearchBar = ({ onSearch, setShowSearch, showSearch }: SearchBarProps) => {
   const [search, setSearch] = useState("");
 
   const handleSubmitSearch = () => {
@@ -40,7 +31,6 @@ const SearchBar = ({ onSearch, setShowSearch, showSearch, cancelSearch }: Search
   const cancelSearchLocal = () => {
     setSearch("");
     setShowSearch(false);
-    cancelSearch();
   };
   return (
     <div className="flex flex-col items-center w-full gap-4">

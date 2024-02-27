@@ -1,10 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 // frontend/src/Components/Home/Home.tsx
 
-import { useCallback, useEffect, useState } from "react";
-import MovieCardTrending from "../MovieCards/MovieCardTrending";
-import SearchBar, { ApiTorrentMovie } from "../SearchBar/SearchBar";
-import { Movie, Order, YtsMovie, filter } from "../../types";
+import { useEffect, useState } from "react";
+import SearchBar from "../SearchBar/SearchBar";
+import { Movie, Order, filter } from "../../types";
 import RecommendedMovie from "./RecommendedMovie/RecommendedMovie";
 import SearchResult from "../SearchResult/SearchResult";
 import Filter from "./Filter/Filter";
@@ -19,15 +18,12 @@ export default function Home() {
   const [filter, setFilter] = useState<filter>(initialState);
   const [sort, setSort] = useState<keyof Movie>("rating");
   const [order, setOrder] = useState<Order>("asc");
-  const [loading, setLoading] = useState<boolean>(false);
 
   async function handleSearch(search: string) {
-    setLoading(true);
     setPage(1);
     setSort("title");
     setOrder("asc");
     setSearchQuery(search);
-    setLoading(false);
   }
 
   const filterSort = (currentMovie: Movie[], arrayMovie: Movie[]) => {
@@ -64,7 +60,6 @@ export default function Home() {
         tmpArrayMovie = tmpArrayMovie.filter(({ length }) => length >= 120);
       }
     }
-    // console.log()
     return tmpArrayMovie;
   };
 

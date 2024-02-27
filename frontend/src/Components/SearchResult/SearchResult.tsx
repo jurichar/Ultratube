@@ -1,8 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
-import { Movie, Order, YtsMovie, filter } from "../../types";
+import { ApiTorrentMovie, Movie, Order, YtsMovie, filter } from "../../types";
 import MovieCard from "../MovieCards/MovieCard";
-import { ApiTorrentMovie } from "../SearchBar/SearchBar";
 
 type searchResultProps = {
   showSearch: boolean;
@@ -159,7 +158,6 @@ export default function SearchResult(props: searchResultProps) {
   const updateMoviesSearch = async (query: string) => {
     try {
       const res = await requestExternalSourceSearch(query);
-      console.log(res);
       setMovies(res);
     } catch (error) {
       setMovies([]);
@@ -172,6 +170,7 @@ export default function SearchResult(props: searchResultProps) {
       updateMoviesSearch(querySearch);
     }
   }, [querySearch, filter, sort]);
+
   return (
     <div className="flex  flex-row flex-wrap gap-5">
       {movies.map((movie, index) => {

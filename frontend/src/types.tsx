@@ -69,6 +69,15 @@ export type UserData = {
   omniauth?: boolean;
 };
 export type Order = "asc" | "desc";
+export type TorrentMovieTrailer = {
+  result: [{ key: string }];
+};
+export type ApiTorrentMovie = {
+  category: string;
+  name: string;
+  videos?: TorrentMovieTrailer[];
+  torrent?: string;
+};
 export type ProfileForm = {
   username?: string;
   email?: string;
