@@ -73,7 +73,7 @@ export default function SearchResult(props: searchResultProps) {
           imdb_link: jsonTmdb.imdb_id,
           image: "https://media.themoviedb.org/t/p/w220_and_h330_face/" + jsonTmdb.poster_path,
           summary: "",
-          genres: jsonTmdb?.genres?.map((genre) => genre.name),
+          genres: jsonTmdb?.genres?.map((genre: { name: string }) => genre.name),
           language: jsonTmdb.original_language,
           length: jsonTmdb.runtime,
           trailer: trailer,
