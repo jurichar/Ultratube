@@ -6,16 +6,28 @@ import RadioInput from "../../Global/RadioInput/RadioInput";
 import { objectFilter, filter } from "../../../types";
 
 type filterProps = {
-  filter: filter;
-  setFilter: React.Dispatch<React.SetStateAction<filter>>;
   initialState: filter;
-  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleSubmitFilter: (filter: filter) => void;
 };
 export default function Filter(props: filterProps) {
-  const { filter, setFilter, initialState, handleChange } = props;
+  const { initialState, handleSubmitFilter } = props;
+  const [filter, setFilter] = useState<filter>(initialState);
   const [open, setOpen] = useState(false);
   const [genre, setGenre] = useState<objectFilter[]>([]);
-
+  function handleFilter(event: React.ChangeEvent<HTMLInputElement>) {
+    const { name, value, type } = event.target;
+    if (type == "number") {
+      if (!isNaN(event.target.valueAsNumber)) {
+        setFilter({ ...filter, [name]: event.target.valueAsNumber });
+      }
+    } else {
+      setFilter({ ...filter, [name]: value });
+    }
+  }
+  function handleDeleteFilter() {
+    setFilter(initialState);
+    handleSubmitFilter(initialState);
+  }
   const arrayDuration: objectFilter[] = [
     { id: 37373737, name: "u_60", placeholder: "under 60 minutes" },
     { id: 3788787, name: "60-120", placeholder: " 60 minutes to 120 minutes" },
@@ -48,20 +60,21 @@ export default function Filter(props: filterProps) {
           <label htmlFor="rating" className="text-heading-sm flex gap-1">
             Choose minimum rating : {filter.rating} <FaStar />
           </label>
-          <input id="rating" type="range" className="w-3/6" name="rating" onChange={handleChange} value={filter.rating} min={0} max={9} />
+          <input id="rating" type="range" className="w-3/6" name="rating" onChange={handleFilter} value={filter.rating} min={0} max={9} />
         </div>
         <div className="flex  flex-col gap-4">
           <label htmlFor="min-year" className="text-heading-sm">
             Choose your minimal release year
           </label>
-          <InputGlobal handleChange={handleChange} name="min_year_release" value={filter.min_year_release} type="number" placeholder="Choose your minimal release year" />
+          <InputGlobal handleChange={handleFilter} name="min_year_release" value={filter.min_year_release} type="number" placeholder="Choose your minimal release year" />
         </div>
-        <RadioInput handleChange={handleChange} legend="Select your genre:" array={genre} value={filter.genre} name="genre" />
-        <InputGlobal handleChange={handleChange} name="name" value={filter.name} type="text" placeholder="filter by name :" />
-        <RadioInput handleChange={handleChange} legend="filter by duration" value={filter.duration} name="duration" array={arrayDuration} />
+        <RadioInput handleChange={handleFilter} legend="Select your genre:" array={genre} value={filter.genre} name="genre" />
+        <InputGlobal handleChange={handleFilter} name="name" value={filter.name} type="text" placeholder="filter by name :" />
+        <RadioInput handleChange={handleFilter} legend="filter by duration" value={filter.duration} name="duration" array={arrayDuration} />
         <div className="flex w-2/6 gap-4">
-          <ButtonCallToAction handleClick={() => setFilter(initialState)} type="button" name="reset" value="reset filter" />
+          <ButtonCallToAction handleClick={handleDeleteFilter} type="button" name="reset" value="reset filter" />
           <ButtonCallToAction handleClick={() => setOpen(false)} type="button" name="close" value="close filter" />
+          <ButtonCallToAction handleClick={() => handleSubmitFilter(filter)} type="button" name="submit" value="submit filter" />
         </div>
       </div>
     </div>

@@ -18,7 +18,21 @@ export interface Movie {
   length: number;
   torrent?: string;
 }
-
+export type YtsMovie = {
+  id: string;
+  title: string;
+  year: number;
+  medium_cover_image: string;
+  synopsis: string;
+  rating: number;
+  imdb_code: string;
+  summary?: string;
+  language: string;
+  yt_trailer_code?: string;
+  genres: Array<string>;
+  runtime: number;
+  torrent?: string;
+};
 export interface User {
   id: string;
   name: string;
@@ -54,7 +68,7 @@ export type UserData = {
   avatar?: string;
   omniauth?: boolean;
 };
-
+export type Order = "asc" | "desc";
 export type ProfileForm = {
   username?: string;
   email?: string;
