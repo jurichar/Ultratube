@@ -23,22 +23,24 @@ function filterNonHtppTrackers(trackers: string[][]): string[][] {
   return httpTrackers;
 }
 
-export function downloadTorrent(torrentUrl: string): string {
+export async function downloadTorrent(torrentUrl: string): Promise<string> {
   const path = generatePath(torrentUrl);
-  https.get(torrentUrl, (res) => {
-    if (res.statusCode !== 200) {
-      console.error(`Error: ${res.statusCode} `);
-    }
 
-    const filePath = fs.createWriteStream(path);
-    res.pipe(filePath);
-    filePath.on("finish", () => {
-      filePath.close();
-      console.log("download complete!");
+  return new Promise((resolve, reject) => {
+    https.get(torrentUrl, (response) => {
+      response.on("data", (chunk) => {
+        fs.appendFileSync(path, chunk);
+      });
+
+      response.on("end", () => {
+        resolve(path);
+      });
+
+      response.on("error", (err: Error) => {
+        reject(err.message);
+      });
     });
   });
-
-  return path;
 }
 
 function convertUint8ArrayToString(data: unknown) {
@@ -93,9 +95,11 @@ function normalizeTorrentMeta(decodedTorrent): ttypes.TorrentMeta {
   torrentMetaData.announce = decodedTorrent.announce;
   torrentMetaData.announceList = decodedTorrent["announce-list"];
 
-  torrentMetaData.announceList = filterNonHtppTrackers(
-    torrentMetaData.announceList,
-  );
+  if (torrentMetaData.announceList) {
+    torrentMetaData.announceList = filterNonHtppTrackers(
+      torrentMetaData.announceList,
+    );
+  }
 
   torrentMetaData.createdBy = decodedTorrent["created by"];
   torrentMetaData.creationDate = decodedTorrent["creation date"];
