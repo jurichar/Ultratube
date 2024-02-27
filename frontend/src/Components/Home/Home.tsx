@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 // frontend/src/Components/Home/Home.tsx
 
 import { useEffect, useState } from "react";
