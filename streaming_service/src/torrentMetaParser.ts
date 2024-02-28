@@ -43,21 +43,6 @@ export async function downloadTorrent(torrentUrl: string): Promise<string> {
   });
 }
 
-function convertUint8ArrayToString(data: unknown) {
-  if (Array.isArray(data)) {
-    return data.map(convertUint8ArrayToString);
-  } else if (data instanceof Uint8Array) {
-    return Buffer.from(data).toString("utf-8");
-  } else if (typeof data === "object" && data !== null) {
-    const result = {};
-    Object.keys(data).forEach((key) => {
-      result[key] = convertUint8ArrayToString(data[key]);
-    });
-    return result;
-  }
-  return data;
-}
-
 function normalizeTorrentMeta(decodedTorrent): ttypes.TorrentMeta {
   const torrentMetaData = {} as ttypes.TorrentMeta;
   const info = {} as ttypes.Info;
@@ -113,9 +98,7 @@ function normalizeTorrentMeta(decodedTorrent): ttypes.TorrentMeta {
 export function getDecodedTorrentFile(torrentPath: string) {
   const torrent = fs.readFileSync(torrentPath);
 
-  const decodedTorrent = normalizeTorrentMeta(
-    convertUint8ArrayToString(bencode.decode(torrent)),
-  );
+  const decodedTorrent = normalizeTorrentMeta(bencode.decode(torrent, "utf-8"));
 
   return decodedTorrent;
 }
@@ -128,8 +111,6 @@ export function deleteTorrent(torrentPath: string) {
       } else {
         throw error;
       }
-    } else {
-      console.log(`${torrentPath} deleted`);
     }
   });
 }

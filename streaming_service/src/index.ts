@@ -5,6 +5,8 @@ import {
   getDecodedTorrentFile,
 } from "./torrentMetaParser.js";
 
+import { queryTracker } from "./torrentStream.js";
+
 import * as fs from "node:fs";
 
 const fastify: FastifyInstance = Fastify({
@@ -29,15 +31,14 @@ fastify.post("/download-torrent", async (request, reply) => {
     const torrentPath = await downloadTorrent(torrentUrl);
     const torrentMetaData = getDecodedTorrentFile(torrentPath);
     // download movie
-    // const movie = await queryTracker(torrentPath, torrentMetaData);
+    const movie = await queryTracker(torrentPath, torrentMetaData);
     // then stream it
-    // delete .torrent file
-    deleteTorrent(torrentPath);
+    // deleteTorrent(torrentPath);
     // save movie path in db
 
-    reply.code(200).send({ torrent: torrentMetaData });
-  } catch (error) {
-    console.error(`Error when downloading torrent: ${error}`);
+    reply.code(200).send({ movie: movie });
+  } catch (error: unknown) {
+    console.error(`Error: ${error}`);
     reply.code(404).send("Torrent is currently unavailable");
   }
 });

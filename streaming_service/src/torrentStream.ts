@@ -1,31 +1,28 @@
-import bencode from "bencode";
 import * as fs from "fs";
-import { createHash, randomInt } from "node:crypto";
+import parseTorrent from "parse-torrent";
 import * as ttypes from "./ft_torrent_types.js";
 
-function generateInfoHash(torrentPath: string): string {
-  const torrent = fs.readFileSync(torrentPath);
-  const toHash = bencode.decode(torrent);
+async function generateInfoHash(torrentPath: string): Promise<string> {
+  const metadata = await parseTorrent(fs.readFileSync(torrentPath));
 
-  return encodeURIComponent(
-    createHash("sha1").update(bencode.encode(toHash.info)).digest("binary"),
-  );
+  return encodeURIComponent(metadata.infoHash);
 }
 
 function generatePeerId(): string {
-  let randomNumbers: string = "";
-  for (let i = 0; i < 12; i++) {
-    randomNumbers += randomInt(10).toString();
-  }
-  return "-FT1000-" + encodeURIComponent(randomNumbers);
+  const randomAlpha = Math.round(
+    Math.pow(36, 12 + 1) - Math.random() * Math.pow(36, 12),
+  )
+    .toString(36)
+    .slice(1);
+  return "-FT1000-" + encodeURIComponent(randomAlpha);
 }
 
-function generateQuery(
+async function generateQuery(
   torrentPath: string,
   torrentMetaData: ttypes.TorrentMeta,
   port: number,
-): string {
-  const infoHash = generateInfoHash(torrentPath);
+): Promise<string> {
+  const infoHash = await generateInfoHash(torrentPath);
   const peerId = generatePeerId();
 
   const uploaded = 0;
@@ -50,30 +47,17 @@ export async function queryTracker(
   torrentPath: string,
   torrentMetaData: ttypes.TorrentMeta,
 ) {
-  console.log("DEBUG: ", torrentPath);
-  console.log("DEBUG: ", torrentMetaData);
-
   const ports: number[] = [];
 
   for (let i = 6881; i < 6889; i++) {
     ports.push(i);
   }
 
-  for (let i = 0; i < ports.length; i++) {
-    const query = generateQuery(torrentPath, torrentMetaData, ports[i]);
+  const query = await generateQuery(torrentPath, torrentMetaData, ports[0]);
 
-    const response = await fetch(query, {
-      method: "GET",
-      headers: {
-        Connection: "close",
-        "Accept-encoding": "gzip",
-      },
-    });
+  const response = await fetch(query);
 
-    console.debug("PORT: ", ports[i]);
-    console.debug("DEBUG: ", response.status);
-    console.debug("DEBUG: ", await response.text());
-  }
-
-  return await fetch(generateQuery(torrentPath, torrentMetaData, 6881));
+  console.log("DEBUG: ", query);
+  console.debug("DEBUG: ", response.status);
+  console.debug("DEBUG: ", await response.text());
 }
