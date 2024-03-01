@@ -57,5 +57,7 @@ export default {
       fill: ["hover", "focus"],
     },
   },
-  plugins: [],
-};
+  plugins: [
+    '@tailwindcss/aspect-ratio',
+  ],
+}

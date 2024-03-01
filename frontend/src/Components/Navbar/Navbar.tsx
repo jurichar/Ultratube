@@ -2,11 +2,19 @@
 
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../context/useAuth";
+import { useTranslation } from "react-i18next";
 
 export default function Navbar() {
   const { userData } = useAuth();
+  const { i18n } = useTranslation();
+
+  const changeLanguage = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const lang = e.target.value;
+    i18n.changeLanguage(lang);
+  };
+
   return (
-    <nav className="z-50 bg-tertiary fixed top-0 w-full h-14 flex justify-between items-center px-4">
+    <nav className="z-50 bg-tertiary  sticky top-0 w-full  flex justify-between items-center px-4 md:flex-col md:w-24  md:h-lvh  md:py-8 md:rounded">
       <NavLink to="/">
         <svg xmlns="http://www.w3.org/2000/svg" width="25" height="20" viewBox="0 0 25 20">
           <path
@@ -15,13 +23,46 @@ export default function Navbar() {
           />
         </svg>
       </NavLink>
-      {userData && Object.keys(userData)?.length > 0 && (
-        <NavLink to="/profile">
-          <div className="bg-white w-7 h-7 rounded-2xl">
-            <img src={userData?.avatar} />
-          </div>
-        </NavLink>
-      )}
+      <div className="flex flex-row gap-4 justify-center items-center md:flex-col">
+        <select className="w-16 h-9 bg-cover bg-no-repeat bg-center transition-all" onChange={changeLanguage}>
+          <option value="en">EN</option>
+          <option value="fr">FR</option>
+          <option value="es">ES</option>
+          <option value="de">DE</option>
+          <option value="it">IT</option>
+          <option value="jp">JP</option>
+          <option value="ru">RU</option>
+        </select>
+        {userData && (
+          <>
+            <NavLink to="/disconnect">
+              <div className="w-16 h-9 bg-[url('./src/assets/exit.svg')] bg-cover bg-no-repeat bg-center transition-all">
+                <div className="w-16 h-9 bg-[url('./src/assets/exit-hover.svg')] bg-cover bg-no-repeat bg-center opacity-0 hover:opacity-50 transition-all"></div>
+              </div>
+            </NavLink>
+            <NavLink to="/profile">
+              <div
+                className={`w-10 h-10 bg-cover bg-no-repeat bg-center transition-all transform hover:scale-105 outline outline-transparent outline-2 hover:outline-white rounded-full`}
+                style={{
+                  backgroundImage: `url(${userData?.avatar})`,
+                }}
+              ></div>
+            </NavLink>
+          </>
+        )}
+        {!userData && (
+          <>
+            <NavLink to="/register" className="text-secondary text-heading-sm">
+              {" "}
+              Register{" "}
+            </NavLink>
+            <NavLink to="/login" className="text-secondary text-heading-sm">
+              {" "}
+              Login{" "}
+            </NavLink>
+          </>
+        )}
+      </div>
     </nav>
   );
 }

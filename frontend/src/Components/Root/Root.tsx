@@ -5,9 +5,9 @@ import Navbar from "../Navbar/Navbar";
 
 export default function Root() {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className=" bg-primary flex md:flex-row sm:flex-col  flex-col   min-h-screen">
       <Navbar />
-      <div className="bg-primary flex-1 overflow-y-auto pt-14">
+      <div className="flex-1 overflow-y-auto ">
         <Outlet />
       </div>
     </div>

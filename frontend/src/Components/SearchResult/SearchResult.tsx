@@ -67,7 +67,7 @@ export default function SearchResult(props: searchResultProps) {
         return {
           id: jsonTmdb.id,
           title: jsonTmdb.title,
-          year: jsonTmdb.release_date,
+          year: new Date(jsonTmdb.release_date).getFullYear(),
           synopsis: jsonTmdb.overview,
           rating: jsonTmdb.vote_average,
           imdb_link: jsonTmdb.imdb_id,

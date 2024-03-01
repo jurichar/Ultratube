@@ -4,8 +4,8 @@ import BookmarkIcon from "./BookmarkIcon";
 import { Movie } from "../../types";
 import { useState } from "react";
 import Loading from "../Loading/Loading";
-import { useNavigate } from "react-router-dom";
 import { FaStar } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 interface MovieCardProps {
   movie: Movie;
 }

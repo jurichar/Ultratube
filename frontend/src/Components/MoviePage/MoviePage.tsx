@@ -2,8 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { Movie, crewUser } from "../../types";
 import MemberMovie from "./MemberMovie/MemberMovie";
-import CommentSection from "./CommentSection/CommentSection";
 import TrailerSection from "../Global/TrailerSection/TrailerSection";
+import Comments from "./Comments";
 
 export default function MoviePage() {
   const { id } = useParams<{ id: string }>();
@@ -76,6 +76,7 @@ export default function MoviePage() {
 
   useEffect(() => {
     const { movieProps } = state;
+    console.log(movieProps);
 
     async function getAsyncTimdb() {
       if (movieProps?.imdb_link) {
@@ -125,7 +126,7 @@ export default function MoviePage() {
       </div>
       <h4 className="text-quinary"> genres : {movie?.genres?.join(",")}</h4>
       <MemberMovie crew={crew} cast={cast} />
-      <CommentSection />
+      <Comments movieId={movie?.id} />
     </div>
   );
 }

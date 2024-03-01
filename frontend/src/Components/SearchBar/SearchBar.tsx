@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ButtonCallToAction from "../Global/ButtonCallToAction/ButtonCallToAction";
+import { useTranslation } from "react-i18next";
 
 interface SearchBarProps {
   onSearch: (search: string) => void;
@@ -11,6 +12,7 @@ interface SearchBarProps {
 }
 
 const SearchBar = ({ onSearch, setShowSearch, showSearch }: SearchBarProps) => {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
 
   const handleSubmitSearch = () => {
@@ -34,7 +36,7 @@ const SearchBar = ({ onSearch, setShowSearch, showSearch }: SearchBarProps) => {
   };
   return (
     <div className="flex flex-col items-center w-full gap-4">
-      <div className="flex flex-row items-center w-full gap-4">
+      <div className="flex flex-row items-center w-full h-12 gap-4 border-b px-4 bg-primary border-quaternary focus-within:border-quinary transition-all">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
           <path
             fillRule="evenodd"
@@ -44,8 +46,8 @@ const SearchBar = ({ onSearch, setShowSearch, showSearch }: SearchBarProps) => {
           />
         </svg>
         <input
-          className="bg-primary text-quaternary px-4 py-2 rounded w-full"
-          placeholder="Search for movies or TV series"
+          className="w-full outline-none bg-primary text-quaternary focus:text-quinary placeholder:text-quaternary focus:border-quinary transition-all"
+          placeholder={t("search")}
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);

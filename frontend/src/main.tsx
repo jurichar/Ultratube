@@ -6,6 +6,7 @@ import { router } from "../src/router/routes.tsx";
 import "./index.css";
 import { RouterProvider } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "react-query";
+import './i18n/i18n.tsx';
 import ContextProvider from "./context/context.tsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

@@ -5,6 +5,7 @@ import { Movie } from "../../types";
 import { useState } from "react";
 import Loading from "../Loading/Loading";
 import { FaStar } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 interface MovieCardProps {
   movie: Movie;
@@ -12,18 +13,18 @@ interface MovieCardProps {
 
 export default function MovieCardTrending({ movie }: MovieCardProps) {
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const handleImageLoad = () => {
     setLoading(false);
   };
-
   const handleMovieClick = () => {
-    window.location.href = `/movie/${movie.id}`;
+    navigate(`/movie/${movie.id}`, { state: { movieProps: movie } });
   };
 
   return (
     <div
-      className="flex-shrink-0 w-60 h-32 rounded flex flex-col justify-between relative"
+      className="flex-shrink-0 w-60 h-32 rounded flex flex-col justify-between relative md:w-[29.375rem] md:h-[14.375rem]"
       style={{
         backgroundImage: `url(${movie.image})`,
         backgroundSize: "cover",
@@ -48,7 +49,6 @@ export default function MovieCardTrending({ movie }: MovieCardProps) {
             />
           </svg>
           <span className="text-quaternary text-xs ">Movie</span>
-          <span className="text-quinary text-xs">{movie.length}min</span>
         </div>
         <span className="text-quinary">{movie.title.length > 25 ? movie.title.slice(0, 25) + "..." : movie.title}</span>
         {movie.rating > 0.0 && (

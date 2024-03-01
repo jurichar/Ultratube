@@ -8,8 +8,10 @@ import SearchResult from "../SearchResult/SearchResult";
 import Filter from "./Filter/Filter";
 import SortMovie from "./SortMovie/SortMovie";
 import TrendingMovie from "../TrendingMovie/TrendingMovie";
+import { useTranslation } from "react-i18next";
 
 export default function Home() {
+  const { t } = useTranslation();
   const [showSearch, setShowSearch] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [page, setPage] = useState<number>(1);
@@ -72,7 +74,9 @@ export default function Home() {
     movieTmp = movieTmp.sort((firstItem, secondItem) => {
       const valueFirstItem = firstItem[value];
       const valueSecondItem = secondItem[value];
-      if (valueFirstItem && valueSecondItem && valueFirstItem > valueSecondItem) {
+      const orderAsc = order == "asc" && valueFirstItem && valueSecondItem && valueFirstItem > valueSecondItem;
+      const orderDesc = order == "desc" && valueFirstItem && valueSecondItem && valueFirstItem < valueSecondItem;
+      if (order == "desc" ? orderDesc : orderAsc) {
         return 1;
       } else if (valueFirstItem && valueSecondItem && valueFirstItem == valueSecondItem) {
         return -0;
@@ -118,7 +122,21 @@ export default function Home() {
       {!showSearch && <TrendingMovie />}
       <div className="w-full h-full flex  pb-60 flex-col gap-4  relative">
         <span className="w-full flex gap-4  items-center text-heading-md">{showSearch ? `Search : ${searchQuery} ` : "Recommended for you"}</span>
-        <SortMovie sort={sort} handleChange={handleSort} />
+        <div className="flex flex-row gap-4">
+          <SortMovie sort={sort} handleChange={handleSort} />
+          <select
+            id="way-sort"
+            value={order}
+            className="bg-gray-50 border  w-fit  border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            onChange={(event) => setOrder(event?.target?.value as Order)}
+          >
+            <option value="" selected>
+              way to sort
+            </option>
+            <option value="asc">ascendent</option>
+            <option value="desc"> descendent</option>
+          </select>
+        </div>
         <Filter initialState={initialState} handleSubmitFilter={handleSubmitFilter} />
         {!showSearch && <RecommendedMovie order={order} filter={filter} page={page} sort={sort} filterSort={filterSort} />}
         {showSearch && <SearchResult showSearch={showSearch} querySearch={searchQuery} filter={filter} sort={sort} filterSort={filterSort} order={order} page={page} />}
