@@ -8,10 +8,10 @@ import SearchResult from "../SearchResult/SearchResult";
 import Filter from "./Filter/Filter";
 import SortMovie from "./SortMovie/SortMovie";
 import TrendingMovie from "../TrendingMovie/TrendingMovie";
-import { useTranslation } from "react-i18next";
+// import { useTranslation } from "react-i18next";
 
 export default function Home() {
-  const { t } = useTranslation();
+  // const { t } = useTranslation();
   const [showSearch, setShowSearch] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [page, setPage] = useState<number>(1);
