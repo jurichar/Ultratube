@@ -2,10 +2,18 @@ import * as fs from "fs";
 import parseTorrent from "parse-torrent";
 import * as ttypes from "./ft_torrent_types.js";
 
+function urlencode(t: Uint8Array): string {
+  let encoded = "";
+  t.forEach((byte) => {
+    encoded += "%" + Buffer.from([byte]).toString("hex").toUpperCase();
+  });
+  return encoded;
+}
+
 async function generateInfoHash(torrentPath: string): Promise<string> {
   const metadata = await parseTorrent(fs.readFileSync(torrentPath));
 
-  return encodeURIComponent(metadata.infoHash);
+  return urlencode(metadata.infoHashBuffer);
 }
 
 function generatePeerId(): string {
@@ -39,14 +47,13 @@ async function generateQuery(
   const host = torrentMetaData.announce;
 
   const query = `${host}?peer_id=${peerId}&info_hash=${infoHash}&port=${port}&uploaded=${uploaded}&downloaded=${downloaded}&left=${left}&compact=1&event=started`;
-  console.log(query);
   return query;
 }
 
 export async function queryTracker(
   torrentPath: string,
   torrentMetaData: ttypes.TorrentMeta,
-) {
+): Promise<string> {
   const ports: number[] = [];
 
   for (let i = 6881; i < 6889; i++) {
@@ -60,4 +67,5 @@ export async function queryTracker(
   console.log("DEBUG: ", query);
   console.debug("DEBUG: ", response.status);
   console.debug("DEBUG: ", await response.text());
+  return response.text();
 }
