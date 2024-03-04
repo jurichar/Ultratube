@@ -5,7 +5,7 @@ import {
   parseTorrentMetadata as parseTorrentMeta,
 } from "./torrentMetaParser.js";
 
-import { queryTracker } from "./torrentStream.js";
+import { queryTracker as discoverPeers } from "./torrentStream.js";
 
 import * as fs from "node:fs";
 
@@ -30,13 +30,13 @@ fastify.post("/download-torrent", async (request, reply) => {
 
     const torrentPath = await downloadTorrentMeta(torrentUrl);
     const torrentMetaData = await parseTorrentMeta(torrentPath);
-    const movie = await queryTracker(torrentMetaData);
+    const trackerResponse = await discoverPeers(torrentMetaData);
 
     deleteTorrentMeta(torrentPath);
 
-    reply.code(200).send({ movie: movie });
+    reply.code(200).send({ movie: trackerResponse });
   } catch (error: unknown) {
-    console.error(`Error: ${error}`);
+    console.error(error);
     reply.code(404).send("Torrent is currently unavailable");
   }
 });

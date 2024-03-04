@@ -1,4 +1,5 @@
 import * as ttypes from "./ft_torrent_types.js";
+import bencode from "bencode";
 
 function urlencode(t: Uint8Array): string {
   let encoded = "";
@@ -53,6 +54,8 @@ export async function queryTracker(
   const query = await generateQuery(torrentMetaData, ports[0]);
 
   const response = await fetch(query);
+  const responseText = await response.arrayBuffer();
+  const decodedResponse = bencode.decode(Buffer.from(responseText));
 
-  return response.text();
+  return decodedResponse;
 }
