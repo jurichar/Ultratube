@@ -1,8 +1,8 @@
 import Fastify, { FastifyInstance } from "fastify";
 import {
-  deleteTorrent,
-  downloadTorrent,
-  getDecodedTorrentFile,
+  deleteTorrentMeta,
+  downloadTorrent as downloadTorrentMeta,
+  parseTorrentMetadata as parseTorrentMeta,
 } from "./torrentMetaParser.js";
 
 import { queryTracker } from "./torrentStream.js";
@@ -28,13 +28,11 @@ fastify.post("/download-torrent", async (request, reply) => {
 
     console.log(`Downloading .torrent at: ${torrentUrl}`);
 
-    const torrentPath = await downloadTorrent(torrentUrl);
-    const torrentMetaData = getDecodedTorrentFile(torrentPath);
-    // download movie
-    const movie = await queryTracker(torrentPath, torrentMetaData);
-    // then stream it
-    // deleteTorrent(torrentPath);
-    // save movie path in db
+    const torrentPath = await downloadTorrentMeta(torrentUrl);
+    const torrentMetaData = await parseTorrentMeta(torrentPath);
+    const movie = await queryTracker(torrentMetaData);
+
+    deleteTorrentMeta(torrentPath);
 
     reply.code(200).send({ movie: movie });
   } catch (error: unknown) {

@@ -2,10 +2,11 @@ import * as fs from "fs";
 import https from "https";
 import bencode from "bencode";
 import * as ttypes from "./ft_torrent_types.js";
+import parseTorrent from "parse-torrent";
 
 function generatePath(torrentUrl: string): string {
   const splitedUrl: string[] = torrentUrl.split("/");
-  return `./torrents/${splitedUrl[splitedUrl.length - 1].toLowerCase()}.torrent`;
+  return `./torrents/metadata/${splitedUrl[splitedUrl.length - 1].toLowerCase()}`;
 }
 
 function filterNonHtppTrackers(trackers: string[][]): string[][] {
@@ -43,25 +44,28 @@ export async function downloadTorrent(torrentUrl: string): Promise<string> {
   });
 }
 
-function normalizeTorrentMeta(decodedTorrent): ttypes.TorrentMeta {
+function normalizeTorrentMeta(
+  decodedMetadata,
+  originalMetaData,
+): ttypes.TorrentMeta {
   const torrentMetaData = {} as ttypes.TorrentMeta;
   const info = {} as ttypes.Info;
 
   // Determine if the .torrent file have one or multiples files
-  if (Object.prototype.hasOwnProperty.call(decodedTorrent?.info, "length")) {
+  if (Object.prototype.hasOwnProperty.call(decodedMetadata?.info, "length")) {
     const file: ttypes.SingleFileMode = {
-      name: decodedTorrent?.info?.name,
-      length: decodedTorrent?.info?.length,
-      md5sum: decodedTorrent?.info?.md5sum,
+      name: decodedMetadata?.info?.name,
+      length: decodedMetadata?.info?.length,
+      md5sum: decodedMetadata?.info?.md5sum,
     };
 
     info.file = file;
   } else if (
-    Object.prototype.hasOwnProperty.call(decodedTorrent?.info, "files")
+    Object.prototype.hasOwnProperty.call(decodedMetadata?.info, "files")
   ) {
     const file: ttypes.MultiFileMode = {
-      name: decodedTorrent?.info?.name,
-      files: decodedTorrent?.info?.files.map((rawFile) => ({
+      name: decodedMetadata?.info?.name,
+      files: decodedMetadata?.info?.files.map((rawFile) => ({
         length: rawFile?.length,
         path: rawFile?.length,
         md5sum: rawFile?.md5sum,
@@ -72,13 +76,14 @@ function normalizeTorrentMeta(decodedTorrent): ttypes.TorrentMeta {
     throw new Error("Torrent type unhandled");
   }
 
-  info.pieceLength = decodedTorrent?.info["piece length"];
-  info.pieces = decodedTorrent?.info?.pieces;
+  info.pieceLength = decodedMetadata?.info["piece length"];
+  info.pieces = originalMetaData.pieces;
+  info.piecesBuffer = originalMetaData.info.pieces;
   info.private =
-    parseInt(decodedTorrent?.info?.private, 10) === 1 ? true : false;
+    parseInt(decodedMetadata?.info?.private, 10) === 1 ? true : false;
 
-  torrentMetaData.announce = decodedTorrent.announce;
-  torrentMetaData.announceList = decodedTorrent["announce-list"];
+  torrentMetaData.announce = decodedMetadata.announce;
+  torrentMetaData.announceList = decodedMetadata["announce-list"];
 
   if (torrentMetaData.announceList) {
     torrentMetaData.announceList = filterNonHtppTrackers(
@@ -86,24 +91,31 @@ function normalizeTorrentMeta(decodedTorrent): ttypes.TorrentMeta {
     );
   }
 
-  torrentMetaData.createdBy = decodedTorrent["created by"];
-  torrentMetaData.creationDate = decodedTorrent["creation date"];
-  torrentMetaData.encoding = decodedTorrent?.encoding;
-  torrentMetaData.comment = decodedTorrent?.comment;
+  torrentMetaData.createdBy = decodedMetadata["created by"];
+  torrentMetaData.creationDate = decodedMetadata["creation date"];
+  torrentMetaData.encoding = decodedMetadata?.encoding;
+  torrentMetaData.comment = decodedMetadata?.comment;
   torrentMetaData.info = info;
+  torrentMetaData.infoHash = originalMetaData.infoHashBuffer;
 
   return torrentMetaData;
 }
 
-export function getDecodedTorrentFile(torrentPath: string) {
+export async function parseTorrentMetadata(
+  torrentPath: string,
+): Promise<ttypes.TorrentMeta> {
   const torrent = fs.readFileSync(torrentPath);
+  const parsed = await parseTorrent(torrent);
 
-  const decodedTorrent = normalizeTorrentMeta(bencode.decode(torrent, "utf-8"));
+  const decodedTorrent = normalizeTorrentMeta(
+    bencode.decode(torrent, "utf-8"),
+    parsed,
+  );
 
   return decodedTorrent;
 }
 
-export function deleteTorrent(torrentPath: string) {
+export function deleteTorrentMeta(torrentPath: string) {
   fs.unlink(torrentPath, (error) => {
     if (error) {
       if (error.code === "EOENT") {

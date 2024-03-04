@@ -17,7 +17,8 @@ export interface MultiFileMode {
 
 export interface Info {
   pieceLength: number;
-  pieces: string;
+  piecesBuffer: Uint8Array;
+  pieces: string[];
   private?: boolean;
   file: SingleFileMode | MultiFileMode;
 }
@@ -30,6 +31,7 @@ export interface TorrentMeta {
   info: Info;
   creationDate?: number;
   encoding?: string;
+  infoHash: Uint8Array;
 }
 
 interface Peer {
@@ -38,7 +40,7 @@ interface Peer {
   port: number;
 }
 
-interface TrackerResponse {
+export interface TrackerResponse {
   failureReason?: string;
   warningMessage?: string;
   interval: number;

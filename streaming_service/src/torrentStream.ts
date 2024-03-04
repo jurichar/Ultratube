@@ -1,5 +1,3 @@
-import * as fs from "fs";
-import parseTorrent from "parse-torrent";
 import * as ttypes from "./ft_torrent_types.js";
 
 function urlencode(t: Uint8Array): string {
@@ -8,12 +6,6 @@ function urlencode(t: Uint8Array): string {
     encoded += "%" + Buffer.from([byte]).toString("hex").toUpperCase();
   });
   return encoded;
-}
-
-async function generateInfoHash(torrentPath: string): Promise<string> {
-  const metadata = await parseTorrent(fs.readFileSync(torrentPath));
-
-  return urlencode(metadata.infoHashBuffer);
 }
 
 function generatePeerId(): string {
@@ -26,11 +18,10 @@ function generatePeerId(): string {
 }
 
 async function generateQuery(
-  torrentPath: string,
   torrentMetaData: ttypes.TorrentMeta,
   port: number,
 ): Promise<string> {
-  const infoHash = await generateInfoHash(torrentPath);
+  const infoHash = urlencode(torrentMetaData.infoHash);
   const peerId = generatePeerId();
 
   const uploaded = 0;
@@ -51,7 +42,6 @@ async function generateQuery(
 }
 
 export async function queryTracker(
-  torrentPath: string,
   torrentMetaData: ttypes.TorrentMeta,
 ): Promise<string> {
   const ports: number[] = [];
@@ -60,12 +50,9 @@ export async function queryTracker(
     ports.push(i);
   }
 
-  const query = await generateQuery(torrentPath, torrentMetaData, ports[0]);
+  const query = await generateQuery(torrentMetaData, ports[0]);
 
   const response = await fetch(query);
 
-  console.log("DEBUG: ", query);
-  console.debug("DEBUG: ", response.status);
-  console.debug("DEBUG: ", await response.text());
   return response.text();
 }
