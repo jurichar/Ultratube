@@ -6,7 +6,7 @@ COPY . .
 
 RUN npm install \
   && npm run build \
-  && mkdir -p /app/torrents
+  && mkdir -p /app/torrents/metadata
 
 EXPOSE 8001
 

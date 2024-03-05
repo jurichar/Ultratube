@@ -47,7 +47,7 @@ const start = async () => {
       host: "0.0.0.0",
       port: 8001,
     });
-    fs.readFile("jojo.txt", "utf8", (err, data) => {
+    fs.readFile("banner", "utf8", (err, data) => {
       if (err) {
         console.error(err);
       }
