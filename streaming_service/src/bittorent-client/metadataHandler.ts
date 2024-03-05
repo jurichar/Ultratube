@@ -24,26 +24,6 @@ function filterNonHtppTrackers(trackers: string[][]): string[][] {
   return httpTrackers;
 }
 
-export async function downloadTorrentMeta(torrentUrl: string): Promise<string> {
-  const path = generatePath(torrentUrl);
-
-  return new Promise((resolve, reject) => {
-    https.get(torrentUrl, (response) => {
-      response.on("data", (chunk) => {
-        fs.appendFileSync(path, chunk);
-      });
-
-      response.on("end", () => {
-        resolve(path);
-      });
-
-      response.on("error", (err: Error) => {
-        reject(err.message);
-      });
-    });
-  });
-}
-
 function normalizeTorrentMeta(
   decodedMetadata: any,
   originalMetaData: any,
@@ -99,6 +79,26 @@ function normalizeTorrentMeta(
   torrentMetaData.infoHash = originalMetaData.infoHashBuffer;
 
   return torrentMetaData;
+}
+
+export async function downloadTorrentMeta(torrentUrl: string): Promise<string> {
+  const path = generatePath(torrentUrl);
+
+  return new Promise((resolve, reject) => {
+    https.get(torrentUrl, (response) => {
+      response.on("data", (chunk) => {
+        fs.appendFileSync(path, chunk);
+      });
+
+      response.on("end", () => {
+        resolve(path);
+      });
+
+      response.on("error", (err: Error) => {
+        reject(err.message);
+      });
+    });
+  });
 }
 
 export async function parseTorrentMeta(
