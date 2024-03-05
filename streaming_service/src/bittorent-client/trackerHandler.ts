@@ -70,7 +70,7 @@ function getChunckOfPeerID(bytes: number, bytes_inserted: number): string {
   return chunk;
 }
 
-function parsePeersFromTrackerResponse(rawPeers): string[] {
+function parsePeersFromTrackerResponse(rawPeers: any): string[] {
   const peers: string[] = [];
   const bytes: number[] = [];
 

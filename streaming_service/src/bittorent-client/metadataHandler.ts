@@ -45,8 +45,8 @@ export async function downloadTorrentMeta(torrentUrl: string): Promise<string> {
 }
 
 function normalizeTorrentMeta(
-  decodedMetadata,
-  originalMetaData,
+  decodedMetadata: any,
+  originalMetaData: any,
 ): ttypes.TorrentMeta {
   const torrentMetaData = {} as ttypes.TorrentMeta;
   const info = {} as ttypes.Info;
@@ -65,7 +65,7 @@ function normalizeTorrentMeta(
   ) {
     const file: ttypes.MultiFileMode = {
       name: decodedMetadata?.info?.name,
-      files: decodedMetadata?.info?.files.map((rawFile) => ({
+      files: decodedMetadata?.info?.files.map((rawFile: any) => ({
         length: rawFile?.length,
         path: rawFile?.length,
         md5sum: rawFile?.md5sum,
