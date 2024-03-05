@@ -24,7 +24,7 @@ function filterNonHtppTrackers(trackers: string[][]): string[][] {
   return httpTrackers;
 }
 
-export async function downloadTorrent(torrentUrl: string): Promise<string> {
+export async function downloadTorrentMeta(torrentUrl: string): Promise<string> {
   const path = generatePath(torrentUrl);
 
   return new Promise((resolve, reject) => {
@@ -101,7 +101,7 @@ function normalizeTorrentMeta(
   return torrentMetaData;
 }
 
-export async function parseTorrentMetadata(
+export async function parseTorrentMeta(
   torrentPath: string,
 ): Promise<ttypes.TorrentMeta> {
   const torrent = fs.readFileSync(torrentPath);

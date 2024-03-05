@@ -1,11 +1,11 @@
 import Fastify, { FastifyInstance } from "fastify";
 import {
-  deleteTorrentMeta,
-  downloadTorrent as downloadTorrentMeta,
-  parseTorrentMetadata as parseTorrentMeta,
+  // deleteTorrentMeta,
+  downloadTorrentMeta,
+  parseTorrentMeta,
 } from "./torrentMetaParser.js";
 
-import { queryTracker as discoverPeers } from "./torrentStream.js";
+import { discoverPeers } from "./torrentStream.js";
 
 import * as fs from "node:fs";
 
@@ -27,12 +27,12 @@ fastify.post("/download-torrent", async (request, reply) => {
       request.body as TorrentDownloadBody;
 
     console.log(`Downloading .torrent at: ${torrentUrl}`);
-
     const torrentPath = await downloadTorrentMeta(torrentUrl);
+
     const torrentMetaData = await parseTorrentMeta(torrentPath);
     const trackerResponse = await discoverPeers(torrentMetaData);
 
-    deleteTorrentMeta(torrentPath);
+    // deleteTorrentMeta(torrentPath);
 
     reply.code(200).send({ movie: trackerResponse });
   } catch (error: unknown) {
