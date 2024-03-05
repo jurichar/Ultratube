@@ -8,7 +8,7 @@ RUN npm install \
   && npm run build \
   && mkdir -p /app/torrents/metadata
 
-EXPOSE 8001
+EXPOSE 8001 6881
 
 ENV ADDRESS=0.0.0.0 PORT=8001
 

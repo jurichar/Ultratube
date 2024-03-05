@@ -20,7 +20,6 @@ function generatePeerId(): string {
 
 async function generateQuery(
   torrentMetaData: ttypes.TorrentMeta,
-  port: number,
 ): Promise<string> {
   const infoHash = urlencode(torrentMetaData.infoHash);
   const peerId = generatePeerId();
@@ -38,18 +37,16 @@ async function generateQuery(
     torrentMetaData.announce = announcer[0];
   }
 
-  const query = `${host}?peer_id=${peerId}&info_hash=${infoHash}&port=${port}&uploaded=${uploaded}&downloaded=${downloaded}&left=${left}&compact=1&event=started`;
+  const query = `${host}?peer_id=${peerId}&info_hash=${infoHash}&port=6881&uploaded=${uploaded}&downloaded=${downloaded}&left=${left}&compact=1&event=started`;
   return query;
 }
 
 async function queryTracker(torrentMetaData: ttypes.TorrentMeta) {
-  const port: number = 6881;
-
-  const query = await generateQuery(torrentMetaData, port);
+  const query = await generateQuery(torrentMetaData);
 
   const response = await fetch(query);
-  const responseText = await response.arrayBuffer();
-  const decodedResponse = bencode.decode(Buffer.from(responseText));
+  const responseBuffer = await response.arrayBuffer();
+  const decodedResponse = bencode.decode(Buffer.from(responseBuffer));
 
   return decodedResponse;
 }
