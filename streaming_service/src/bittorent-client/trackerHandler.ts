@@ -1,4 +1,3 @@
-import { parse } from "node:path";
 import * as ttypes from "./ft_torrent_types.js";
 import bencode from "bencode";
 
@@ -55,44 +54,48 @@ async function queryTracker(torrentMetaData: ttypes.TorrentMeta) {
   return decodedResponse;
 }
 
+function bytesToNumber(bytes: number[]): number {
+  const buffer = new ArrayBuffer(2);
+  const uint8Array = new Uint8Array(buffer);
+
+  for (let i = 0; i < bytes.length; i++) {
+    uint8Array[i] = bytes[i];
+  }
+
+  const dataView = new DataView(buffer);
+
+  return dataView.getUint16(0, false);
+}
+
+function getChunckOfPeerID(bytes: number, bytes_inserted: number): string {
+  let chunk = bytes.toString();
+  chunk += bytes_inserted !== 3 ? "." : ":";
+  return chunk;
+}
+
 function parsePeersFromTrackerResponse(rawPeers): string[] {
   const peers: string[] = [];
   const bytes: number[] = [];
 
-  rawPeers.forEach((key: number) => {
-    bytes.push(key);
+  rawPeers.forEach((bytesValue: number) => {
+    bytes.push(bytesValue);
   });
 
   let i = 0;
-  let bytes_inserted = 0;
+  let bytesCount = 0;
   let peer = "";
 
   while (i < bytes.length) {
-    if (bytes_inserted < 4) {
-      peer += bytes[i].toString();
-      if (bytes_inserted !== 3) {
-        peer += ".";
-      } else {
-        peer += ":";
-      }
-    } else {
-      const buff = new ArrayBuffer(2);
-      const uint8Array = new Uint8Array(buff);
-
-      uint8Array[0] = bytes[i];
-      uint8Array[1] = bytes[i + 1];
-
-      const dataView = new DataView(buff);
-
-      peer += dataView.getUint16(0, false).toString();
-
-      peers.push(peer);
-      peer = "";
-      bytes_inserted = -1;
+    while (bytesCount < 4) {
+      peer += getChunckOfPeerID(bytes[i], bytesCount);
       i++;
+      bytesCount++;
     }
-    bytes_inserted++;
-    i++;
+    peer += bytesToNumber([bytes[i], bytes[i + 1]]);
+    peers.push(peer);
+    peer = "";
+    bytesCount = 0;
+    i += 2;
   }
 
   return peers;
