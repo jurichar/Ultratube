@@ -5,9 +5,16 @@ import {
   parseTorrentMeta,
 } from "./bittorent-client/metadataHandler.js";
 
-import { discoverPeers } from "./bittorent-client/trackerHandler.js";
+import {
+  discoverPeers,
+  generatePeerId,
+} from "./bittorent-client/trackerHandler.js";
+
+import { initPeerConnection } from "./bittorent-client/peers.js";
 
 import * as fs from "node:fs";
+
+import { createHash } from "node:crypto";
 
 const fastify: FastifyInstance = Fastify({
   logger: false,
@@ -25,12 +32,27 @@ fastify.post("/download-torrent", async (request, reply) => {
   try {
     const { torrentUrl }: TorrentDownloadBody =
       request.body as TorrentDownloadBody;
+    const peerId = generatePeerId();
 
     console.log(`Downloading .torrent at: ${torrentUrl}`);
 
     const torrentPath = await downloadTorrentMeta(torrentUrl);
     const torrentMetaData = await parseTorrentMeta(torrentPath);
-    const trackerResponse = await discoverPeers(torrentMetaData);
+    const trackerResponse = await discoverPeers(torrentMetaData, peerId);
+    const peer = trackerResponse.peers[0].split(":");
+
+    // need info hash, peer_id, peer:port
+    initPeerConnection(
+      peer[0],
+      parseInt(peer[1], 10),
+      torrentMetaData.infoHash,
+      peerId,
+    );
+
+    console.log(
+      "DEBUG : ",
+      createHash("sha1").update(torrentMetaData.infoHash).digest(),
+    );
 
     deleteTorrentMeta(torrentPath);
 
