@@ -48,16 +48,16 @@ export default function ResetPasswordPage() {
       console.log(error);
     }
   };
-  const checkFormValidity = () => {
-    let valid = true;
-    let message = "";
-    if (!checkPasswordValidity()) valid = false;
-    message += "Password must be valid.\n";
-    if (!checkConfirmPasswordValidity()) valid = false;
-    message += "Confirm password must be valid.\n";
-    if (!valid) alert(message);
-    return valid;
-  };
+  // const checkFormValidity = () => {
+  //   let valid = true;
+  //   let message = "";
+  //   if (!checkPasswordValidity()) valid = false;
+  //   message += "Password must be valid.\n";
+  //   if (!checkConfirmPasswordValidity()) valid = false;
+  //   message += "Confirm password must be valid.\n";
+  //   if (!valid) alert(message);
+  //   return valid;
+  // };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
