@@ -1,14 +1,16 @@
 // src/Components/ForgetPasswordPage/ResetPasswordPage.tsx
 import { useState } from "react";
 import { validateEmail } from "../../utils/validateEmail";
+import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
 
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState("");
 
-  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!checkFormValidity()) return;
     console.log("Form submitted");
+    await resetPassword();
     console.log(email);
   };
 
@@ -20,7 +22,16 @@ export default function ResetPasswordPage() {
     if (!valid) alert(message);
     return valid;
   };
-
+  const resetPassword = async () => {
+    try {
+      const res = await fetchWrapper("oauth/reset-password/" + email + "/", {
+        method: "GET",
+      });
+      console.log(res);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <div className="w-full p-6 gap-10 overflow-y-auto flex flex-col items-center justify-around">
       <h1 className="text-quinary text-heading-lg">Password forget ?</h1>

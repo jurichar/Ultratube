@@ -5,6 +5,7 @@ import { FormInput, LoginType } from "../../types";
 import { reducer } from "./reducer";
 import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/useAuth";
 
 const initialState: LoginType = {
   username: "",
@@ -14,6 +15,7 @@ const initialState: LoginType = {
 export default function Login() {
   const [state, dispatch] = useReducer(reducer, initialState);
   const navigate = useNavigate();
+  const { TriggerReload } = useAuth();
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     dispatch({ type: "change", name: event.target.name, value: event.target.value });
   };
@@ -29,7 +31,8 @@ export default function Login() {
     if (name == "Login") {
       if (is_valid_arg({ ...state })) {
         await login();
-        navigate("/profile");
+        await TriggerReload();
+        navigate("/");
       } else {
         console.log("cant login");
       }

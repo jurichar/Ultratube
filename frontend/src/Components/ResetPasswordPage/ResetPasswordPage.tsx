@@ -1,22 +1,32 @@
 // src/Components/ResetPasswordPage/ResetPasswordPage.tsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
+import { useParams } from "react-router-dom";
+import InputGlobal from "../Global/InputGlobal/InputGlobal";
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const { uid } = useParams();
 
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!checkFormValidity()) return;
+    // if (!checkFormValidity()) return;
+    submitNewPassword();
     console.log("Form submitted");
   };
 
+  useEffect(() => {
+    console.log(password);
+  }, [password]);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     switch (e.target.name) {
       case "password":
+        console.log(e.target.value);
         setPassword(e.target.value);
         break;
       case "confirmPassword":
@@ -25,14 +35,30 @@ export default function ResetPasswordPage() {
     }
   };
 
+  const submitNewPassword = async () => {
+    try {
+      const res = await fetchWrapper("oauth/reset-password/" + email + "/", {
+        method: "PATCH",
+        body: {
+          password: password,
+          hash: uid,
+        },
+      });
+      console.log(res);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const checkFormValidity = () => {
     let valid = true;
     let message = "";
-    if (!checkPasswordValidity()) valid = false; message += "Password must be valid.\n";
-    if (!checkConfirmPasswordValidity()) valid = false; message += "Confirm password must be valid.\n";
+    if (!checkPasswordValidity()) valid = false;
+    message += "Password must be valid.\n";
+    if (!checkConfirmPasswordValidity()) valid = false;
+    message += "Confirm password must be valid.\n";
     if (!valid) alert(message);
     return valid;
-  }
+  };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -64,20 +90,21 @@ export default function ResetPasswordPage() {
     if (!password.match(/[\W_]/)) valid = false;
     if (!password.match(/[A-Z]/)) valid = false;
     return valid;
-  }
+  };
 
   const checkConfirmPasswordValidity = () => {
     return password === confirmPassword;
-  }
+  };
 
   return (
     <div className="w-full p-6 gap-10 overflow-y-auto flex flex-col items-center justify-around">
       <h1 className="text-quinary text-heading-lg">Reset Password</h1>
       <div className="w-full rounded p-6 flex flex-col items-center gap-6 bg-tertiary">
         <form className="w-full flex flex-col gap-4 justify-center items-center" onSubmit={handleFormSubmit}>
+          <InputGlobal handleChange={(event) => setEmail(event.target.value)} value={email} name={"email"} placeholder={"your email"} type="text" />
           <div className="flex w-full h-12 border-b px-4 bg-tertiary border-quaternary focus-within:border-quinary transition-all">
             <input
-              name="currentPassword"
+              name="password"
               className="w-full outline-none bg-tertiary text-quaternary focus:text-quinary placeholder:text-quaternary focus:border-quinary transition-all"
               type={showPassword ? "text" : "password"}
               placeholder="Password"

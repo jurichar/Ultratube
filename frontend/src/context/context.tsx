@@ -19,6 +19,7 @@ interface ContextProps {
   setAuthenticate: (authenticate: boolean) => void;
   readonly setUserData: (userData: UserData) => void;
   readonly loadUserData: () => Promise<void>;
+  readonly TriggerReload: () => Promise<void>;
 }
 
 /**
@@ -35,6 +36,7 @@ export const UserContext = React.createContext<ContextProps>({
   authenticate: false,
   setAuthenticate: () => false,
   loadUserData: async () => {},
+  TriggerReload: async () => {},
 });
 
 const ContextProvider: React.FC<Props> = ({ children }) => {
@@ -53,6 +55,9 @@ const ContextProvider: React.FC<Props> = ({ children }) => {
     }
   };
 
+  async function TriggerReload() {
+    await loadUserData();
+  }
   useEffect(() => {
     setReload(true);
     loadUserData();
@@ -65,6 +70,7 @@ const ContextProvider: React.FC<Props> = ({ children }) => {
     loadUserData,
     reload,
     authenticate,
+    TriggerReload,
     setAuthenticate,
   };
 
