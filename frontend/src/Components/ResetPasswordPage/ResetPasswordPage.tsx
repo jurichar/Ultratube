@@ -15,7 +15,7 @@ export default function ResetPasswordPage() {
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // if (!checkFormValidity()) return;
+    if (!checkFormValidity()) return;
     submitNewPassword();
     console.log("Form submitted");
   };
@@ -26,7 +26,6 @@ export default function ResetPasswordPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     switch (e.target.name) {
       case "password":
-        console.log(e.target.value);
         setPassword(e.target.value);
         break;
       case "confirmPassword":

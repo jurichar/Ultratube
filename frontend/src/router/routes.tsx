@@ -69,7 +69,7 @@ export const router = createBrowserRouter([
         element: <ForgetPasswordPage />,
       },
       {
-        path: "/reset-password",
+        path: "/reset-password/:uid",
         element: <ResetPasswordPage />,
       },
     ],

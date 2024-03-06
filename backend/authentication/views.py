@@ -2,7 +2,6 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.http import JsonResponse
 from django.http import Http404
 import requests
-from rest_framework.decorators import action
 import hashlib
 from .sendEmail import sendEmail
 from rest_framework import viewsets

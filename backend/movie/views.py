@@ -4,11 +4,14 @@ from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.mixins import Response
 from rest_framework.viewsets import GenericViewSet, ModelViewSet, ReadOnlyModelViewSet
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from oauth2_provider.contrib.rest_framework import (
-    OAuth2Authentication,
-    TokenHasReadWriteScope,
-)
+
+from rest_framework.permissions import AllowAny
+
+# from rest_framework.permissions import AllowAny, IsAuthenticated
+# from oauth2_provider.contrib.rest_framework import (
+#     OAuth2Authentication,
+#     TokenHasReadWriteScope,
+# )
 from .models import Comment, FavouriteMovie, Movie
 from .serializers import (
     CommentCreateSerializer,

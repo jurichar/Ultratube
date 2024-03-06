@@ -27,7 +27,6 @@ export default function Login() {
 
   const handleSubmit = async (event: MouseEvent<HTMLButtonElement>, name: string) => {
     event.preventDefault();
-    console.log(event);
     if (name == "Login") {
       if (is_valid_arg({ ...state })) {
         await login();
