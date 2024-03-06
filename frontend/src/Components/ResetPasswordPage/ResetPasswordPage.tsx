@@ -1,5 +1,5 @@
 // src/Components/ResetPasswordPage/ResetPasswordPage.tsx
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
 import { useParams } from "react-router-dom";
 import InputGlobal from "../Global/InputGlobal/InputGlobal";
@@ -15,14 +15,11 @@ export default function ResetPasswordPage() {
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // if (!checkFormValidity()) return;
+    if (!checkFormValidity()) return;
     submitNewPassword();
     console.log("Form submitted");
   };
 
-  useEffect(() => {
-    console.log(password);
-  }, [password]);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     switch (e.target.name) {
       case "password":
@@ -48,16 +45,16 @@ export default function ResetPasswordPage() {
       console.log(error);
     }
   };
-  // const checkFormValidity = () => {
-  //   let valid = true;
-  //   let message = "";
-  //   if (!checkPasswordValidity()) valid = false;
-  //   message += "Password must be valid.\n";
-  //   if (!checkConfirmPasswordValidity()) valid = false;
-  //   message += "Confirm password must be valid.\n";
-  //   if (!valid) alert(message);
-  //   return valid;
-  // };
+  const checkFormValidity = () => {
+    let valid = true;
+    let message = "";
+    if (!checkPasswordValidity()) valid = false;
+    message += "Password must be valid.\n";
+    if (!checkConfirmPasswordValidity()) valid = false;
+    message += "Confirm password must be valid.\n";
+    if (!valid) alert(message);
+    return valid;
+  };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);

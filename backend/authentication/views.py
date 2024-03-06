@@ -147,26 +147,23 @@ class ResetPassword(APIView):
         user = self.get_object(email)
         sendEmail(
             subject="reset password",
-            message="go reset your password http://localhost:3000/reset-password/"
-            + hashlib.sha256(str.encode(user.email + user.username)).hexdigest(),
+            message=f"go reset your password http://localhost:3000/reset-password/{hashlib.sha256(str.encode(user.email + user.username)).hexdigest()}",
             mailReceiver=user.email,
         )
         return Response(status=status.HTTP_200_OK)
 
     def patch(self, request, email):
         if "hash" in request.data and "password" in request.data:
-
             user = self.get_object(email)
-            print(hashlib.sha256(str.encode(user.email + user.username)).hexdigest())
-            if (
-                hashlib.sha256(str.encode(user.email + user.username)).hexdigest()
-                == request.data["hash"]
-            ):
+            hashUsername = hashlib.sha256(
+                str.encode(user.email + user.username)
+            ).hexdigest()
+            if hashUsername == request.data["hash"]:
                 dataPatched = {"password": request.data["password"]}
                 serializer = UserPatchSerializer(user, data=dataPatched, partial=True)
                 if serializer.is_valid():
                     user.set_password(request.data["password"])
-                    serializer.save()
+                    user.save()
                     return Response("Password change with success")
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response(
