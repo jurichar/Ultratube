@@ -63,7 +63,7 @@ class UserRegister(APIView):
                 },
                 status=status.HTTP_201_CREATED,
             )
-            if len(access_token):
+            if access_token and len(access_token):
                 response_serializer.set_cookie(
                     "token",
                     access_token,

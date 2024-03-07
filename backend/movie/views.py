@@ -12,6 +12,7 @@ from rest_framework.permissions import AllowAny
 #     OAuth2Authentication,
 #     TokenHasReadWriteScope,
 # )
+
 from .models import Comment, FavouriteMovie, Movie
 from .serializers import (
     CommentCreateSerializer,

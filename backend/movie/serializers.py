@@ -20,14 +20,26 @@ class MovieListSerializer(serializers.ModelSerializer):
 class MovieDetailSerializer(serializers.ModelSerializer):
 
     comments_number = serializers.SerializerMethodField()
-    available_subtitles = SubtitleListSerializer(many=True)
+    available_subtitles = serializers.SerializerMethodField()
 
     class Meta:
         model = Movie
-        fields = ["name", "id", "imdb_rating", "production_year", "duration", "comments_number", "available_subtitles"]
+        fields = [
+            "name",
+            "id",
+            "imdb_rating",
+            "production_year",
+            "duration",
+            "comments_number",
+            "available_subtitles",
+        ]
 
     def get_comments_number(self, obj):
         return Comment.objects.filter(movie=obj).count()
+
+    def get_available_subtitles(self, obj):
+        subtitles = Subtitle.objects.filter(movie=obj)
+        return SubtitleListSerializer(subtitles, many=True).data
 
 
 class CommentViewSerializer(serializers.ModelSerializer):
