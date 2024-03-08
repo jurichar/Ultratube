@@ -1,7 +1,7 @@
 from dataclasses import fields
 from rest_framework import serializers
 
-from .models import Comment, FavouriteMovie, Movie, Subtitle
+from .models import Comment, FavouriteMovie, Movie, Subtitle, WatchedMovie
 
 
 class SubtitleListSerializer(serializers.ModelSerializer):
@@ -106,3 +106,17 @@ class FavouriteMovieCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = FavouriteMovie
         fields = ["movie"]
+
+
+class WatchedMovieListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = WatchedMovie
+        fields = ["movie"]
+
+
+class WatchedMovieCreateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = WatchedMovie
+        fields = ["movie", "watcher"]

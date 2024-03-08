@@ -46,9 +46,17 @@ class MultipleSerializerMixin:
 
 class MovieViewSet(MultipleSerializerMixin, ReadOnlyModelViewSet):
     permission_classes = [AllowAny]
+    authentication_classes = [OAuth2Authentication]
     serializer_class = MovieListSerializer
     detail_serializer_class = MovieDetailSerializer
     destroy_serializer_class = MovieDeleteSerializer
+
+    def get_permissions(self):
+        if self.action == "destroy":
+            permission_classes = [IsAuthenticated, TokenHasReadWriteScope]
+        else:
+            permission_classes = [AllowAny]
+        return [permission() for permission in permission_classes]
 
     def get_queryset(self):
         return Movie.objects.all()
@@ -87,14 +95,11 @@ class MovieViewSet(MultipleSerializerMixin, ReadOnlyModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    #  need to be auth to do that
     def destroy(self, request, pk=None):
         movie = get_object_or_404(Movie, pk=pk)
         movie.delete()
-
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-    # def destroy(self, request, pk=None, *args, **kwargs):
-    #     return super(MovieViewSet, self).destroy(request, pk, *args, **kwargs)
 
 
 class CommentViewSet(MultipleSerializerMixin, ModelViewSet):
@@ -123,8 +128,17 @@ class FavouriteListCreateDeleteViewSet(
     serializer_class = FavouriteMovieSerializer
     create_serializer_class = FavouriteMovieCreateSerializer
 
+    #  need to be auth
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
     def get_queryset(self):
         return FavouriteMovie.objects.filter(user=self.request.user).all()
+
+
+class WatchedMovie(mixins.ListModelMixin, mixins.CreateModelMixin):
+    pass
+
+
+#  get list need to be register
+#  post  need to be register

@@ -114,6 +114,8 @@ class TestMovie(MovieAPITestCase):
         self.assertEqual(response1.status_code, 400)
 
     def test_delete(self):
+        access_token, client, user = setUpAuth(self)
+        custom_header = {"Authorization": f"Bearer {access_token}"}
         movie = {
             "name": "Return of thedd Jedi",
             "imdb_rating": 1.0,
@@ -129,6 +131,7 @@ class TestMovie(MovieAPITestCase):
         movie_db = Movie.objects.last()
         response_delete = self.client.delete(
             "http://localhost:8000/api/movies/" + str(movie_db.id) + "/",
+            **custom_header,
         )
         response_detail = self.client.get(
             reverse("movies-detail", args=[movie_db.id]), format="json"
