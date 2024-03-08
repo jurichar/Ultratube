@@ -40,6 +40,12 @@ class UserModelSerializer(serializers.ModelSerializer):
             raise e
 
 
+class UserLanguageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["language"]
+
+
 class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

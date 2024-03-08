@@ -149,3 +149,31 @@ class UserActionTest(APITestCase):
             data=data,
         )
         self.assertEqual(response_patch.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_user_change_language(self):
+        data = {"language": "fr"}
+        access_token, client, user = setUpAuth(self)
+        custom_header = {"Authorization": f"Bearer {access_token}"}
+        self.assertEqual(user.language, "en")
+        response_patch = self.client.patch(
+            "http://localhost:8000/oauth/users/" + str(user.id) + "/change_language/",
+            **custom_header,
+            data=data,
+        )
+        self.assertEqual(response_patch.status_code, 200)
+        user_patched = User.objects.get(pk=user.id)
+        self.assertEqual(user_patched.language, "fr")
+
+    def test_user_change_language_non_existing(self):
+        data = {"language": "wl"}
+        access_token, client, user = setUpAuth(self)
+        custom_header = {"Authorization": f"Bearer {access_token}"}
+        self.assertEqual(user.language, "en")
+        response_patch = self.client.patch(
+            "http://localhost:8000/oauth/users/" + str(user.id) + "/change_language/",
+            **custom_header,
+            data=data,
+        )
+        self.assertEqual(response_patch.status_code, 400)
+        user_patched = User.objects.get(pk=user.id)
+        self.assertEqual(user_patched.language, "en")

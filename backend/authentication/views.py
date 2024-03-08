@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.http import Http404
 import requests
 import hashlib
+from rest_framework.decorators import action
 from .sendEmail import sendEmail
 from rest_framework import viewsets
 from django.contrib.auth import authenticate, login, logout
@@ -10,6 +11,7 @@ import copy
 from .serializer import (
     AccessTokenSerializer,
     UserDetailSerializer,
+    UserLanguageSerializer,
     UserListSerializer,
     UserLoginSerializer,
     UserModelSerializer,
@@ -404,6 +406,16 @@ class UserViewSet(MultipleSerializerMixin, viewsets.ModelViewSet):
             instance.set_password(request.data["password"])
             instance.save()
         return Response("update successful")
+
+    @action(detail=True, methods=["patch"])
+    def change_language(self, request, pk=None):
+        user = get_object_or_404(User, pk=pk)
+        serializer = UserLanguageSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"language change successfully"})
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserList(generics.ListAPIView):
