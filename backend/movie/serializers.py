@@ -1,4 +1,3 @@
-from dataclasses import fields
 from rest_framework import serializers
 
 from .models import Comment, FavouriteMovie, Movie, Subtitle, WatchedMovie
@@ -120,3 +119,6 @@ class WatchedMovieCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = WatchedMovie
         fields = ["movie", "watcher"]
+
+    def create(self, validated_data):
+        return WatchedMovie.objects.create(**validated_data)

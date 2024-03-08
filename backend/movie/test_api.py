@@ -1,8 +1,7 @@
-from re import I
 from django.contrib.auth import get_user_model
 from django.urls import reverse, reverse_lazy
 from rest_framework.test import APITestCase
-from authentication.test_user_action import setUpAuth, header_auth
+from authentication.test_user_action import setUpAuth
 
 from movie.models import Comment, FavouriteMovie, Movie, Subtitle
 
@@ -81,63 +80,64 @@ class TestMovie(MovieAPITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), expected)
 
-    def test_create(self):
-        movie = {
-            "name": "Return of thedd Jedi",
-            "imdb_rating": 1.0,
-            "production_year": 1988,
-            "duration": 100,
-            "thumbnail_cover": "path/to/thumbnail/",
-        }
-        response = self.client.post(
-            "http://localhost:8000/api/movies/create_movie/", movie
-        )
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.json(), movie)
 
-    def test_create_existing(self):
-        movie = {
-            "name": "Return of thedd Jedi",
-            "imdb_rating": 1.0,
-            "production_year": 1988,
-            "duration": 100,
-            "thumbnail_cover": "path/to/thumbnail/",
-        }
-        response = self.client.post(
-            "http://localhost:8000/api/movies/create_movie/", data=movie
-        )
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.json(), movie)
-        response1 = self.client.post(
-            "http://localhost:8000/api/movies/create_movie/", data=movie
-        )
-        self.assertEqual(response1.status_code, 400)
+def test_create(self):
+    movie = {
+        "name": "Return of thedd Jedi",
+        "imdb_rating": 1.0,
+        "production_year": 1988,
+        "duration": 100,
+        "thumbnail_cover": "path/to/thumbnail/",
+    }
+    response = self.client.post("http://localhost:8000/api/movies/create_movie/", movie)
+    self.assertEqual(response.status_code, 201)
+    self.assertEqual(response.json(), movie)
 
-    def test_delete(self):
-        access_token, client, user = setUpAuth(self)
-        custom_header = {"Authorization": f"Bearer {access_token}"}
-        movie = {
-            "name": "Return of thedd Jedi",
-            "imdb_rating": 1.0,
-            "production_year": 1988,
-            "duration": 100,
-            "thumbnail_cover": "path/to/thumbnail/",
-        }
-        response = self.client.post(
-            "http://localhost:8000/api/movies/create_movie/", data=movie
-        )
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.json(), movie)
-        movie_db = Movie.objects.last()
-        response_delete = self.client.delete(
-            "http://localhost:8000/api/movies/" + str(movie_db.id) + "/",
-            **custom_header,
-        )
-        response_detail = self.client.get(
-            reverse("movies-detail", args=[movie_db.id]), format="json"
-        )
-        self.assertEqual(response_delete.status_code, 204)
-        self.assertEqual(response_detail.status_code, 404)
+
+def test_create_existing(self):
+    movie = {
+        "name": "Return of thedd Jedi",
+        "imdb_rating": 1.0,
+        "production_year": 1988,
+        "duration": 100,
+        "thumbnail_cover": "path/to/thumbnail/",
+    }
+    response = self.client.post(
+        "http://localhost:8000/api/movies/create_movie/", data=movie
+    )
+    self.assertEqual(response.status_code, 201)
+    self.assertEqual(response.json(), movie)
+    response1 = self.client.post(
+        "http://localhost:8000/api/movies/create_movie/", data=movie
+    )
+    self.assertEqual(response1.status_code, 400)
+
+
+def test_delete(self):
+    access_token, client, user = setUpAuth(self)
+    custom_header = {"Authorization": f"Bearer {access_token}"}
+    movie = {
+        "name": "Return of thedd Jedi",
+        "imdb_rating": 1.0,
+        "production_year": 1988,
+        "duration": 100,
+        "thumbnail_cover": "path/to/thumbnail/",
+    }
+    response = self.client.post(
+        "http://localhost:8000/api/movies/create_movie/", data=movie
+    )
+    self.assertEqual(response.status_code, 201)
+    self.assertEqual(response.json(), movie)
+    movie_db = Movie.objects.last()
+    response_delete = self.client.delete(
+        "http://localhost:8000/api/movies/" + str(movie_db.id) + "/",
+        **custom_header,
+    )
+    response_detail = self.client.get(
+        reverse("movies-detail", args=[movie_db.id]), format="json"
+    )
+    self.assertEqual(response_delete.status_code, 204)
+    self.assertEqual(response_detail.status_code, 404)
 
     def test_detail(self):
 
@@ -324,3 +324,76 @@ class TestFavouriteMovie(MovieAPITestCase):
             reverse("favourite-movies-list"), {"movie": new_movie.id}
         )
         self.assertEqual(response.status_code, 201)
+
+
+class TestWatchedMovie(MovieAPITestCase):
+    def setUp(self):
+        self.movie = Movie.objects.create(
+            name="Return of ccthe Jediddd",
+            thumbnail_cover="path/to/thumbnail/",
+            duration=100,
+            production_year=1988,
+            imdb_rating=1.0,
+        )
+        self.movie1 = Movie.objects.create(
+            name="Return of dddhjccthe Jediddd",
+            thumbnail_cover="path/to/thumbnail/",
+            duration=100,
+            production_year=1988,
+            imdb_rating=1.0,
+        )
+        self.user = User.objects.create_user(username="tata", password="secret")
+
+    def test_create(self):
+        access_token, client, user = setUpAuth(self)
+        custom_header = {"Authorization": f"Bearer {access_token}"}
+        response = self.client.post(
+            reverse("watched-movies-list"),
+            {"movie": self.movie.id},
+            **custom_header,
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual({"movie": self.movie.id, "watcher": user.id}, response.json())
+
+    def test_create_already_seen(self):
+        access_token, client, user = setUpAuth(self)
+        custom_header = {"Authorization": f"Bearer {access_token}"}
+        response = self.client.post(
+            reverse("watched-movies-list"),
+            {"movie": self.movie.id},
+            **custom_header,
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual({"movie": self.movie.id, "watcher": user.id}, response.json())
+        response1 = self.client.post(
+            reverse("watched-movies-list"),
+            {"movie": self.movie.id},
+            **custom_header,
+        )
+        self.assertEqual(response1.status_code, 400)
+
+    def test_list_watched(self):
+        access_token, client, user = setUpAuth(self)
+        custom_header = {"Authorization": f"Bearer {access_token}"}
+        response = self.client.post(
+            reverse("watched-movies-list"),
+            {"movie": self.movie.id},
+            **custom_header,
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual({"movie": self.movie.id, "watcher": user.id}, response.json())
+        response = self.client.post(
+            reverse("watched-movies-list"),
+            {"movie": self.movie1.id},
+            **custom_header,
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual({"movie": self.movie1.id, "watcher": user.id}, response.json())
+        response = self.client.get(
+            reverse("watched-movies-list"),
+            **custom_header,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(), [{"movie": self.movie.id}, {"movie": self.movie1.id}]
+        )

@@ -3,7 +3,12 @@ from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.mixins import Response
-from rest_framework.viewsets import GenericViewSet, ModelViewSet, ReadOnlyModelViewSet
+from rest_framework.viewsets import (
+    GenericViewSet,
+    ModelViewSet,
+    ReadOnlyModelViewSet,
+    ViewSet,
+)
 
 
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -12,7 +17,7 @@ from oauth2_provider.contrib.rest_framework import (
     TokenHasReadWriteScope,
 )
 
-from .models import Comment, FavouriteMovie, Movie
+from .models import Comment, FavouriteMovie, Movie, WatchedMovie
 from .serializers import (
     CommentCreateSerializer,
     CommentUpdateSerializer,
@@ -23,6 +28,8 @@ from .serializers import (
     MovieDeleteSerializer,
     MovieDetailSerializer,
     MovieListSerializer,
+    WatchedMovieCreateSerializer,
+    WatchedMovieListSerializer,
 )
 
 
@@ -136,8 +143,33 @@ class FavouriteListCreateDeleteViewSet(
         return FavouriteMovie.objects.filter(user=self.request.user).all()
 
 
-class WatchedMovie(mixins.ListModelMixin, mixins.CreateModelMixin):
-    pass
+class WatchedMovieViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, ViewSet):
+    authentication_classes = [OAuth2Authentication]
+    permission_classes = [IsAuthenticated, TokenHasReadWriteScope]
+
+    def list(self, request):
+        queryset = WatchedMovie.objects.filter(watcher=request.user).all()
+        serializer = WatchedMovieListSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def create(self, request):
+        dataSerializer = {
+            "watcher": self.request.user.id,
+            "movie": request.data["movie"],
+        }
+        serializer = WatchedMovieCreateSerializer(data=dataSerializer)
+        if serializer.is_valid():
+            queryset = WatchedMovie.objects.filter(
+                watcher=request.user, movie=serializer.validated_data["movie"]
+            ).exists()
+            if not queryset:
+                serializer.create(serializer.validated_data)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response("already seen", status=status.HTTP_400_BAD_REQUEST)
+
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 #  get list need to be register

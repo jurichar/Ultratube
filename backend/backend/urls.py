@@ -14,7 +14,13 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from movie.views import CommentViewSet, FavouriteListCreateDeleteViewSet, MovieViewSet
+
+from movie.views import (
+    CommentViewSet,
+    FavouriteListCreateDeleteViewSet,
+    MovieViewSet,
+    WatchedMovieViewSet,
+)
 from rest_framework import routers
 from django.contrib import admin
 from django.urls import include, path
@@ -29,6 +35,7 @@ router.register("comments", CommentViewSet, basename="comments")
 router.register(
     "favourite-movies", FavouriteListCreateDeleteViewSet, basename="favourite-movies"
 )
+router.register("watched-movies", WatchedMovieViewSet, basename="watched-movies")
 
 
 urlpatterns = [

@@ -1,10 +1,6 @@
-from email.policy import default
 from django.contrib.auth import get_user_model
-from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models.signals import post_save, post_delete
-from django.dispatch import receiver
 
 
 class Movie(models.Model):
@@ -41,6 +37,9 @@ class WatchedMovie(models.Model):
     watcher = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     watched_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.watcher.username}: {self.movie.name}"
 
 
 class Comment(models.Model):

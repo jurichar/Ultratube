@@ -1,10 +1,9 @@
-import datetime
-
 from django.contrib.auth import get_user_model
 from django.core.validators import ValidationError
 from django.test import TestCase
 
-from .models import Comment, Movie, Subtitle
+
+from .models import Comment, Movie, Subtitle, WatchedMovie
 
 
 class MovieTestCase(TestCase):
@@ -104,3 +103,38 @@ class CommentTestCase(TestCase):
         comment = Comment.objects.first()
         self.assertEqual(self.movie, comment.movie)
         self.assertEqual(str(comment), comment.content)
+
+
+class WatchedTestCase(TestCase):
+    def setUp(self) -> None:
+        self.movie = Movie.objects.create(
+            name="Return of the Jedi",
+            thumbnail_cover="path/to/thumbnail/",
+            duration=100,
+            production_year=1988,
+            imdb_rating=1.0,
+        )
+        self.movie1 = Movie.objects.create(
+            name="Returnddddd of the Jedi",
+            thumbnail_cover="path/to/thumbnail/",
+            duration=100,
+            production_year=1988,
+            imdb_rating=1.0,
+        )
+        self.movie2 = Movie.objects.create(
+            name="Retu of the Jedi",
+            thumbnail_cover="path/to/thumbnail/",
+            duration=100,
+            production_year=1988,
+            imdb_rating=1.0,
+        )
+        self.user = get_user_model().objects.create_user(
+            username="toto", password="tata"
+        )
+        WatchedMovie.objects.create(watcher=self.user, movie=self.movie)
+        WatchedMovie.objects.create(watcher=self.user, movie=self.movie1)
+
+    def test_str(self):
+        watched = WatchedMovie.objects.last()
+        self.assertEqual(watched.movie, self.movie1)
+        self.assertEqual(watched.watcher, self.user)
