@@ -1,3 +1,4 @@
+from dataclasses import fields
 from rest_framework import serializers
 
 from .models import Comment, FavouriteMovie, Movie, Subtitle
@@ -15,6 +16,24 @@ class MovieListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
         fields = ["id", "name"]
+
+
+class MovieCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Movie
+        fields = [
+            "name",
+            "imdb_rating",
+            "production_year",
+            "duration",
+            "thumbnail_cover",
+        ]
+
+
+class MovieDeleteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Movie
+        fields = "__all__"
 
 
 class MovieDetailSerializer(serializers.ModelSerializer):

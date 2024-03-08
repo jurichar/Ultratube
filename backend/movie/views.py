@@ -5,13 +5,12 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.mixins import Response
 from rest_framework.viewsets import GenericViewSet, ModelViewSet, ReadOnlyModelViewSet
 
-from rest_framework.permissions import AllowAny
 
-# from rest_framework.permissions import AllowAny, IsAuthenticated
-# from oauth2_provider.contrib.rest_framework import (
-#     OAuth2Authentication,
-#     TokenHasReadWriteScope,
-# )
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from oauth2_provider.contrib.rest_framework import (
+    OAuth2Authentication,
+    TokenHasReadWriteScope,
+)
 
 from .models import Comment, FavouriteMovie, Movie
 from .serializers import (
@@ -20,6 +19,8 @@ from .serializers import (
     CommentViewSerializer,
     FavouriteMovieCreateSerializer,
     FavouriteMovieSerializer,
+    MovieCreateSerializer,
+    MovieDeleteSerializer,
     MovieDetailSerializer,
     MovieListSerializer,
 )
@@ -29,6 +30,7 @@ class MultipleSerializerMixin:
     detail_serializer_class = None
     update_serializer_class = None
     create_serializer_class = None
+    destroy_serializer_class = None
 
     def get_serializer_class(self):
         opt = {
@@ -36,6 +38,7 @@ class MultipleSerializerMixin:
             "partial_update": self.update_serializer_class,
             "update": self.update_serializer_class,
             "create": self.create_serializer_class,
+            "destroy": self.destroy_serializer_class,
         }.get(self.action, super().get_serializer_class())
 
         return super().get_serializer_class() if not opt else opt
@@ -45,23 +48,18 @@ class MovieViewSet(MultipleSerializerMixin, ReadOnlyModelViewSet):
     permission_classes = [AllowAny]
     serializer_class = MovieListSerializer
     detail_serializer_class = MovieDetailSerializer
+    destroy_serializer_class = MovieDeleteSerializer
 
     def get_queryset(self):
         return Movie.objects.all()
 
-    #  to do uncomment this to implement permissions but change test
-    # def get_permissions(self):
-    #     if self.action in ["create", "detail"]:
-    #         self.permission_classes = [IsAuthenticated, TokenHasReadWriteScope]
-    #         self.authentication_classes = [OAuth2Authentication]
-    #     elif self.action in ["list", "partial_update", "destroy"]:
-    #         self.permission_classes = [
-    #             AllowAny,
-    #         ]
-
-    #     return super().get_permissions()
-
-    @action(detail=True, methods=["GET", "POST"])
+    #  Post and GET  for comment
+    @action(
+        detail=True,
+        methods=["GET", "POST"],
+        permission_classes=[IsAuthenticated, TokenHasReadWriteScope],
+        authentication_classes=[OAuth2Authentication],
+    )
     def comments(self, request, pk=None):
         movie = get_object_or_404(Movie, pk=pk)
         if request.method == "GET":
@@ -80,13 +78,29 @@ class MovieViewSet(MultipleSerializerMixin, ReadOnlyModelViewSet):
                 return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+    #  Post for create movie
+    @action(detail=False, methods=["POST"])
+    def create_movie(self, request):
+        serializer = MovieCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, pk=None):
+        movie = get_object_or_404(Movie, pk=pk)
+        movie.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    # def destroy(self, request, pk=None, *args, **kwargs):
+    #     return super(MovieViewSet, self).destroy(request, pk, *args, **kwargs)
+
 
 class CommentViewSet(MultipleSerializerMixin, ModelViewSet):
     http_method_names = ["get", "post", "patch", "delete"]
-    permission_classes = [AllowAny]
-    # to do uncomment this permission  but change test
-    # authentication_classes = [OAuth2Authentication]
-    # permission_classes = [IsAuthenticated, TokenHasReadWriteScope]
+    authentication_classes = [OAuth2Authentication]
+    permission_classes = [IsAuthenticated, TokenHasReadWriteScope]
     serializer_class = CommentViewSerializer
     update_serializer_class = CommentUpdateSerializer
     create_serializer_class = CommentCreateSerializer

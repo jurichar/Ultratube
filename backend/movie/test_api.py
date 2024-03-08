@@ -1,6 +1,8 @@
+from re import I
 from django.contrib.auth import get_user_model
 from django.urls import reverse, reverse_lazy
 from rest_framework.test import APITestCase
+from authentication.test_user_action import setUpAuth, header_auth
 
 from movie.models import Comment, FavouriteMovie, Movie, Subtitle
 
@@ -79,6 +81,61 @@ class TestMovie(MovieAPITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), expected)
 
+    def test_create(self):
+        movie = {
+            "name": "Return of thedd Jedi",
+            "imdb_rating": 1.0,
+            "production_year": 1988,
+            "duration": 100,
+            "thumbnail_cover": "path/to/thumbnail/",
+        }
+        response = self.client.post(
+            "http://localhost:8000/api/movies/create_movie/", movie
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json(), movie)
+
+    def test_create_existing(self):
+        movie = {
+            "name": "Return of thedd Jedi",
+            "imdb_rating": 1.0,
+            "production_year": 1988,
+            "duration": 100,
+            "thumbnail_cover": "path/to/thumbnail/",
+        }
+        response = self.client.post(
+            "http://localhost:8000/api/movies/create_movie/", data=movie
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json(), movie)
+        response1 = self.client.post(
+            "http://localhost:8000/api/movies/create_movie/", data=movie
+        )
+        self.assertEqual(response1.status_code, 400)
+
+    def test_delete(self):
+        movie = {
+            "name": "Return of thedd Jedi",
+            "imdb_rating": 1.0,
+            "production_year": 1988,
+            "duration": 100,
+            "thumbnail_cover": "path/to/thumbnail/",
+        }
+        response = self.client.post(
+            "http://localhost:8000/api/movies/create_movie/", data=movie
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json(), movie)
+        movie_db = Movie.objects.last()
+        response_delete = self.client.delete(
+            "http://localhost:8000/api/movies/" + str(movie_db.id) + "/",
+        )
+        response_detail = self.client.get(
+            reverse("movies-detail", args=[movie_db.id]), format="json"
+        )
+        self.assertEqual(response_delete.status_code, 204)
+        self.assertEqual(response_detail.status_code, 404)
+
     def test_detail(self):
 
         movie = Movie.objects.first()
@@ -99,19 +156,24 @@ class TestMovie(MovieAPITestCase):
         self.assertEqual(response.json(), expected)
 
     def test_movie_comments_get(self):
-
-        response = self.client.get(reverse("movies-comments", args=[self.movie.id]))
+        access_token, client, user = setUpAuth(self)
+        custom_header = {"Authorization": f"Bearer {access_token}"}
+        response = self.client.get(
+            reverse("movies-comments", args=[self.movie.id]),
+            **custom_header,
+        )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()), 2)
         self.assertIn("This is a great movie !", response.data[0]["content"])
         self.assertIn("I love it !", response.data[1]["content"])
 
     def test_movie_comments_post(self):
-
-        self.client.force_login(self.user)
+        access_token, client, user = setUpAuth(self)
+        custom_header = {"Authorization": f"Bearer {access_token}"}
         response_success = self.client.post(
             reverse("movies-comments", args=[self.movie.id]),
             {"movie": self.movie.id, "content": "test"},
+            **custom_header,
         )
         self.assertEqual(response_success.status_code, 201)
 
@@ -124,8 +186,12 @@ class TestMovie(MovieAPITestCase):
 class TestComment(MovieAPITestCase):
 
     def test_list(self):
-
-        response = self.client.get(reverse("comments-list"))
+        access_token, client, user = setUpAuth(self)
+        custom_header = {"Authorization": f"Bearer {access_token}"}
+        response = self.client.get(
+            reverse("comments-list"),
+            **custom_header,
+        )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["count"], 2)
         self.assertIn(self.comment.content, response.json()["results"][1]["content"])
@@ -138,8 +204,12 @@ class TestComment(MovieAPITestCase):
         )
 
     def test_detail(self):
-
-        response = self.client.get(reverse("comments-detail", args=[self.comment.id]))
+        access_token, client, user = setUpAuth(self)
+        custom_header = {"Authorization": f"Bearer {access_token}"}
+        response = self.client.get(
+            reverse("comments-detail", args=[self.comment.id]),
+            **custom_header,
+        )
         expected = {
             "author": self.comment.author.username,
             "id": self.comment.id,
@@ -150,7 +220,8 @@ class TestComment(MovieAPITestCase):
         self.assertEqual(response.json(), expected)
 
     def test_delete(self):
-
+        access_token = setUpAuth(self)
+        custom_header = {"Authorization": f"Bearer {access_token}"}
         comment_to_delete = Comment.objects.create(
             author=self.user,
             movie=self.movie,
@@ -159,16 +230,19 @@ class TestComment(MovieAPITestCase):
 
         self.assertEqual(Comment.objects.all().count(), 3)
         response = self.client.delete(
-            reverse("comments-detail", args=[comment_to_delete.id])
+            reverse("comments-detail", args=[comment_to_delete.id]),
+            **custom_header,
         )
         self.assertEqual(response.status_code, 204)
         self.assertEqual(Comment.objects.all().count(), 2)
 
     def test_patch(self):
-
+        access_token, client, user = setUpAuth(self)
+        custom_header = {"Authorization": f"Bearer {access_token}"}
         response = self.client.patch(
             reverse("comments-detail", args=[self.comment.id]),
             {"content": "I AM UPDATED"},
+            **custom_header,
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -176,10 +250,13 @@ class TestComment(MovieAPITestCase):
         )
 
     def test_post(self):
-
+        access_token, client, user = setUpAuth(self)
+        custom_header = {"Authorization": f"Bearer {access_token}"}
         self.client.force_login(self.user)
         response = self.client.post(
-            reverse("comments-list"), {"movie": self.movie.id, "content": "test"}
+            reverse("comments-list"),
+            {"movie": self.movie.id, "content": "test"},
+            **custom_header,
         )
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Comment.objects.last().content, "test")
