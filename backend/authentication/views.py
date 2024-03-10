@@ -117,7 +117,6 @@ class UserLogin(APIView):
                     access_token,
                     path="/",
                     domain="localhost",
-
                     httponly=True,
                     samesite="Lax",
                     expires=None,
