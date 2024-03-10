@@ -6,6 +6,7 @@ import { FormInput, RegisterType } from "../../types";
 import { reducer } from "./reducer";
 import { validateEmail } from "../../utils/validateEmail";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/useAuth";
 
 const initialState: RegisterType = {
   username: "",
@@ -18,6 +19,7 @@ const initialState: RegisterType = {
 
 export default function Register() {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const { TriggerReload } = useAuth();
   const navigate = useNavigate();
 
   const handlePermission = () => {
@@ -54,6 +56,7 @@ export default function Register() {
     if (name == "Register") {
       if (is_valid_arg({ ...state })) {
         await createUser();
+        await TriggerReload();
         navigate("/profile");
       } else {
         console.log("cant create");
