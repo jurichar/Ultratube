@@ -2,9 +2,10 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.http import JsonResponse
 from django.http import Http404
 import requests
+import hashlib
 from .sendEmail import sendEmail
 from rest_framework import viewsets
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 import copy
 from .serializer import (
     AccessTokenSerializer,
@@ -110,12 +111,7 @@ class UserLogin(APIView):
                 if not request.session.session_key:
                     request.session.save()
                 access_token = get_or_create_access_token(request)
-                # sendEmail(
-                #     subject="bjr", message="hello", mailReceiver=request.data["email"]
-                # )
-                response = Response(
-                    {"data": serializer.data, "ACCESTOKEN": access_token}
-                )
+                response = Response({"data": serializer.data})
                 response.set_cookie(
                     "token",
                     access_token,
@@ -130,14 +126,53 @@ class UserLogin(APIView):
                 return Response(
                     "password doesnt match ", status=status.HTTP_401_UNAUTHORIZED
                 )
-        except Exception as e:
-            print(e)
+        except Exception:
             return Response("user doesnt exist", status=status.HTTP_403_FORBIDDEN)
 
 
 @ensure_csrf_cookie
 def get_csrf_token(request):
-    return JsonResponse({"detail": "CSRF token obtenu avec succès"})
+    return JsonResponse({"detail": "CSRF token get with success"})
+
+
+class ResetPassword(APIView):
+    permission_classes = [AllowAny]
+
+    def get_object(self, email):
+        try:
+            return User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise Http404
+
+    def get(self, request, email):
+        user = self.get_object(email)
+        sendEmail(
+            subject="reset password",
+            message=f"go reset your password http://localhost:3000/reset-password/{hashlib.sha256(str.encode(user.email + user.username)).hexdigest()}",
+            mailReceiver=user.email,
+        )
+        return Response(status=status.HTTP_200_OK)
+
+    def patch(self, request, email):
+        if "hash" in request.data and "password" in request.data:
+            user = self.get_object(email)
+            hashUsername = hashlib.sha256(
+                str.encode(user.email + user.username)
+            ).hexdigest()
+            if hashUsername == request.data["hash"]:
+                dataPatched = {"password": request.data["password"]}
+                serializer = UserPatchSerializer(user, data=dataPatched, partial=True)
+                if serializer.is_valid():
+                    user.set_password(request.data["password"])
+                    user.save()
+                    return Response("Password change with success")
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            "you must have all the parameter", status=status.HTTP_403_FORBIDDEN
+        )
+
+
+#  send email to the user
 
 
 class UserLogout(APIView):
@@ -146,7 +181,10 @@ class UserLogout(APIView):
 
     def post(self, request, format=None):
         try:
+            logout(request)
             request.auth.delete()
+            request.session.flush()
+
             return Response(
                 {"message": "Successfully logged out."}, status=status.HTTP_200_OK
             )
@@ -197,8 +235,7 @@ class FortyTwoAuthView(APIView):
             authenticate_login_user(request, username=user_created.username)
             request.session.save()
             token_api = get_or_create_access_token(request)
-        except Exception as e:
-            print("errpor", e)
+        except Exception:
             return Response("cant create user ", status=status.HTTP_403_FORBIDDEN)
         frontend_redirect_url = request.GET.get(
             "state", "http://localhost:3000/register"
@@ -347,21 +384,26 @@ class UserViewSet(MultipleSerializerMixin, viewsets.ModelViewSet):
     def partial_update(self, request, *args, **kwargs):
 
         instance = get_object_or_404(User, pk=kwargs.get("pk"))
+        data_parsed = copy.deepcopy(request.data)
+        if "password" in data_parsed:
+            del data_parsed["password"]
         if request.user.has_perm("authentication.omniauth") and request.user.omniauth:
-            data_parsed = copy.deepcopy(request.data)
             if "username" in data_parsed:
                 del data_parsed["username"]
-            if "password" in data_parsed:
-                del data_parsed["password"]
             serializer = self.update_serializer_class(
                 instance, data=data_parsed, partial=True
             )
         else:
+
             serializer = self.update_serializer_class(
-                instance, data=request.data, partial=True
+                instance, data=data_parsed, partial=True
             )
+
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        if "password" in request.data:
+            instance.set_password(request.data["password"])
+            instance.save()
         return Response("update successful")
 
 

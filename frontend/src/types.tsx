@@ -5,12 +5,34 @@ import { ChangeEvent, ReactElement, ReactPortal } from "react";
 export interface Movie {
   id: string;
   title: string;
-  release: string;
+  year: number;
   image: string;
   synopsis: string;
-  trailer: string;
+  rating: number;
+  t_imdb_id?: string;
+  imdb_link?: string;
+  summary?: string;
+  language: string;
+  trailer?: string;
+  genres: Array<string>;
+  length: number;
+  torrent?: string;
 }
-
+export type YtsMovie = {
+  id: string;
+  title: string;
+  year: number;
+  medium_cover_image: string;
+  synopsis: string;
+  rating: number;
+  imdb_code: string;
+  summary?: string;
+  language: string;
+  yt_trailer_code?: string;
+  genres: Array<string>;
+  runtime: number;
+  torrent?: string;
+};
 export interface User {
   id: string;
   name: string;
@@ -63,7 +85,16 @@ export type UserData = {
   avatar?: string;
   omniauth?: boolean;
 };
-
+export type Order = "asc" | "desc";
+export type TorrentMovieTrailer = {
+  result: [{ key: string }];
+};
+export type ApiTorrentMovie = {
+  category: string;
+  name: string;
+  videos?: TorrentMovieTrailer[];
+  torrent?: string;
+};
 export type ProfileForm = {
   username?: string;
   email?: string;
@@ -80,6 +111,13 @@ export type NotifyType = {
 export interface UserPatchInterface extends ProfileForm {
   avatar?: string;
 }
+export type crewUser = {
+  character: string;
+  known_for_department: string;
+  name: string;
+  profile_path: string;
+};
+
 type ReactText = string | number;
 type ReactChild = ReactElement | ReactText;
 
@@ -89,4 +127,18 @@ type ReactNode = ReactChild | ReactFragment | ReactPortal | boolean | null | und
 
 export type Props = {
   children: ReactNode;
+};
+
+export type objectFilter = {
+  id: number;
+  name: string;
+  placeholder?: string;
+};
+
+export type filter = {
+  rating: number;
+  genre: string;
+  min_year_release: number;
+  duration: string | "all" | "u_60" | "60-120" | "a_120";
+  name: string;
 };

@@ -1,48 +1,132 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { Movie } from "../../types";
-import moviesData from "../../utils/movies.json";
-import trendingData from "../../utils/trending.json";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useLocation, useParams } from "react-router-dom";
+import { Movie, crewUser } from "../../types";
+import MemberMovie from "./MemberMovie/MemberMovie";
+import TrailerSection from "../Global/TrailerSection/TrailerSection";
 import Comments from "./Comments";
 
 export default function MoviePage() {
-    const { id } = useParams<{ id: string }>();
-    const [movie, setMovie] = useState<Movie | undefined>();
+  const { id } = useParams<{ id: string }>();
+  const { state } = useLocation();
+  const [movie, setMovie] = useState<Movie>();
+  const [crew, setCrew] = useState<crewUser[]>();
+  const [cast, setCast] = useState<crewUser[]>();
 
-    useEffect(() => {
-        let _movie = moviesData.find((movie) => movie.id === id);
-        if (!_movie) {
-            _movie = trendingData.find((movie) => movie.id === id);
-        }
-        if (_movie) {
-            setMovie(_movie);
-        }
-        else {
-            console.log("Movie not found");
-        }
-    }, [id]);
+  const options = useMemo(
+    () => ({
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        Authorization: `Bearer  ${import.meta.env.VITE_TIMDB_ACCESS_KEY}`,
+      },
+    }),
+    []
+  );
+  const getImdbInfo = useCallback(
+    async (imdbLink: string) => {
+      fetch(`https://api.themoviedb.org/3/movie/${imdbLink}?append_to_response=credits&language=en-US`, options)
+        .then((res) => res.json())
+        .then((json) => {
+          if ("credits" in json && "cast" in json["credits"]) {
+            const cast = json["credits"]["cast"].map((elem: crewUser) => {
+              return {
+                character: elem.character,
+                known_for_department: elem.known_for_department,
+                name: elem.name,
+                profile_path: elem.profile_path && "https://image.tmdb.org/t/p/w138_and_h175_face/" + elem.profile_path,
+              };
+            });
+            setCast(cast);
+          }
+          if ("credits" in json && "crew" in json["credits"]) {
+            const crew = json["credits"]["crew"].map((elem: crewUser) => {
+              return {
+                character: "",
+                known_for_department: elem?.known_for_department,
+                name: elem.name,
+                profile_path: elem.profile_path && "https://image.tmdb.org/t/p/w138_and_h175_face/" + elem.profile_path,
+              };
+            });
+            setCrew(crew);
+          }
+        })
+        .catch((err) => console.error("error:" + err));
+    },
+    [options]
+  );
 
-    return (
-        <div className="flex flex-col justify-center items-center gap-4 md:pl-9">
-            <div className="w-full text-quinary opacity-100 relative flex flex-col justify-center items-center">
-                <div className="w-full h-full bg-cover bg-center bg-no-repeat opacity-30 absolute" style={{ backgroundImage: `url(${movie?.image})` }}>
-                </div>
-                <h1 className="text-heading-lg font-bold opacity-100 p-4">{movie?.title}</h1>
-                <h2 className="text-heading-md p-4">{movie?.release}</h2>
-            </div>
-            <div className="w-full h-auto flex flex-col justify-center items-center p-4">
-                <p className="text-quaternary text-lg">{movie?.synopsis}</p>
-            </div>
-            <div className="w-full aspect-video bg-secondary">
-                <iframe
-                    src={`https://moacloud.com/iframe/FavoXpQrbD`}
-                    title="movie"
-                    width="100%"
-                    height="100%"
-                    allowFullScreen
-                ></iframe>
-            </div>
-            <Comments movieId={movie?.id} />
-        </div >
-    );
+  const getTimdbId = useCallback(
+    async (imdbLink: string) => {
+      let id_timdb = "";
+      try {
+        const response = await fetch(`https://api.themoviedb.org/3/find/${imdbLink}?external_source=imdb_id`, options);
+        const json = await response.json();
+        if ("movie_results" in json && json["movie_results"].length > 0) {
+          if ("id" in json["movie_results"][0]) {
+            id_timdb = json["movie_results"][0].id;
+            return id_timdb;
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    [options]
+  );
+
+  useEffect(() => {
+    const { movieProps } = state;
+    console.log(movieProps);
+
+    async function getAsyncTimdb() {
+      if (movieProps?.imdb_link) {
+        const timdb_id = await getTimdbId(movieProps?.imdb_link);
+        if (timdb_id) {
+          getImdbInfo(timdb_id);
+        }
+      } else if (movieProps?.t_imdb_id) {
+        getImdbInfo(movieProps?.t_imdb_id);
+      }
+    }
+    getAsyncTimdb();
+    setMovie(movieProps);
+    return () => {
+      setMovie(undefined);
+      setCrew(undefined);
+    };
+  }, [getImdbInfo, getTimdbId, id, state]);
+
+  return (
+    <div className="flex flex-col  gap-20 justify-center items-center ">
+      <div className="w-full h-40 text-quinary opacity-100 relative flex flex-col justify-center items-center">
+        <div className="w-full h-full bg-cover bg-center bg-no-repeat opacity-30 absolute" style={{ backgroundImage: `url(${movie?.image})` }}></div>
+        <h1 className="text-4xl font-bold opacity-100">{movie?.title}</h1>
+        <h2 className="text-2xl">{movie?.year}</h2>
+        {movie && movie?.rating > 0.0 && <h3>imb rating : {movie?.rating} /10 </h3>}
+        <h3> {movie?.length} minutes</h3>
+      </div>
+      {movie?.summary ? (
+        <div className="w-8/12 flex flex-col  gap-6 justify-center items-center">
+          <h1 className="text-4xl font-bold text-white">Summary</h1>
+          <span className="text-white text-center">{movie?.summary}</span>
+        </div>
+      ) : (
+        movie?.synopsis && (
+          <div className="w-8/12 flex flex-col  gap-6 justify-center items-center">
+            <h1 className="text-4xl font-bold text-white">Synopsis</h1>
+            <span className="text-white text-center">{movie?.synopsis}</span>
+          </div>
+        )
+      )}
+      {movie?.trailer && <TrailerSection linkEmbed={movie.trailer} />}
+
+      <h1 className="text-4xl font-bold text-white">Movie</h1>
+      <div className="w-10/12 h-auto  bg-secondary">
+        <iframe className="w-full aspect-video" src="https://moacloud.com/iframe/FavoXpQrbD" allowFullScreen></iframe>
+      </div>
+      <h4 className="text-quinary"> genres : {movie?.genres?.join(",")}</h4>
+      <MemberMovie crew={crew} cast={cast} />
+      <Comments movieId={movie?.id} />
+    </div>
+  );
 }
