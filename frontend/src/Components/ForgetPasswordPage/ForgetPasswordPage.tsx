@@ -1,5 +1,6 @@
 // src/Components/ForgetPasswordPage/ResetPasswordPage.tsx
 import { useState } from "react";
+import { validateEmail } from "../../utils/validateEmail";
 
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState("");
@@ -14,14 +15,11 @@ export default function ResetPasswordPage() {
   const checkFormValidity = () => {
     let valid = true;
     let message = "";
-    if (!checkEmailValidity()) valid = false; message += "Email must be valid.\n";
+    if (!validateEmail) valid = false;
+    message += "Email must be valid.\n";
     if (!valid) alert(message);
     return valid;
-  }
-
-  const checkEmailValidity = () => {
-    return email.includes("@") && email.includes(".");
-  }
+  };
 
   return (
     <div className="w-full p-6 gap-10 overflow-y-auto flex flex-col items-center justify-around">

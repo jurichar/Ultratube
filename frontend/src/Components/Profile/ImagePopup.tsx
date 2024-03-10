@@ -35,7 +35,7 @@ const ImagePopup: React.FC<ImagePopupProps> = ({ setShowImagePopup, setSelectedI
   return (
     <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-10 flex justify-center items-center px-4">
       <div className="w-96 h-96 bg-tertiary rounded flex flex-col justify-center items-center gap-6 p-4">
-        <h1 className="text-quinary text-heading-md">{t('chooseAvatar')}</h1>
+        <h1 className="text-quinary text-heading-md">{t("chooseAvatar")}</h1>
         <div className="w-full h-80 flex flex-wrap justify-center items-center gap-6 overflow-y-auto p-4">
           {ImagesUrl.map((imageUrl, index) => (
             <img
@@ -47,10 +47,7 @@ const ImagePopup: React.FC<ImagePopupProps> = ({ setShowImagePopup, setSelectedI
             />
           ))}
         </div>
-        <button
-          className="w-32 h-12 transition-all bg-quaternary text-quinary rounded-full hover:bg-quinary hover:text-tertiary"
-          onClick={() => setShowImagePopup(false)}
-        >
+        <button className="w-32 h-12 transition-all bg-quaternary text-quinary rounded-full hover:bg-quinary hover:text-tertiary" onClick={() => setShowImagePopup(false)}>
           {t("close")}
         </button>
       </div>

@@ -18,7 +18,20 @@ class User(AbstractUser):
         (man2, man2),
         (avocado, avocado),
     }
+    english = "en"
+    spanish = "es"
+    french = "fr"
+    russe = "ru"
+    german = "gb"
+    language_user = {
+        (english, english),
+        (spanish, spanish),
+        (french, french),
+        (russe, russe),
+        (german, german),
+    }
     avatar = models.CharField(blank=True, choices=avatars_user)
+    language = models.CharField(default="en", choices=language_user)
     omniauth = models.BooleanField(default=False)
 
     class Meta:

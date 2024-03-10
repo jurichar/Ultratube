@@ -5,6 +5,11 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.mixins import Response
 from rest_framework.viewsets import GenericViewSet, ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.permissions import AllowAny
+
+# from oauth2_provider.contrib.rest_framework import (
+#     OAuth2Authentication,
+#     TokenHasReadWriteScope,
+# )
 from .models import Comment, FavouriteMovie, Movie
 from .serializers import (
     CommentCreateSerializer,
@@ -41,6 +46,18 @@ class MovieViewSet(MultipleSerializerMixin, ReadOnlyModelViewSet):
     def get_queryset(self):
         return Movie.objects.all()
 
+    #  to do uncomment this to implement permissions but change test
+    # def get_permissions(self):
+    #     if self.action in ["create", "detail"]:
+    #         self.permission_classes = [IsAuthenticated, TokenHasReadWriteScope]
+    #         self.authentication_classes = [OAuth2Authentication]
+    #     elif self.action in ["list", "partial_update", "destroy"]:
+    #         self.permission_classes = [
+    #             AllowAny,
+    #         ]
+
+    #     return super().get_permissions()
+
     @action(detail=True, methods=["GET", "POST"])
     def comments(self, request, pk=None):
         movie = get_object_or_404(Movie, pk=pk)
@@ -64,6 +81,9 @@ class MovieViewSet(MultipleSerializerMixin, ReadOnlyModelViewSet):
 class CommentViewSet(MultipleSerializerMixin, ModelViewSet):
     http_method_names = ["get", "post", "patch", "delete"]
     permission_classes = [AllowAny]
+    # to do uncomment this permission  but change test
+    # authentication_classes = [OAuth2Authentication]
+    # permission_classes = [IsAuthenticated, TokenHasReadWriteScope]
     serializer_class = CommentViewSerializer
     update_serializer_class = CommentUpdateSerializer
     create_serializer_class = CommentCreateSerializer

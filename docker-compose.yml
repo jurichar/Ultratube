@@ -38,6 +38,9 @@ services:
     ports:
       - "3000:3000"
     tty: true
-
+  api-py:
+    build: ./api-torrent
+    ports:
+      - "8009:8009"
 volumes:
   data: {}

@@ -110,12 +110,7 @@ class UserLogin(APIView):
                 if not request.session.session_key:
                     request.session.save()
                 access_token = get_or_create_access_token(request)
-                # sendEmail(
-                #     subject="bjr", message="hello", mailReceiver=request.data["email"]
-                # )
-                response = Response(
-                    {"data": serializer.data, "ACCESTOKEN": access_token}
-                )
+                response = Response({"data": serializer.data})
                 response.set_cookie(
                     "token",
                     access_token,
@@ -130,8 +125,7 @@ class UserLogin(APIView):
                 return Response(
                     "password doesnt match ", status=status.HTTP_401_UNAUTHORIZED
                 )
-        except Exception as e:
-            print(e)
+        except Exception:
             return Response("user doesnt exist", status=status.HTTP_403_FORBIDDEN)
 
 
@@ -197,8 +191,7 @@ class FortyTwoAuthView(APIView):
             authenticate_login_user(request, username=user_created.username)
             request.session.save()
             token_api = get_or_create_access_token(request)
-        except Exception as e:
-            print("errpor", e)
+        except Exception:
             return Response("cant create user ", status=status.HTTP_403_FORBIDDEN)
         frontend_redirect_url = request.GET.get(
             "state", "http://localhost:3000/register"

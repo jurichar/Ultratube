@@ -61,7 +61,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/:id",
+        path: "movie/:id",
         element: <MoviePage />,
       },
       {
@@ -71,7 +71,7 @@ export const router = createBrowserRouter([
       {
         path: "/reset-password",
         element: <ResetPasswordPage />,
-      }
+      },
     ],
   },
 ]);

@@ -14,6 +14,7 @@ interface Props {
   linkOtherAUth: "/register" | "/login";
   valueLinkOtherAuth: "Register" | "Login";
 }
+
 export default function FormAuthenticate({ handleSubmit, nameForm, nameOtherAuth, linkOtherAUth, valueLinkOtherAuth, formInput, nameSubmit }: Props) {
   return (
     <div className="  bg-tertiary m-auto p-6 md:p-8  mt-20 w-10/12 h-3/6 md:w-6/12  lg:w-96 lg:h-4/6  rounded">
@@ -57,6 +58,13 @@ export default function FormAuthenticate({ handleSubmit, nameForm, nameOtherAuth
           {valueLinkOtherAuth}
         </Link>
       </div>
+      {nameForm == "Login" && (
+        <div className="w-full text-center">
+          <Link to="/forget-password" className="text-quinary text-body-md ">
+            Forgot your password ?
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
