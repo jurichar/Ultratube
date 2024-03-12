@@ -76,26 +76,43 @@ export default function MoviePage() {
     [options]
   );
 
-  async function createMovieInDb() {
-    console.log(movie);
-    const dataObject = {
-      name: movie?.title,
-      thumbnail_cover: movie?.image,
-      imdb_rating: movie?.rating,
-      production_year: movie?.year,
-      duration: movie?.length,
-      quality: movie?.quality,
-      language: movie?.language,
-      torrent: movie?.torrent,
-    };
-    try {
-      const result: { id: number } = await fetchWrapper("api/movies/create_movie/", { method: "POST", body: dataObject });
-      setMovieIdDb(result.id);
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  // async function createMovieInDb() {
+  //   const dataObject = {
+  //     name: movie?.title,
+  //     thumbnail_cover: movie?.image,
+  //     imdb_rating: movie?.rating,
+  //     production_year: movie?.year,
+  //     duration: movie?.length,
+  //     quality: movie?.quality,
+  //     language: movie?.language,
+  //     torrent: movie?.torrent,
+  //   };
+  //   try {
+  //     const result: { id: number } = await fetchWrapper("api/movies/create_movie/", { method: "POST", body: dataObject });
+  //     setMovieIdDb(result.id);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
   useEffect(() => {
+    async function createMovieInDb() {
+      const dataObject = {
+        name: movie?.title,
+        thumbnail_cover: movie?.image,
+        imdb_rating: movie?.rating,
+        production_year: movie?.year,
+        duration: movie?.length,
+        quality: movie?.quality,
+        language: movie?.language,
+        torrent: movie?.torrent,
+      };
+      try {
+        const result: { id: number } = await fetchWrapper("api/movies/create_movie/", { method: "POST", body: dataObject });
+        setMovieIdDb(result.id);
+      } catch (error) {
+        console.log(error);
+      }
+    }
     if (movie && Object.keys(movie).length > 0) {
       createMovieInDb();
     }
