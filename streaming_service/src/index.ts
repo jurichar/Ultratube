@@ -37,7 +37,7 @@ fastify.post("/download-torrent", async (request, reply) => {
     const torrentPath = await downloadTorrentMeta(torrentUrl);
     const torrentMetaData = await parseTorrentMeta(torrentPath);
     const trackerResponse = await discoverPeers(torrentMetaData, peerId);
-    const [host, ip] = trackerResponse.peers[1].split(":");
+    const [host, ip] = trackerResponse.peers[0].split(":");
 
     console.log(`Intiating TCP connection with peer: ${host}:${ip}`);
     const tcpHandshake = await initPeerConnection(

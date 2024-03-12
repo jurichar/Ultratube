@@ -55,8 +55,10 @@ function decodeHandshake(rawHandshake: Buffer): ttypes.PeerHandshake {
   const protocolLength = rawHandshake[0];
   offset += 1;
 
-  const protocol = rawHandshake.subarray(offset, PROTOCOL_LENGTH).toString();
-  offset += PROTOCOL_LENGTH;
+  const protocol = rawHandshake
+    .subarray(offset, PROTOCOL_LENGTH + 1)
+    .toString();
+  offset += PROTOCOL_LENGTH + 1;
 
   const reservedBytes = rawHandshake.subarray(offset, 8);
   offset += reservedBytes.length;
