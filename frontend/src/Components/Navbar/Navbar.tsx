@@ -1,15 +1,17 @@
 // frontend/src/Components/Navbar/Navbar.tsx
 
 import { NavLink } from "react-router-dom";
-import { useAuth } from "../../context/useAuth";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../../context/useAuth";
+import { language } from "../../types";
 
 export default function Navbar() {
-  const { userData } = useAuth();
   const { i18n } = useTranslation();
+  const { languageSelected, setLanguageSelected, userData } = useAuth();
 
   const changeLanguage = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const lang = e.target.value;
+    const lang: language = e.target.value;
+    setLanguageSelected(lang);
     i18n.changeLanguage(lang);
   };
 
@@ -24,7 +26,7 @@ export default function Navbar() {
         </svg>
       </NavLink>
       <div className="flex flex-row gap-4 justify-center items-center md:flex-col">
-        <select className="w-16 h-9 bg-cover bg-no-repeat bg-center transition-all" onChange={changeLanguage}>
+        <select value={languageSelected} className="w-16 h-9 bg-cover bg-no-repeat bg-center transition-all" onChange={changeLanguage}>
           <option value="en">EN</option>
           <option value="fr">FR</option>
           <option value="es">ES</option>

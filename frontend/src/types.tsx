@@ -47,7 +47,7 @@ export interface User {
   password: string;
   avatar: string;
 }
-
+export type language = "en" | "fr" | "es" | "de" | "it" | "jp" | "ru" | string;
 export interface Comment {
   id: string;
   user_id: string;
