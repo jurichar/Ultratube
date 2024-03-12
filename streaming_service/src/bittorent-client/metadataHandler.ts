@@ -77,6 +77,7 @@ function normalizeTorrentMeta(
   torrentMetaData.comment = decodedMetadata?.comment;
   torrentMetaData.info = info;
   torrentMetaData.infoHash = originalMetaData.infoHashBuffer;
+  torrentMetaData.infoHashHex = originalMetaData.infoHash;
 
   return torrentMetaData;
 }
@@ -106,8 +107,6 @@ export async function parseTorrentMeta(
 ): Promise<ttypes.TorrentMeta> {
   const torrent = fs.readFileSync(torrentPath);
   const parsed = await parseTorrent(torrent);
-
-  console.log("infoHash: ", parsed.infoHash);
 
   const decodedTorrent = normalizeTorrentMeta(
     bencode.decode(torrent, "utf-8"),

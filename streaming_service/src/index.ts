@@ -44,6 +44,7 @@ fastify.post("/download-torrent", async (request, reply) => {
       host,
       parseInt(ip, 10),
       torrentMetaData.infoHash,
+      torrentMetaData.infoHashHex,
       peerId,
     );
 
