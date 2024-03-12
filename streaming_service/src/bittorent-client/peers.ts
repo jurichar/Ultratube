@@ -2,7 +2,7 @@ import net from "node:net";
 import * as ttypes from "./ft_torrent_types.js";
 
 const PROTOCOL_NAME = "BitTorrent protocol";
-const PROTOCOL_LENGTH = PROTOCOL_NAME.length;
+const PROTOCOL_LENGTH = 19;
 
 export function initPeerConnection(
   host: string,
@@ -58,10 +58,10 @@ function decodeHandshake(rawHandshake: Buffer): ttypes.PeerHandshake {
   const protocol = rawHandshake
     .subarray(offset, PROTOCOL_LENGTH + 1)
     .toString();
-  offset += PROTOCOL_LENGTH + 1;
+  offset += PROTOCOL_LENGTH;
 
   const reservedBytes = rawHandshake.subarray(offset, 8);
-  offset += reservedBytes.length;
+  offset += 8;
 
   const infoHash = rawHandshake.subarray(offset, offset + 20).toString("hex");
   offset += 20;

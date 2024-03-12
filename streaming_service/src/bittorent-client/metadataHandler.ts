@@ -107,6 +107,8 @@ export async function parseTorrentMeta(
   const torrent = fs.readFileSync(torrentPath);
   const parsed = await parseTorrent(torrent);
 
+  console.log("infoHash: ", parsed.infoHash);
+
   const decodedTorrent = normalizeTorrentMeta(
     bencode.decode(torrent, "utf-8"),
     parsed,
