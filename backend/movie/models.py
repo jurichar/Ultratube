@@ -1,10 +1,11 @@
+from email.policy import default
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 
 class Movie(models.Model):
-    name = models.CharField(max_length=128, unique=True)
+    name = models.CharField(max_length=128)
     imdb_rating = models.FloatField(
         validators=[MinValueValidator(0.0), MaxValueValidator(10.0)],
         null=True,
@@ -14,10 +15,10 @@ class Movie(models.Model):
     production_year = models.IntegerField(
         validators=[MinValueValidator(1888)], null=True, blank=True
     )
-
+    language = models.CharField(null=False, default="en")
+    quality = models.CharField(null=False, default="720p")
     duration = models.IntegerField(validators=[MinValueValidator(0)])
-
-    #  path to the torrent with different language and quality
+    torrent = models.CharField(null=False)
 
     def __str__(self):
         return self.name

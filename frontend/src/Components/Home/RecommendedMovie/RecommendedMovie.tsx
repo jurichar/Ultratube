@@ -23,6 +23,8 @@ export default function RecommendedMovie(props: propsRecommended) {
       if ("movies" in movieResponse.data) {
         const all_Movie_Data: YtsMovie[] = movieResponse.data.movies;
         const arrayMovie: Movie[] = all_Movie_Data.map((elem) => {
+          const quality = Array.isArray(elem.torrents) && elem.torrents?.length > 0 ? elem.torrents[0].quality : elem.torrents.quality;
+          const torrent_url = Array.isArray(elem.torrents) && elem.torrents?.length > 0 ? elem.torrents[0].url : elem.torrents.url;
           return {
             id: elem.id,
             title: elem.title,
@@ -36,6 +38,8 @@ export default function RecommendedMovie(props: propsRecommended) {
             rating: elem.rating,
             summary: elem.summary,
             length: elem.runtime,
+            quality: quality,
+            torrent: torrent_url,
           };
         });
         return arrayMovie;
@@ -49,13 +53,18 @@ export default function RecommendedMovie(props: propsRecommended) {
   useEffect(() => {
     async function setUpMovies() {
       const resultMovies = await getMoviesJson();
+      console.log(resultMovies);
       if (resultMovies) {
         const movieFiltered = filterSort(movies, resultMovies);
+        console.log(movieFiltered);
         setMovies(movieFiltered);
       }
     }
     setUpMovies();
   }, [filter, page, getMoviesJson, sort]);
+  useEffect(() => {
+    console.log(movies);
+  }, [movies]);
   return (
     <div className="w-full h-full flex  pb-60 flex-col gap-4  relative">
       <div className="flex  flex-row flex-wrap gap-5">

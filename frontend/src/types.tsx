@@ -16,8 +16,14 @@ export interface Movie {
   trailer?: string;
   genres: Array<string>;
   length: number;
-  torrent?: string;
+  torrent: string;
+  quality: string;
 }
+
+type torrent = {
+  url: string;
+  quality: string;
+};
 export type YtsMovie = {
   id: string;
   title: string;
@@ -28,10 +34,11 @@ export type YtsMovie = {
   imdb_code: string;
   summary?: string;
   language: string;
+  quality: string;
   yt_trailer_code?: string;
   genres: Array<string>;
   runtime: number;
-  torrent?: string;
+  torrents: torrent[] | torrent;
 };
 export interface User {
   id: string;
@@ -55,7 +62,7 @@ export type FormInput = {
   name: string;
   value: string;
   placeholder: string;
-  handleChange: (event: ChangeEvent<HTMLInputElement>) => void
+  handleChange: (event: ChangeEvent<HTMLInputElement>) => void;
 };
 
 export type ReducerAction = {
@@ -93,7 +100,7 @@ export type ApiTorrentMovie = {
   category: string;
   name: string;
   videos?: TorrentMovieTrailer[];
-  torrent?: string;
+  torrent: string;
 };
 export type ProfileForm = {
   username?: string;

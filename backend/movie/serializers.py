@@ -14,7 +14,7 @@ class MovieListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Movie
-        fields = ["id", "name"]
+        fields = ["id", "name", "language", "quality"]
 
 
 class MovieCreateSerializer(serializers.ModelSerializer):
@@ -26,6 +26,9 @@ class MovieCreateSerializer(serializers.ModelSerializer):
             "production_year",
             "duration",
             "thumbnail_cover",
+            "quality",
+            "language",
+            "torrent",
         ]
 
 
@@ -50,6 +53,9 @@ class MovieDetailSerializer(serializers.ModelSerializer):
             "duration",
             "comments_number",
             "available_subtitles",
+            "quality",
+            "language",
+            "torrent",
         ]
 
     def get_comments_number(self, obj):

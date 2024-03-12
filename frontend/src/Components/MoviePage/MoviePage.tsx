@@ -4,6 +4,7 @@ import { Movie, crewUser } from "../../types";
 import MemberMovie from "./MemberMovie/MemberMovie";
 import TrailerSection from "../Global/TrailerSection/TrailerSection";
 import Comments from "./Comments";
+import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
 
 export default function MoviePage() {
   const { id } = useParams<{ id: string }>();
@@ -74,9 +75,33 @@ export default function MoviePage() {
     [options]
   );
 
+  async function createMovieInDb() {
+    console.log(movie);
+    const dataObject = {
+      name: movie?.title,
+      thumbnail_cover: movie?.image,
+      imdb_rating: movie?.rating,
+      production_year: movie?.year,
+      duration: movie?.length,
+      quality: movie?.quality,
+      language: movie?.language,
+      torrent: movie?.torrent,
+    };
+    try {
+      const result = await fetchWrapper("api/movies/create_movie/", { method: "POST", body: dataObject });
+      console.log(result);
+    } catch (error) {
+      // fetch by id si deja en db  pour savoir si ya des availables soustitre / nbr commentaire
+      console.log(error);
+    }
+  }
+  useEffect(() => {
+    if (movie && Object.keys(movie).length > 0) {
+      createMovieInDb();
+    }
+  }, [movie]);
   useEffect(() => {
     const { movieProps } = state;
-    console.log(movieProps);
 
     async function getAsyncTimdb() {
       if (movieProps?.imdb_link) {
