@@ -58,6 +58,13 @@ export interface Comment {
   movie?: Movie;
 }
 
+export interface CommentMovie {
+  id: number;
+  author: string;
+  created_at: string;
+  content: string;
+}
+
 export type FormInput = {
   name: string;
   value: string;

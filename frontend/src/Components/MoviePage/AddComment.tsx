@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
 
-const AddComment = () => {
+interface AddCommentProps {
+  movieId: number | undefined;
+  getComment: () => Promise<void>;
+}
+const AddComment: React.FC<AddCommentProps> = ({ movieId, getComment }) => {
   const { t } = useTranslation();
   const [comment, setComment] = useState("");
   const textAreaRef = React.useRef<HTMLTextAreaElement>(null);
@@ -14,12 +19,23 @@ const AddComment = () => {
     }
   };
 
-  const handleCommentSubmit = (event: React.FormEvent) => {
+  const handleCommentSubmit = async (event: React.FormEvent) => {
+    if (movieId == undefined) {
+      return;
+    }
     event.preventDefault();
-    // ! TODO: Submit comment to backend
-    console.log("Comment submitted");
+    createCommentary();
+    setComment("");
   };
-  // to do  show comment if auth but show
+
+  async function createCommentary() {
+    try {
+      await fetchWrapper("api/comments/", { method: "POST", body: { movie: movieId, content: comment } });
+      await getComment();
+    } catch (error) {
+      console.log(error);
+    }
+  }
   return (
     <form onSubmit={handleCommentSubmit} className="w-full mt-4 flex flex-row justify-between items-center gap-4 px-4">
       <textarea
@@ -32,7 +48,7 @@ const AddComment = () => {
       />
       <button
         type="submit"
-        className="h-8 w-8 shrink-0 rounded-full"
+        className="h-8 w-8 shrink-0 rounded-full bg-secondary"
         style={{
           backgroundImage: `url('./src/assets/send.svg')`,
         }}

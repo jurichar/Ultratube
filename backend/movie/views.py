@@ -98,8 +98,25 @@ class MovieViewSet(MultipleSerializerMixin, ReadOnlyModelViewSet):
     def create_movie(self, request):
         serializer = MovieCreateSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            movie_db = Movie.objects.filter(
+                name=serializer.validated_data["name"],
+                imdb_rating=serializer.validated_data["imdb_rating"],
+                quality=serializer.validated_data["quality"],
+                language=serializer.validated_data["language"],
+            )
+            if not movie_db.exists():
+                serializer.save()
+                movie_db = Movie.objects.filter(
+                    name=serializer.data["name"],
+                    imdb_rating=serializer.data["imdb_rating"],
+                    quality=serializer.data["quality"],
+                    language=serializer.data["language"],
+                )
+                return Response(
+                    {"id": movie_db.first().id}, status=status.HTTP_201_CREATED
+                )
+            else:
+                return Response({"id": movie_db.first().id}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     #  need to be auth to do that
@@ -170,7 +187,3 @@ class WatchedMovieViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, ViewSe
 
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-#  get list need to be register
-#  post  need to be register

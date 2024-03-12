@@ -12,6 +12,7 @@ export default function MoviePage() {
   const [movie, setMovie] = useState<Movie>();
   const [crew, setCrew] = useState<crewUser[]>();
   const [cast, setCast] = useState<crewUser[]>();
+  const [movieIdDb, setMovieIdDb] = useState<number>(0);
 
   const options = useMemo(
     () => ({
@@ -88,10 +89,9 @@ export default function MoviePage() {
       torrent: movie?.torrent,
     };
     try {
-      const result = await fetchWrapper("api/movies/create_movie/", { method: "POST", body: dataObject });
-      console.log(result);
+      const result: { id: number } = await fetchWrapper("api/movies/create_movie/", { method: "POST", body: dataObject });
+      setMovieIdDb(result.id);
     } catch (error) {
-      // fetch by id si deja en db  pour savoir si ya des availables soustitre / nbr commentaire
       console.log(error);
     }
   }
@@ -151,7 +151,7 @@ export default function MoviePage() {
       </div>
       <h4 className="text-quinary"> genres : {movie?.genres?.join(",")}</h4>
       <MemberMovie crew={crew} cast={cast} />
-      <Comments movieId={movie?.id} />
+      <Comments movieId={movieIdDb} />
     </div>
   );
 }
