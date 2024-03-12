@@ -38,3 +38,11 @@ export interface TrackerResponse {
   interval: number;
   peers: string[];
 }
+
+export interface PeerHandshake {
+  protocolLength: number;
+  protocol: string;
+  reservedBytes: Buffer;
+  infoHash: string;
+  peerId: string;
+}

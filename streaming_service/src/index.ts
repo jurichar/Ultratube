@@ -14,8 +14,6 @@ import { initPeerConnection } from "./bittorent-client/peers.js";
 
 import * as fs from "node:fs";
 
-import { createHash } from "node:crypto";
-
 const fastify: FastifyInstance = Fastify({
   logger: false,
 });
@@ -39,20 +37,17 @@ fastify.post("/download-torrent", async (request, reply) => {
     const torrentPath = await downloadTorrentMeta(torrentUrl);
     const torrentMetaData = await parseTorrentMeta(torrentPath);
     const trackerResponse = await discoverPeers(torrentMetaData, peerId);
-    const peer = trackerResponse.peers[0].split(":");
+    const [host, ip] = trackerResponse.peers[1].split(":");
 
-    // need info hash, peer_id, peer:port
-    initPeerConnection(
-      peer[0],
-      parseInt(peer[1], 10),
+    console.log(`Intiating TCP connection with peer: ${host}:${ip}`);
+    const tcpHandshake = await initPeerConnection(
+      host,
+      parseInt(ip, 10),
       torrentMetaData.infoHash,
       peerId,
     );
 
-    console.log(
-      "DEBUG : ",
-      createHash("sha1").update(torrentMetaData.infoHash).digest(),
-    );
+    console.log("DEBUG: ", tcpHandshake);
 
     deleteTorrentMeta(torrentPath);
 
