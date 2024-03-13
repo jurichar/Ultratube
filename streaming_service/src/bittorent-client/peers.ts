@@ -57,7 +57,14 @@ function isValidHandshake(
   infoHashHex: string,
   decodedHandshake: ttypes.PeerHandshake,
 ): boolean {
-  return infoHashHex === decodedHandshake.infoHash;
+  if (
+    infoHashHex !== decodedHandshake.infoHash ||
+    decodedHandshake.protocolLength !== PROTOCOL_LENGTH ||
+    decodedHandshake.protocol !== PROTOCOL_NAME
+  ) {
+    return false;
+  }
+  return true;
 }
 
 export function initPeerConnection(
