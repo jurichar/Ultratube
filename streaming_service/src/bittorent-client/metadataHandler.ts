@@ -1,4 +1,4 @@
-import * as fs from "fs";
+import * as fs from "fs/promises";
 import https from "https";
 import bencode from "bencode";
 import * as ttypes from "./ft_torrent_types.js";
@@ -72,7 +72,6 @@ function normalizeTorrentMeta(
   }
 
   if (torrentMetaData.announce.toLowerCase().startsWith("udp")) {
-    console.log("CHANGE");
     torrentMetaData.announce = torrentMetaData.announceList[0][0];
   }
 
@@ -92,7 +91,7 @@ export async function downloadTorrentMeta(torrentUrl: string): Promise<string> {
   return new Promise((resolve, reject) => {
     https.get(torrentUrl, (response) => {
       response.on("data", (chunk) => {
-        fs.appendFileSync(path, chunk);
+        fs.appendFile(path, chunk);
       });
 
       response.on("end", () => {
@@ -109,25 +108,21 @@ export async function downloadTorrentMeta(torrentUrl: string): Promise<string> {
 export async function parseTorrentMeta(
   torrentPath: string,
 ): Promise<ttypes.TorrentMeta> {
-  const torrent = fs.readFileSync(torrentPath);
-  const parsed = await parseTorrent(torrent);
+  try {
+    const torrent = await fs.readFile(torrentPath);
+    const parsed = await parseTorrent(torrent);
 
-  const decodedTorrent = normalizeTorrentMeta(
-    bencode.decode(torrent, "utf-8"),
-    parsed,
-  );
+    const decodedTorrent = normalizeTorrentMeta(
+      bencode.decode(torrent, "utf-8"),
+      parsed,
+    );
 
-  return decodedTorrent;
+    return decodedTorrent;
+  } catch (error) {
+    console.error(error.message);
+  }
 }
 
-export function deleteTorrentMeta(torrentPath: string) {
-  fs.unlink(torrentPath, (error) => {
-    if (error) {
-      if (error.code === "EOENT") {
-        console.error("File doesn't exist");
-      } else {
-        throw error;
-      }
-    }
-  });
+export async function deleteTorrentMeta(torrentPath: string) {
+  await fs.unlink(torrentPath);
 }

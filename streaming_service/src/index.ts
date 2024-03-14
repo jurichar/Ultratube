@@ -12,8 +12,6 @@ import {
 
 import { Peer } from "./bittorent-client/peers.js";
 
-import * as fs from "node:fs";
-
 const fastify: FastifyInstance = Fastify({
   logger: false,
 });
@@ -39,7 +37,7 @@ fastify.post("/download-torrent", async (request, reply) => {
     const trackerResponse = await discoverPeers(torrentMetaData, peerId);
     const [host, ip] = trackerResponse.peers[0].split(":");
 
-    console.log(`Intiating TCP connection with peer: ${host}:${ip}`);
+    console.log(`Initiating TCP connection with peer: ${host}:${ip}`);
 
     const peer = new Peer(
       parseInt(ip, 10),
@@ -50,7 +48,7 @@ fastify.post("/download-torrent", async (request, reply) => {
 
     await peer.connect();
 
-    deleteTorrentMeta(torrentPath);
+    await deleteTorrentMeta(torrentPath);
 
     reply.code(200).send({ movie: torrentMetaData });
   } catch (error: unknown) {
@@ -64,12 +62,6 @@ const start = async () => {
     await fastify.listen({
       host: "0.0.0.0",
       port: 8001,
-    });
-    fs.readFile("banner", "utf8", (err, data) => {
-      if (err) {
-        console.error(err);
-      }
-      console.log(data);
     });
   } catch (error) {
     fastify.log.error(`Error: ${error}`);
