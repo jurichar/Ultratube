@@ -5,6 +5,7 @@ import MemberMovie from "./MemberMovie/MemberMovie";
 import TrailerSection from "../Global/TrailerSection/TrailerSection";
 import Comments from "./Comments";
 import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
+import { notify } from "../../utils/notifyToast";
 
 export default function MoviePage() {
   const { id } = useParams<{ id: string }>();
@@ -24,6 +25,7 @@ export default function MoviePage() {
     }),
     []
   );
+
   const getImdbInfo = useCallback(
     async (imdbLink: string) => {
       fetch(`https://api.themoviedb.org/3/movie/${imdbLink}?append_to_response=credits&language=en-US`, options)
@@ -52,7 +54,11 @@ export default function MoviePage() {
             setCrew(crew);
           }
         })
-        .catch((err) => console.error("error:" + err));
+        .catch((error) => {
+          let message = "Unknown Error";
+          if (error instanceof Error) message = error.message;
+          notify({ type: "error", msg: message });
+        });
     },
     [options]
   );
@@ -70,7 +76,9 @@ export default function MoviePage() {
           }
         }
       } catch (error) {
-        console.log(error);
+        let message = "Unknown Error";
+        if (error instanceof Error) message = error.message;
+        notify({ type: "error", msg: message });
       }
     },
     [options]
@@ -92,7 +100,9 @@ export default function MoviePage() {
         const result: { id: number } = await fetchWrapper("api/movies/create_movie/", { method: "POST", body: dataObject });
         setMovieIdDb(result.id);
       } catch (error) {
-        console.log(error);
+        let message = "Unknown Error";
+        if (error instanceof Error) message = error.message;
+        notify({ type: "error", msg: message });
       }
     }
     if (movie && Object.keys(movie).length > 0) {

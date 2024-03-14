@@ -7,6 +7,7 @@ import { reducer } from "./reducer";
 import { validateEmail } from "../../utils/validateEmail";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/useAuth";
+import { notify } from "../../utils/notifyToast";
 
 const initialState: RegisterType = {
   username: "",
@@ -22,13 +23,9 @@ export default function Register() {
   const { TriggerReload } = useAuth();
   const navigate = useNavigate();
 
-  const handlePermission = () => {
-    fetchWrapper("oauth/user/", { method: "get" })
-      .then((data) => console.log(data))
-      .catch((error) => {
-        console.log(error);
-      });
-  };
+  // const handlePermission = () => {
+  //   fetchWrapper("oauth/user/", { method: "get" }).then((data) => console.log(data));
+  // };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     dispatch({ type: "change", name: event.target.name, value: event.target.value });
@@ -46,7 +43,6 @@ export default function Register() {
     if (username.length == 0 || firstName.length == 0 || lastName.length == 0 || email.length == 0 || password.length == 0 || password1.length == 0) return false;
     if (password != password1) return false;
     if (!validateEmail(email)) return false;
-    // if password enough secure
     return true;
   };
 
@@ -56,13 +52,12 @@ export default function Register() {
     if (name == "Register") {
       if (is_valid_arg({ ...state })) {
         await createUser();
-        await TriggerReload();
-        navigate("/profile");
       } else {
-        console.log("cant create");
+        notify({ type: "error", msg: "argument are not valid" });
       }
     }
   };
+
   async function createUser() {
     try {
       await fetchWrapper("oauth/register/", {
@@ -75,8 +70,13 @@ export default function Register() {
           password: state.password,
         },
       });
+      await TriggerReload();
+      navigate("/profile");
+      notify({ type: "success", msg: "register complete " });
     } catch (error) {
-      console.log(error);
+      let message = "Unknown Error";
+      if (error instanceof Error) message = error.message;
+      notify({ type: "error", msg: message });
     }
   }
   return (
@@ -93,7 +93,6 @@ export default function Register() {
         formInput={formInput}
         nameSubmit="Create an account"
       />
-      <button onClick={handlePermission}> click</button>
     </div>
   );
 }

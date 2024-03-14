@@ -6,6 +6,7 @@ import { reducer } from "./reducer";
 import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/useAuth";
+import { notify } from "../../utils/notifyToast";
 
 const initialState: LoginType = {
   username: "",
@@ -32,10 +33,10 @@ export default function Login() {
         await login();
         await TriggerReload();
         navigate("/");
+        notify({ type: "success", msg: "login successful" });
       } else {
-        console.log("cant login");
+        notify({ type: "error", msg: "information are not valid" });
       }
-      console.log("log in ");
     }
   };
 
@@ -49,13 +50,17 @@ export default function Login() {
         },
       });
     } catch (error) {
-      console.log(error);
+      let message = "Unknown Error";
+      if (error instanceof Error) message = error.message;
+      notify({ type: "error", msg: message });
     }
   };
+
   const formInput: FormInput[] = [
     { name: "username", value: state.username, placeholder: "username", handleChange },
     { name: "password", value: state.password, placeholder: "password", handleChange },
   ];
+
   return (
     <div className="flex flex-col w-full">
       <header className="w-full flex justify-center mt-12">

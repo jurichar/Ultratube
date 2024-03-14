@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
+import { notify } from "../../utils/notifyToast";
 
 interface AddCommentProps {
   movieId: number | undefined;
@@ -32,8 +33,11 @@ const AddComment: React.FC<AddCommentProps> = ({ movieId, getComment }) => {
     try {
       await fetchWrapper("api/comments/", { method: "POST", body: { movie: movieId, content: comment } });
       await getComment();
+      notify({ type: "success", msg: "comment successfully upload" });
     } catch (error) {
-      console.log(error);
+      let message = "Unknown Error";
+      if (error instanceof Error) message = error.message;
+      notify({ type: "error", msg: message });
     }
   }
   return (

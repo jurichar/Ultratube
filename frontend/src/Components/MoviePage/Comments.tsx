@@ -34,14 +34,15 @@ const Comments: React.FC<CommentsProps> = ({ movieId }) => {
       } else {
         setComments([]);
       }
-      console.log(res);
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      return;
     }
   }
+
   useEffect(() => {
     getComment();
   }, []);
+
   return (
     <div className="w-full h-auto flex flex-col justify-center items-center text-quaternary">
       <h1 className="text-4xl font-bold">{t("comments")}</h1>

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ImagePopup from "./ImagePopup";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
 import { useLoaderData, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../context/useAuth";
@@ -65,8 +65,11 @@ export default function Profile() {
       await fetchWrapper("oauth/logout/", { method: "POST" });
       await loadUserData();
       navigate("/");
+      notify({ type: "success", msg: "disconnection successfully" });
     } catch (error) {
-      console.log(error);
+      let message = "Unknown Error";
+      if (error instanceof Error) message = error.message;
+      notify({ type: "error", msg: message });
     }
   };
 
@@ -128,7 +131,7 @@ export default function Profile() {
 
   return (
     <div className="w-full p-6 gap-10 overflow-y-auto flex flex-col items-center justify-around">
-      <h1 className="text-quinary text-heading-lg">{t('edit')}</h1>
+      <h1 className="text-quinary text-heading-lg">{t("edit")}</h1>
       <button
         className="w-32 h-32 rounded-full relative transition-all transform hover:scale-105 outline outline-transparent outline-4 hover:outline-white "
         style={{
@@ -140,14 +143,9 @@ export default function Profile() {
       >
         <img className="absolute -right-1 -bottom-1 h-12 w-12" src="https://static-assets.bamgrid.com/product/disneyplus/images/edit.0a8445c2cff0e80361b2e66906aaeca0.svg" alt="edit-svg" />
       </button>
-      {showImagePopup && (
-        <ImagePopup
-          user={user}
-          setShowImagePopup={setShowImagePopup}
-          setSelectedImage={setSelectedImage} />
-      )}
+      {showImagePopup && <ImagePopup user={user} setShowImagePopup={setShowImagePopup} setSelectedImage={setSelectedImage} />}
       <div className="w-full rounded p-6 flex flex-col items-center gap-6 bg-tertiary">
-        <h2 className="text-quinary mb-4 text-heading-md">{t('personalInfo')}</h2>
+        <h2 className="text-quinary mb-4 text-heading-md">{t("personalInfo")}</h2>
         <form className="w-full flex flex-col gap-4 justify-center items-center" onSubmit={handleFormSubmit}>
           <input
             name="username"
