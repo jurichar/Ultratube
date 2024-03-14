@@ -71,6 +71,11 @@ function normalizeTorrentMeta(
     );
   }
 
+  if (torrentMetaData.announce.toLowerCase().startsWith("udp")) {
+    console.log("CHANGE");
+    torrentMetaData.announce = torrentMetaData.announceList[0][0];
+  }
+
   torrentMetaData.createdBy = decodedMetadata["created by"];
   torrentMetaData.creationDate = decodedMetadata["creation date"];
   torrentMetaData.encoding = decodedMetadata?.encoding;

@@ -40,13 +40,7 @@ fastify.post("/download-torrent", async (request, reply) => {
     const [host, ip] = trackerResponse.peers[0].split(":");
 
     console.log(`Intiating TCP connection with peer: ${host}:${ip}`);
-    // const tcpHandshake = await initPeerConnection(
-    //   host,
-    //   parseInt(ip, 10),
-    //   torrentMetaData.infoHash,
-    //   torrentMetaData.infoHashHex,
-    //   peerId,
-    // );
+
     const peer = new Peer(
       parseInt(ip, 10),
       host,
@@ -54,13 +48,11 @@ fastify.post("/download-torrent", async (request, reply) => {
       peerId,
     );
 
-    const tcpHandshake = await peer.connect();
-
-    console.log("DEBUG: ", tcpHandshake);
+    await peer.connect();
 
     deleteTorrentMeta(torrentPath);
 
-    reply.code(200).send({ movie: trackerResponse });
+    reply.code(200).send({ movie: torrentMetaData });
   } catch (error: unknown) {
     console.error(error);
     reply.code(404).send("Torrent is currently unavailable");

@@ -47,6 +47,7 @@ async function queryTracker(
 ) {
   const query = await generateQuery(torrentMetaData, peerId);
 
+  console.log(query);
   const response = await fetch(query);
   const responseBuffer = await response.arrayBuffer();
   const decodedResponse = bencode.decode(Buffer.from(responseBuffer));

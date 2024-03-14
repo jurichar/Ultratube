@@ -82,14 +82,11 @@ export class Peer {
     infoHashHex: string,
     decodedHandshake: ttypes.PeerHandshake,
   ): boolean {
-    if (
+    return !(
       infoHashHex !== decodedHandshake.infoHash ||
       decodedHandshake.protocolLength !== PROTOCOL_LENGTH ||
       decodedHandshake.protocol !== PROTOCOL_NAME
-    ) {
-      return false;
-    }
-    return true;
+    );
   }
 
   async makeHandshake() {
@@ -102,20 +99,36 @@ export class Peer {
     }
   }
 
+  handlePeerResponse(chunk: Buffer) {
+    console.log("Chunk: ", chunk);
+    switch (chunk[4]) {
+      case 1: {
+        const buff = Buffer.from([0, 0, 0, 5, 2]);
+        console.log("unchoke ... send: ", buff);
+        this.client.write(buff);
+        break;
+      }
+      case 5:
+        console.log("bitfield: ", chunk.readUint8(4));
+        break;
+      case 7:
+        console.log("piece");
+        break;
+    }
+    return chunk;
+  }
+
   async connect() {
     this.client = new net.Socket();
     this.client.connect(this.ip, this.host);
 
-    this.client.on("data", (chunk) => {
-      console.log("MY CHUNK", chunk);
-      return chunk;
-    });
+    this.client.on("data", this.handlePeerResponse.bind(this));
 
     this.client.on("error", (error) => {
       throw Error(error.message);
     });
 
     this.client.on("destroy", () => console.log("client closed"));
-    this.makeHandshake();
+    await this.makeHandshake();
   }
 }
