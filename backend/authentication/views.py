@@ -152,7 +152,7 @@ class ResetPassword(APIView):
             message=f"go reset your password http://localhost:3000/reset-password/{hashlib.sha256(str.encode(user.email + user.username)).hexdigest()}",
             mailReceiver=user.email,
         )
-        return Response(status=status.HTTP_200_OK)
+        return Response("email send successfully", status=status.HTTP_200_OK)
 
     def patch(self, request, email):
         if "hash" in request.data and "password" in request.data:
