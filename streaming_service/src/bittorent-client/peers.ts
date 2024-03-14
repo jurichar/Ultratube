@@ -1,3 +1,4 @@
+"use strict";
 import net from "node:net";
 import * as ttypes from "./ft_torrent_types.js";
 
@@ -95,7 +96,7 @@ export class Peer {
     const response = await this.waitForData();
     const infoHash = Buffer.from(this.infoHash).toString("hex");
     if (!this.isValidHandshake(infoHash, this.decodeHandshake(response))) {
-      throw Error("Invalid handshake");
+      throw new Error("Invalid handshake");
     }
   }
 
@@ -125,7 +126,7 @@ export class Peer {
     this.client.on("data", this.handlePeerResponse.bind(this));
 
     this.client.on("error", (error) => {
-      throw Error(error.message);
+      throw new Error(error.message);
     });
 
     this.client.on("destroy", () => console.log("client closed"));

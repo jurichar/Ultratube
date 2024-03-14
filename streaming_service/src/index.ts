@@ -1,3 +1,4 @@
+"use strict";
 import Fastify, { FastifyInstance } from "fastify";
 import {
   deleteTorrentMeta,

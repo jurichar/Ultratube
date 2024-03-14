@@ -1,3 +1,4 @@
+"use strict";
 import * as fs from "fs/promises";
 import https from "https";
 import bencode from "bencode";
