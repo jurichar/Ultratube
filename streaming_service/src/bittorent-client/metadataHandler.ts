@@ -77,7 +77,6 @@ function normalizeTorrentMeta(
   torrentMetaData.comment = decodedMetadata?.comment;
   torrentMetaData.info = info;
   torrentMetaData.infoHash = originalMetaData.infoHashBuffer;
-  torrentMetaData.infoHashHex = originalMetaData.infoHash;
 
   return torrentMetaData;
 }

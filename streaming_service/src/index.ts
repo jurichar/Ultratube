@@ -10,7 +10,7 @@ import {
   generatePeerId,
 } from "./bittorent-client/trackerHandler.js";
 
-import { initPeerConnection } from "./bittorent-client/peers.js";
+import { Peer } from "./bittorent-client/peers.js";
 
 import * as fs from "node:fs";
 
@@ -40,13 +40,21 @@ fastify.post("/download-torrent", async (request, reply) => {
     const [host, ip] = trackerResponse.peers[0].split(":");
 
     console.log(`Intiating TCP connection with peer: ${host}:${ip}`);
-    const tcpHandshake = await initPeerConnection(
-      host,
+    // const tcpHandshake = await initPeerConnection(
+    //   host,
+    //   parseInt(ip, 10),
+    //   torrentMetaData.infoHash,
+    //   torrentMetaData.infoHashHex,
+    //   peerId,
+    // );
+    const peer = new Peer(
       parseInt(ip, 10),
+      host,
       torrentMetaData.infoHash,
-      torrentMetaData.infoHashHex,
       peerId,
     );
+
+    const tcpHandshake = await peer.connect();
 
     console.log("DEBUG: ", tcpHandshake);
 

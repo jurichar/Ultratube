@@ -4,105 +4,118 @@ import * as ttypes from "./ft_torrent_types.js";
 const PROTOCOL_NAME = "BitTorrent protocol";
 const PROTOCOL_LENGTH = 19;
 
-function encodeHandshake(infoHash: Uint8Array, peerId: string): Buffer {
-  const protocolLength = Buffer.from([PROTOCOL_LENGTH]);
-  const protocol = Buffer.from(PROTOCOL_NAME);
-  const freeBytes = Buffer.alloc(8);
-  const infoHashBuff = Buffer.from(infoHash);
+export class Peer {
+  ip: number;
+  host: string;
+  client: net.Socket;
+  infoHash: Uint8Array;
+  peerId: string;
+  buffer: Buffer;
 
-  const peerIdBuff = Buffer.from(peerId);
-
-  const totalLength =
-    protocolLength.length +
-    protocol.length +
-    freeBytes.length +
-    infoHashBuff.length +
-    peerIdBuff.length;
-
-  return Buffer.concat(
-    [protocolLength, protocol, freeBytes, infoHashBuff, peerIdBuff],
-    totalLength,
-  );
-}
-
-function decodeHandshake(rawHandshake: Buffer): ttypes.PeerHandshake {
-  let offset = 0;
-
-  const protocolLength = rawHandshake[0];
-  offset += 1;
-
-  const protocol = rawHandshake
-    .subarray(offset, offset + PROTOCOL_LENGTH)
-    .toString();
-  offset += PROTOCOL_LENGTH;
-
-  const reservedBytes = rawHandshake.subarray(offset, offset + 8);
-  offset += 8;
-
-  const infoHash = rawHandshake.subarray(offset, offset + 20).toString("hex");
-  offset += 20;
-
-  const peerId = rawHandshake.subarray(offset, offset + 20).toString("hex");
-
-  return {
-    protocolLength,
-    protocol,
-    reservedBytes,
-    infoHash,
-    peerId,
-  } as ttypes.PeerHandshake;
-}
-
-function isValidHandshake(
-  infoHashHex: string,
-  decodedHandshake: ttypes.PeerHandshake,
-): boolean {
-  if (
-    infoHashHex !== decodedHandshake.infoHash ||
-    decodedHandshake.protocolLength !== PROTOCOL_LENGTH ||
-    decodedHandshake.protocol !== PROTOCOL_NAME
-  ) {
-    return false;
+  constructor(ip: number, host: string, infoHash: Uint8Array, peerId: string) {
+    this.ip = ip;
+    this.host = host;
+    this.infoHash = infoHash;
+    this.peerId = peerId;
   }
-  return true;
-}
 
-export function initPeerConnection(
-  host: string,
-  port: number,
-  infoHash: Uint8Array,
-  infoHashHex: string,
-  peerId: string,
-): Promise<ttypes.PeerHandshake | Error> {
-  const client = new net.Socket();
+  async waitForData(): Promise<Buffer> {
+    return new Promise((resolve) => {
+      const onData = (data: Buffer) => {
+        this.client.removeListener("data", onData);
+        resolve(data);
+      };
+      this.client.addListener("data", onData);
+    });
+  }
 
-  return new Promise((_, reject) => {
-    client.connect(port, host, () => {
-      client.write(encodeHandshake(infoHash, peerId));
+  encodeHandshake(infoHash: Uint8Array, peerId: string): Buffer {
+    const protocolLength = Buffer.from([PROTOCOL_LENGTH]);
+    const protocol = Buffer.from(PROTOCOL_NAME);
+    const freeBytes = Buffer.alloc(8);
+    const infoHashBuff = Buffer.from(infoHash);
+
+    const peerIdBuff = Buffer.from(peerId);
+
+    const totalLength =
+      protocolLength.length +
+      protocol.length +
+      freeBytes.length +
+      infoHashBuff.length +
+      peerIdBuff.length;
+
+    return Buffer.concat(
+      [protocolLength, protocol, freeBytes, infoHashBuff, peerIdBuff],
+      totalLength,
+    );
+  }
+
+  decodeHandshake(rawHandshake: Buffer): ttypes.PeerHandshake {
+    let offset = 0;
+
+    const protocolLength = rawHandshake[0];
+    offset += 1;
+
+    const protocol = rawHandshake
+      .subarray(offset, offset + PROTOCOL_LENGTH)
+      .toString();
+    offset += PROTOCOL_LENGTH;
+
+    const reservedBytes = rawHandshake.subarray(offset, offset + 8);
+    offset += 8;
+
+    const infoHash = rawHandshake.subarray(offset, offset + 20).toString("hex");
+    offset += 20;
+
+    const peerId = rawHandshake.subarray(offset, offset + 20).toString("hex");
+
+    return {
+      protocolLength,
+      protocol,
+      reservedBytes,
+      infoHash,
+      peerId,
+    } as ttypes.PeerHandshake;
+  }
+
+  isValidHandshake(
+    infoHashHex: string,
+    decodedHandshake: ttypes.PeerHandshake,
+  ): boolean {
+    if (
+      infoHashHex !== decodedHandshake.infoHash ||
+      decodedHandshake.protocolLength !== PROTOCOL_LENGTH ||
+      decodedHandshake.protocol !== PROTOCOL_NAME
+    ) {
+      return false;
+    }
+    return true;
+  }
+
+  async makeHandshake() {
+    this.client.write(this.encodeHandshake(this.infoHash, this.peerId));
+
+    const response = await this.waitForData();
+    const infoHash = Buffer.from(this.infoHash).toString("hex");
+    if (!this.isValidHandshake(infoHash, this.decodeHandshake(response))) {
+      throw Error("Invalid handshake");
+    }
+  }
+
+  async connect() {
+    this.client = new net.Socket();
+    this.client.connect(this.ip, this.host);
+
+    this.client.on("data", (chunk) => {
+      console.log("MY CHUNK", chunk);
+      return chunk;
     });
 
-    client.on("data", (chunk) => {
-      if (chunk.length === 68) {
-        const serverHandshake = decodeHandshake(chunk);
-        if (!isValidHandshake(infoHashHex, serverHandshake)) {
-          throw Error("Invalid handshake");
-        }
-        console.log("Server response to handshake", serverHandshake);
-      } else {
-        console.log("THIS IS ANOTHER MESSAGE FROM PEER id: ", chunk[4], chunk);
-        if (chunk[4] === 5) {
-          console.log("Bitfield spotted: ", chunk, chunk.length);
-        } else if (chunk[4] === 1) {
-          console.log("Unchoked received: ", chunk, chunk.length);
-        } else {
-          console.log("CHUNK: ", chunk, chunk.length);
-        }
-      }
-      // client.destroy();
+    this.client.on("error", (error) => {
+      throw Error(error.message);
     });
 
-    client.on("error", (error) => {
-      reject(`Error tcp: ${error.message}`);
-    });
-  });
+    this.client.on("destroy", () => console.log("client closed"));
+    this.makeHandshake();
+  }
 }
