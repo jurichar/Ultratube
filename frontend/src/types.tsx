@@ -155,4 +155,5 @@ export type filter = {
   min_year_release: number;
   duration: string | "all" | "u_60" | "60-120" | "a_120";
   name: string;
+  genre_en: string;
 };

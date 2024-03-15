@@ -8,6 +8,7 @@ import SearchResult from "../SearchResult/SearchResult";
 import Filter from "./Filter/Filter";
 import SortMovie from "./SortMovie/SortMovie";
 import TrendingMovie from "../TrendingMovie/TrendingMovie";
+import { useAuth } from "../../context/useAuth";
 // import { useTranslation } from "react-i18next";
 
 export default function Home() {
@@ -15,11 +16,11 @@ export default function Home() {
   const [showSearch, setShowSearch] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [page, setPage] = useState<number>(1);
-  const initialState = { rating: 0, genre: "all", min_year_release: 1900, duration: "all", name: "" };
+  const initialState = { rating: 0, genre: "all", min_year_release: 1900, duration: "all", name: "", genre_en: "all" };
   const [filter, setFilter] = useState<filter>(initialState);
   const [sort, setSort] = useState<keyof Movie>("rating");
   const [order, setOrder] = useState<Order>("asc");
-
+  const { languageSelected } = useAuth();
   async function handleSearch(search: string) {
     setPage(1);
     setSort("title");
@@ -92,6 +93,10 @@ export default function Home() {
     const valueCast = value as keyof Movie;
     setSort(valueCast);
   }
+
+  useEffect(() => {
+    setPage(1);
+  }, [languageSelected]);
   /*** INFINITE SCROLL */
   useEffect(() => {
     function watchScroll() {
@@ -117,11 +122,11 @@ export default function Home() {
   }
 
   return (
-    <div className="w-full h-max text-quinary p-4 flex flex-col items-center justify-around gap-6">
+    <div className="w-full h-max text-quinary p-4 flex flex-col items-center justify-around gap-6 md:p-0 md:pl-9">
       <SearchBar onSearch={handleSearch} setShowSearch={setShowSearch} showSearch={showSearch} setPage={setPage} />
       {!showSearch && <TrendingMovie />}
-      <div className="w-full h-full flex  pb-60 flex-col gap-4  relative">
-        <span className="w-full flex gap-4  items-center text-heading-md">{showSearch ? `Search : ${searchQuery} ` : "Recommended for you"}</span>
+      <div className="w-full h-full flex pb-60 flex-col gap-4 relative">
+        <span className="w-full flex gap-4 items-center text-heading-md">{showSearch ? `Search : ${searchQuery} ` : "Recommended for you"}</span>
         <div className="flex flex-row gap-4">
           <SortMovie sort={sort} handleChange={handleSort} />
           <select
