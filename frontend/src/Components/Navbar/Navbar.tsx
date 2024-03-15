@@ -7,7 +7,7 @@ import { language } from "../../types";
 
 export default function Navbar() {
   const { i18n } = useTranslation();
-  const { languageSelected, setLanguageSelected, userData } = useAuth();
+  const { setLanguageSelected, userData } = useAuth();
 
   const changeLanguage = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const lang: language = e.target.value;
@@ -26,6 +26,18 @@ export default function Navbar() {
         </svg>
       </NavLink>
       <div className="flex flex-row gap-4 justify-center items-center md:flex-col">
+        <select className="w-14 h-9 bg-white border border-gray-300 rounded-md text-gray-700 p-2" onChange={changeLanguage}>
+          <svg className="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+          </svg>
+          <option value="en" className="bg-gray-100 text-gray-700">
+            EN
+          </option>
+          <option value="fr">FR</option>
+          <option value="es">ES</option>
+          <option value="pt">PT</option>
+          <option value="NL">NL</option>
+        </select>
         {userData && (
           <>
             <NavLink to="/disconnect">
@@ -44,20 +56,6 @@ export default function Navbar() {
               </svg>
             </NavLink>
             <div className="flex flex-row gap-4 justify-center items-center text-sm md:flex-col">
-              <select className="w-14 h-9 bg-white border border-gray-300 rounded-md text-gray-700 p-2" onChange={changeLanguage}>
-                <svg className="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                </svg>
-                <option value="en" className="bg-gray-100 text-gray-700">
-                  EN
-                </option>
-                <option value="fr">FR</option>
-                <option value="es">ES</option>
-                <option value="de">DE</option>
-                <option value="it">IT</option>
-                <option value="jp">JP</option>
-                <option value="ru">RU</option>
-              </select>
               <NavLink to="/profile">
                 <div
                   className={`w-10 h-10 bg-cover bg-no-repeat bg-center transition-all transform hover:scale-105 outline outline-transparent outline-2 hover:outline-white rounded-full`}

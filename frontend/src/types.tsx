@@ -3,7 +3,7 @@
 import { ChangeEvent, ReactElement, ReactPortal } from "react";
 
 export interface Movie {
-  id: string;
+  id?: string;
   title: string;
   year: number;
   image: string;

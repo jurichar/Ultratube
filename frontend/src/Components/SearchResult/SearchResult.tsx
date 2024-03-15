@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { ApiTorrentMovie, Movie, Order, YtsMovie, filter } from "../../types";
 import MovieCard from "../MovieCards/MovieCard";
 import ptt from "parse-torrent-title";
+import { useAuth } from "../../context/useAuth";
 type searchResultProps = {
   showSearch: boolean;
   querySearch: string;
@@ -17,6 +18,7 @@ export default function SearchResult(props: searchResultProps) {
   const { querySearch, filter, sort, filterSort, order, page } = props;
   const [loading, setLoading] = useState<boolean>(false);
   const [movies, setMovies] = useState<Movie[]>([]);
+  const { languageSelected } = useAuth();
   const options = {
     method: "GET",
     headers: {
@@ -35,7 +37,7 @@ export default function SearchResult(props: searchResultProps) {
       const json = await response.json();
       if (json.results && json.results.length > 0) {
         const timdb_movie = json.results[0];
-        const responseTmdb = await fetch(`https://api.themoviedb.org/3/movie/${timdb_movie.id}?append_to_response=videos&language=en-US`, options);
+        const responseTmdb = await fetch(`https://api.themoviedb.org/3/movie/${timdb_movie.id}?append_to_response=videos&language=${languageSelected}`, options);
         const jsonTmdb = await responseTmdb.json();
         let trailer = "";
         if (jsonTmdb.videos && jsonTmdb.videos.results && jsonTmdb.videos.results.length > 0) {
@@ -66,8 +68,9 @@ export default function SearchResult(props: searchResultProps) {
     try {
       setLoading(true);
       setMovies([]);
-      const response = await fetch(`http://127.0.0.1:8009/api/v1/search?site=torlock&query=${query}`, { method: "GET" });
+      const response = await fetch(`http://127.0.0.1:8009/api/v1/search?site=torlock&query=${query}`, { method: "GET", headers: { "Accept-Language": languageSelected } });
       const data = await response.json();
+      setLoading(false);
       if (data.data) {
         const apiResponseMovie: ApiTorrentMovie[] = data.data;
         const movieResponse = apiResponseMovie.filter(({ category }) => category == "Movies");
@@ -87,7 +90,6 @@ export default function SearchResult(props: searchResultProps) {
           return movieFiltered;
         }
       }
-      setLoading(false);
     } catch (error) {
       console.log(error);
     }
@@ -95,7 +97,7 @@ export default function SearchResult(props: searchResultProps) {
   const getMovieYtsSearch = async (query: string) => {
     const url = `https://yts.mx/api/v2/list_movies.json?&&query_term=${query}&sort=${sort}&order=${order}&page=${page}&limit=50`;
     try {
-      const response = await fetch(url, { method: "GET", headers: { Cookie: document.cookie } });
+      const response = await fetch(url, { method: "GET", headers: { "Accept-Language": languageSelected } });
       const movieResponse = await response.json();
       if ("movies" in movieResponse.data) {
         const all_Movie_Data: YtsMovie[] = movieResponse.data.movies;

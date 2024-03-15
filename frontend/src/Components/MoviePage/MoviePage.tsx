@@ -6,6 +6,7 @@ import TrailerSection from "../Global/TrailerSection/TrailerSection";
 import Comments from "./Comments";
 import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
 import { notify } from "../../utils/notifyToast";
+import { useAuth } from "../../context/useAuth";
 
 export default function MoviePage() {
   const { id } = useParams<{ id: string }>();
@@ -14,6 +15,7 @@ export default function MoviePage() {
   const [crew, setCrew] = useState<crewUser[]>();
   const [cast, setCast] = useState<crewUser[]>();
   const [movieIdDb, setMovieIdDb] = useState<number>(0);
+  const { languageSelected } = useAuth();
 
   const options = useMemo(
     () => ({
@@ -24,64 +26,6 @@ export default function MoviePage() {
       },
     }),
     []
-  );
-
-  const getImdbInfo = useCallback(
-    async (imdbLink: string) => {
-      fetch(`https://api.themoviedb.org/3/movie/${imdbLink}?append_to_response=credits&language=en-US`, options)
-        .then((res) => res.json())
-        .then((json) => {
-          if ("credits" in json && "cast" in json["credits"]) {
-            const cast = json["credits"]["cast"].map((elem: crewUser) => {
-              return {
-                character: elem.character,
-                known_for_department: elem.known_for_department,
-                name: elem.name,
-                profile_path: elem.profile_path && "https://image.tmdb.org/t/p/w138_and_h175_face/" + elem.profile_path,
-              };
-            });
-            setCast(cast);
-          }
-          if ("credits" in json && "crew" in json["credits"]) {
-            const crew = json["credits"]["crew"].map((elem: crewUser) => {
-              return {
-                character: "",
-                known_for_department: elem?.known_for_department,
-                name: elem.name,
-                profile_path: elem.profile_path && "https://image.tmdb.org/t/p/w138_and_h175_face/" + elem.profile_path,
-              };
-            });
-            setCrew(crew);
-          }
-        })
-        .catch((error) => {
-          let message = "Unknown Error";
-          if (error instanceof Error) message = error.message;
-          notify({ type: "error", msg: message });
-        });
-    },
-    [options]
-  );
-
-  const getTimdbId = useCallback(
-    async (imdbLink: string) => {
-      let id_timdb = "";
-      try {
-        const response = await fetch(`https://api.themoviedb.org/3/find/${imdbLink}?external_source=imdb_id`, options);
-        const json = await response.json();
-        if ("movie_results" in json && json["movie_results"].length > 0) {
-          if ("id" in json["movie_results"][0]) {
-            id_timdb = json["movie_results"][0].id;
-            return id_timdb;
-          }
-        }
-      } catch (error) {
-        let message = "Unknown Error";
-        if (error instanceof Error) message = error.message;
-        notify({ type: "error", msg: message });
-      }
-    },
-    [options]
   );
 
   useEffect(() => {
@@ -109,26 +53,63 @@ export default function MoviePage() {
       createMovieInDb();
     }
   }, [movie]);
+
+  async function getInfoMovie(title: string, year: number, torrent: string, quality: string, language: string, image: string, trailer: string, length: number) {
+    const movieInfoTmp: Movie = { rating: 0, synopsis: "", genres: [], year: year, title: title, torrent, quality, language, image, trailer, length };
+    const url = `https://api.themoviedb.org/3/search/movie?query=${title}&include_adult=false&language=${languageSelected}&page=1&append_to_response=credits`;
+    try {
+      const response = await fetch(url, options);
+      const json = await response.json();
+      if ("results" in json && json["results"] && json["results"].length > 0) {
+        const movieData = json["results"][0];
+        movieInfoTmp.synopsis = movieData.overview;
+        movieInfoTmp.rating = movieData.vote_average;
+        const urlInfo = `https://api.themoviedb.org/3/movie/${movieData.id}?append_to_response=credits%2Cvideos&language=${languageSelected}`;
+        const responseInfo = await fetch(urlInfo, options);
+        const movieInfo = await responseInfo.json();
+        console.log(movieInfo);
+        if (movieInfo && Object.keys(movieInfo).length > 0) {
+          const genres = movieInfo.genres.map((elem: { id: number; name: string }) => elem.name);
+          movieInfoTmp.genres = genres;
+          setMovie(movieInfoTmp);
+          if ("credits" in movieInfo && "cast" in movieInfo["credits"]) {
+            const cast = movieInfo["credits"]["cast"].map((elem: crewUser) => {
+              return {
+                character: elem.character,
+                known_for_department: elem.known_for_department,
+                name: elem.name,
+                profile_path: elem.profile_path && "https://image.tmdb.org/t/p/w138_and_h175_face/" + elem.profile_path,
+              };
+            });
+            setCast(cast);
+          }
+          if ("credits" in movieInfo && "crew" in movieInfo["credits"]) {
+            const crew = movieInfo["credits"]["crew"].map((elem: crewUser) => {
+              return {
+                character: "",
+                known_for_department: elem?.known_for_department,
+                name: elem.name,
+                profile_path: elem.profile_path && "https://image.tmdb.org/t/p/w138_and_h175_face/" + elem.profile_path,
+              };
+            });
+            setCrew(crew);
+          }
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      notify({ type: "error", msg: "cant get info for this movie" });
+    }
+  }
+
   useEffect(() => {
     const { movieProps } = state;
-
-    async function getAsyncTimdb() {
-      if (movieProps?.imdb_link) {
-        const timdb_id = await getTimdbId(movieProps?.imdb_link);
-        if (timdb_id) {
-          getImdbInfo(timdb_id);
-        }
-      } else if (movieProps?.t_imdb_id) {
-        getImdbInfo(movieProps?.t_imdb_id);
-      }
+    // check if all key is present
+    if ("title" in movieProps && movieProps["title"] && movieProps["title"].length > 0) {
+      const { title, year, torrent, quality, language, image, trailer, length } = movieProps;
+      getInfoMovie(title, year, torrent, quality, language, image, trailer, length);
     }
-    getAsyncTimdb();
-    setMovie(movieProps);
-    return () => {
-      setMovie(undefined);
-      setCrew(undefined);
-    };
-  }, [getImdbInfo, getTimdbId, id, state]);
+  }, [state]);
 
   return (
     <div className="flex flex-col  gap-20 justify-center items-center ">
