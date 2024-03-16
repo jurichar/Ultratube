@@ -117,7 +117,7 @@ export default function Home() {
   }
 
   return (
-    <div className="w-full h-max text-quinary p-4 flex flex-col items-center justify-around gap-6 md:p-0 md:pl-9">
+    <div className="w-full h-max text-quinary p-4 flex flex-col items-center justify-around gap-6 md:p-0 md:pt-4 ">
       <SearchBar onSearch={handleSearch} setShowSearch={setShowSearch} showSearch={showSearch} setPage={setPage} />
       {!showSearch && <TrendingMovie />}
       <div className="w-full h-full flex pb-60 flex-col gap-4 relative">
@@ -130,9 +130,6 @@ export default function Home() {
             className="bg-gray-50 border  w-fit  border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             onChange={(event) => setOrder(event?.target?.value as Order)}
           >
-            <option value="" selected>
-              way to sort
-            </option>
             <option value="asc">ascendent</option>
             <option value="desc"> descendent</option>
           </select>

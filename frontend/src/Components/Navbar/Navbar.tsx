@@ -14,7 +14,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="z-50 bg-tertiary  sticky top-0 w-full  flex justify-between items-center px-4 md:flex-col md:w-24  md:h-lvh  md:py-8 md:rounded">
+    <nav className="z-50 bg-tertiary mx-4 sticky top-0 md:top-4 w-full flex justify-between items-center px-4 md:flex-col md:w-24  md:h-[calc(100vh-2rem)] md:py-8 md:rounded">
       <NavLink to="/">
         <svg xmlns="http://www.w3.org/2000/svg" width="25" height="20" viewBox="0 0 25 20">
           <path

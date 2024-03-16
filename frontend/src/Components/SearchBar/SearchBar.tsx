@@ -35,7 +35,7 @@ const SearchBar = ({ onSearch, setShowSearch, showSearch }: SearchBarProps) => {
     setShowSearch(false);
   };
   return (
-    <div className="flex flex-col items-center w-full gap-4">
+    <div className="flex flex-col items-center w-full gap-4 mr-8">
       <div className="flex flex-row items-center w-full h-12 gap-4 border-b px-4 bg-primary border-quaternary focus-within:border-quinary transition-all">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
           <path
@@ -53,7 +53,7 @@ const SearchBar = ({ onSearch, setShowSearch, showSearch }: SearchBarProps) => {
             setSearch(e.target.value);
           }}
         />
-        <div className="w-fit">
+        <div className="w-24">
           <ButtonCallToAction handleClick={handleSubmitSearch} type="button" value="search" name="search" />
         </div>
       </div>
