@@ -26,11 +26,6 @@ export default function Navbar() {
       <div className="flex flex-row gap-4 justify-center items-center md:flex-col">
         {userData && (
           <>
-            <NavLink to="/disconnect">
-              <div className="w-16 h-9 bg-[url('./src/assets/exit.svg')] bg-cover bg-no-repeat bg-center transition-all">
-                <div className="w-16 h-9 bg-[url('./src/assets/exit-hover.svg')] bg-cover bg-no-repeat bg-center opacity-0 hover:opacity-50 transition-all"></div>
-              </div>
-            </NavLink>
             <NavLink to="/bookmarks">
               <svg width="54" height="54" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path fillRule="evenodd"
