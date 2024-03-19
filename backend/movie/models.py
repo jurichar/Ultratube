@@ -1,3 +1,4 @@
+from email.policy import default
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -17,7 +18,7 @@ class Movie(models.Model):
     language = models.CharField(null=False, default="en")
     quality = models.CharField(null=False, default="720p")
     duration = models.IntegerField(validators=[MinValueValidator(0)])
-    torrent = models.CharField(null=False)
+    torrent = models.CharField(null=False, default="")
 
     def __str__(self):
         return self.name
