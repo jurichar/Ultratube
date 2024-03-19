@@ -1,3 +1,4 @@
+from os import name
 from django.contrib.auth import get_user_model
 from django.urls import reverse, reverse_lazy
 from rest_framework.test import APITestCase
@@ -110,8 +111,11 @@ class TestMovie(MovieAPITestCase):
         response = self.client.post(
             "http://localhost:8000/api/movies/create_movie/", movie
         )
+        movieDb = Movie.objects.filter(
+            name=movie["name"], duration=movie["duration"], torrent=movie["torrent"]
+        ).first()
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.json(), movie)
+        self.assertEqual(response.json(), {"id": movieDb.id})
 
     # def test_create_existing(self):
     #     movie = {
@@ -150,8 +154,11 @@ class TestMovie(MovieAPITestCase):
         response = self.client.post(
             "http://localhost:8000/api/movies/create_movie/", data=movie
         )
+        movieDb = Movie.objects.filter(
+            name=movie["name"], duration=movie["duration"], torrent=movie["torrent"]
+        ).first()
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.json(), movie)
+        self.assertEqual(response.json(), {"id": movieDb.id})
         movie_db = Movie.objects.last()
         response_delete = self.client.delete(
             "http://localhost:8000/api/movies/" + str(movie_db.id) + "/",
