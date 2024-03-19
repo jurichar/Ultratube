@@ -5,6 +5,7 @@ import ButtonCallToAction from "../ButtonCallToAction/ButtonCallToAction";
 import { FaGithub } from "react-icons/fa";
 import { FaDiscord } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import InputPassword from "../InputPassword/InputPassword";
 interface Props {
   handleSubmit: (event: MouseEvent<HTMLButtonElement>, name: string) => void;
   nameForm: string;
@@ -21,11 +22,20 @@ export default function FormAuthenticate({ handleSubmit, nameForm, nameOtherAuth
       <h1 className="mb-10 text-heading-lg text-quinary text-light font-custom"> {nameForm}</h1>
       <form className="flex flex-col gap-6 ">
         {formInput?.map((input, index) => {
-          return (
-            <React.Fragment key={index}>
-              <InputGlobal handleChange={input.handleChange} value={input.value} name={input.name} placeholder={input.placeholder} type="text" />
-            </React.Fragment>
-          );
+          if (input.name == "password" || input.name == "password1") {
+            return (
+              <React.Fragment key={index}>
+                <InputPassword handleChange={input.handleChange} />
+              </React.Fragment>
+            );
+          }
+          else {
+            return (
+              <React.Fragment key={index}>
+                <InputGlobal handleChange={input.handleChange} value={input.value} name={input.name} placeholder={input.placeholder} type="text" />
+              </React.Fragment>
+            );
+          }
         })}
         <ButtonCallToAction handleClick={handleSubmit} type="submit" name={nameForm} value={nameSubmit} />
       </form>
@@ -39,9 +49,8 @@ export default function FormAuthenticate({ handleSubmit, nameForm, nameOtherAuth
         </Link>
         <Link
           className={` w-full  flex flex-row   gap-1 justify-center text-quinary  bg-gray-300 rounded text-body-md font-custom hover:bg-discord p-2.5"} `}
-          to={`${import.meta.env.VITE_DISCORD_URL}/authorize?client_id=${import.meta.env.VITE_DISCORD_UID}&response_type=code&redirect_uri=${
-            import.meta.env.VITE_DISCORD_REDIRECT
-          }&scope=identify+email`}
+          to={`${import.meta.env.VITE_DISCORD_URL}/authorize?client_id=${import.meta.env.VITE_DISCORD_UID}&response_type=code&redirect_uri=${import.meta.env.VITE_DISCORD_REDIRECT
+            }&scope=identify+email`}
         >
           <FaDiscord className="size-8" />
         </Link>
@@ -58,13 +67,15 @@ export default function FormAuthenticate({ handleSubmit, nameForm, nameOtherAuth
           {valueLinkOtherAuth}
         </Link>
       </div>
-      {nameForm == "Login" && (
-        <div className="w-full text-center">
-          <Link to="/forget-password" className="text-quinary text-body-md ">
-            Forgot your password ?
-          </Link>
-        </div>
-      )}
+      {
+        nameForm == "Login" && (
+          <div className="w-full text-center">
+            <Link to="/forget-password" className="text-quinary text-body-md ">
+              Forgot your password ?
+            </Link>
+          </div>
+        )
+      }
     </div>
   );
 }

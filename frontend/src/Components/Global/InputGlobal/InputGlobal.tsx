@@ -8,14 +8,14 @@ interface Props {
 }
 export default function InputGlobal({ handleChange, name, value, placeholder, type }: Props) {
   return (
-    <div className="relative w-full">
+    <div className="flex w-full h-12 border-b px-4 bg-tertiary border-quaternary focus-within:border-quinary transition-all">
       <input
         name={name}
         onChange={handleChange}
         type={type}
         value={value}
         placeholder={placeholder}
-        className="relative w-full pl-2 h-9  text-quinary border-gray-400 border-b-2 outline-none  hover:border-cyan-50 hover:placeholder:text-white focus:border-cyan-100 transition-all tra bg-transparent"
+        className="w-full outline-none bg-tertiary text-quaternary focus:text-quinary placeholder:text-quaternary focus:border-quinary transition-all placeholder:capitalize"
       />
     </div>
   );

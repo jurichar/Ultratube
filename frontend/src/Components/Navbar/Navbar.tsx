@@ -16,7 +16,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="z-50 bg-tertiary  sticky top-0 w-full  flex justify-between items-center px-4 md:flex-col md:w-24  md:h-lvh  md:py-8 md:rounded">
+    <nav className="z-50 bg-tertiary mx-4 sticky top-0 md:top-4 w-full flex justify-between items-center px-4 md:flex-col md:w-24  md:h-[calc(100vh-2rem)] md:py-8 md:rounded">
       <NavLink to="/">
         <svg xmlns="http://www.w3.org/2000/svg" width="25" height="20" viewBox="0 0 25 20">
           <path
@@ -40,11 +40,6 @@ export default function Navbar() {
         </select>
         {userData && (
           <>
-            <NavLink to="/disconnect">
-              <div className="w-16 h-9 bg-[url('./src/assets/exit.svg')] bg-cover bg-no-repeat bg-center transition-all">
-                <div className="w-16 h-9 bg-[url('./src/assets/exit-hover.svg')] bg-cover bg-no-repeat bg-center opacity-0 hover:opacity-50 transition-all"></div>
-              </div>
-            </NavLink>
             <NavLink to="/bookmarks">
               <svg width="54" height="54" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path

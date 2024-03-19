@@ -29,7 +29,7 @@ export default function InputPassword({ handleChange }: Props) {
     <div className="flex w-full h-12 border-b px-4 bg-tertiary border-quaternary focus-within:border-quinary transition-all">
       <input
         name="password"
-        className="w-full outline-none bg-tertiary text-quaternary focus:text-quinary placeholder:text-quaternary focus:border-quinary transition-all"
+        className="w-full outline-none bg-tertiary text-quaternary focus:text-quinary placeholder:text-quaternary focus:border-quinary transition-all placeholder:capitalize"
         type={showPassword ? "text" : "password"}
         placeholder="Password"
         autoComplete="current-password"
