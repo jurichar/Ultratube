@@ -148,6 +148,8 @@ class ResetPassword(APIView):
 
     def get(self, request, email):
         user = self.get_object(email)
+        if user.omniauth:
+            return Response("You can't do this", status=status.HTTP_403_FORBIDDEN)
         sendEmail(
             subject="reset password",
             message=f"go reset your password http://localhost:3000/reset-password/{hashlib.sha256(str.encode(user.email + user.username)).hexdigest()}",
@@ -158,6 +160,8 @@ class ResetPassword(APIView):
     def patch(self, request, email):
         if "hash" in request.data and "password" in request.data:
             user = self.get_object(email)
+            if user.omniauth:
+                return Response("You can't do this", status=status.HTTP_403_FORBIDDEN)
             hashUsername = hashlib.sha256(
                 str.encode(user.email + user.username)
             ).hexdigest()
@@ -228,8 +232,7 @@ class FortyTwoAuthView(APIView):
             )
             user = user.json()
             user_created = create_or_get_user(
-                username=user["login"],
-                email=user["email"],
+                username=user["login"] + "42",
                 firstname=user["first_name"],
                 lastname=user["last_name"],
             )
@@ -272,8 +275,7 @@ class DiscordAuthView(APIView):
                 "https://discord.com/api/v10/users/@me", response["access_token"]
             )
             user_created = create_or_get_user(
-                username=user["username"],
-                email=user["email"],
+                username=user["username"] + "DISC",
                 firstname="",
                 lastname="",
             )
@@ -314,8 +316,7 @@ class GithubAUthView(APIView):
                 "https://api.github.com/user", access_token=access_token["access_token"]
             )
             user_created = create_or_get_user(
-                username=user["login"],
-                email="",
+                username=user["login"] + "GH",
                 firstname=user["name"],
                 lastname="",
             )
@@ -442,7 +443,7 @@ class sendEmailAPI(APIView):
 # -----------------------------  OmniAuth strategy ---------------------
 
 
-def create_or_get_user(username="", password="", email="", firstname="", lastname=""):
+def create_or_get_user(username="", password="", email=None, firstname="", lastname=""):
     user, created = User.objects.get_or_create(
         username=username, email=email, first_name=firstname, last_name=lastname
     )

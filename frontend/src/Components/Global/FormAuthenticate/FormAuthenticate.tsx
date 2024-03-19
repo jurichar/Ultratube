@@ -25,11 +25,10 @@ export default function FormAuthenticate({ handleSubmit, nameForm, nameOtherAuth
           if (input.name == "password" || input.name == "password1") {
             return (
               <React.Fragment key={index}>
-                <InputPassword handleChange={input.handleChange} />
+                <InputPassword handleChange={input.handleChange} name={input.name} />
               </React.Fragment>
             );
-          }
-          else {
+          } else {
             return (
               <React.Fragment key={index}>
                 <InputGlobal handleChange={input.handleChange} value={input.value} name={input.name} placeholder={input.placeholder} type="text" />
@@ -49,8 +48,9 @@ export default function FormAuthenticate({ handleSubmit, nameForm, nameOtherAuth
         </Link>
         <Link
           className={` w-full  flex flex-row   gap-1 justify-center text-quinary  bg-gray-300 rounded text-body-md font-custom hover:bg-discord p-2.5"} `}
-          to={`${import.meta.env.VITE_DISCORD_URL}/authorize?client_id=${import.meta.env.VITE_DISCORD_UID}&response_type=code&redirect_uri=${import.meta.env.VITE_DISCORD_REDIRECT
-            }&scope=identify+email`}
+          to={`${import.meta.env.VITE_DISCORD_URL}/authorize?client_id=${import.meta.env.VITE_DISCORD_UID}&response_type=code&redirect_uri=${
+            import.meta.env.VITE_DISCORD_REDIRECT
+          }&scope=identify+email`}
         >
           <FaDiscord className="size-8" />
         </Link>
@@ -67,15 +67,13 @@ export default function FormAuthenticate({ handleSubmit, nameForm, nameOtherAuth
           {valueLinkOtherAuth}
         </Link>
       </div>
-      {
-        nameForm == "Login" && (
-          <div className="w-full text-center">
-            <Link to="/forget-password" className="text-quinary text-body-md ">
-              Forgot your password ?
-            </Link>
-          </div>
-        )
-      }
+      {nameForm == "Login" && (
+        <div className="w-full text-center">
+          <Link to="/forget-password" className="text-quinary text-body-md ">
+            Forgot your password ?
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { CommentMovie } from "../../types";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../context/useAuth";
 import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
+import { Link } from "react-router-dom";
 
 interface CommentsProps {
   movieId: number | undefined;
@@ -52,7 +53,7 @@ const Comments: React.FC<CommentsProps> = ({ movieId }) => {
           <div className="p-4 flex flex-col gap-4 justify-between items-start">
             {comments.length > 0 ? (
               comments.map((comment) => (
-                <div key={comment.id} className="p-2 bg-tertiary bg-opacity-50 rounded">
+                <Link to={`/profile/${comment.author_id}`} key={comment.id} className="p-2 bg-tertiary bg-opacity-50 rounded">
                   <p>
                     {t("name")}: {comment.author || "Bob"}
                   </p>
@@ -62,7 +63,7 @@ const Comments: React.FC<CommentsProps> = ({ movieId }) => {
                   <p>
                     {t("comment")}: {comment.content}
                   </p>
-                </div>
+                </Link>
               ))
             ) : (
               <div>{t("noComments")}</div>

@@ -4,6 +4,7 @@ import { NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../context/useAuth";
 import { language } from "../../types";
+import DisconnectButton from "../Global/DisconnectButton/DisconnectButton";
 
 export default function Navbar() {
   const { i18n } = useTranslation();
@@ -59,11 +60,7 @@ export default function Navbar() {
                   }}
                 ></div>
               </NavLink>
-              <NavLink to="/disconnect">
-                <div className="w-10 h-10 bg-[url('./src/assets/exit.svg')] bg-cover bg-no-repeat bg-center transition-all">
-                  <div className="w-10 h-10 bg-[url('./src/assets/exit-hover.svg')] bg-cover bg-no-repeat bg-center opacity-0 hover:opacity-50 transition-all"></div>
-                </div>
-              </NavLink>
+              <DisconnectButton />
             </div>
           </>
         )}
