@@ -3,6 +3,7 @@ import { useState } from "react";
 import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
 import { useParams } from "react-router-dom";
 import InputGlobal from "../Global/InputGlobal/InputGlobal";
+import { notify } from "../../utils/notifyToast";
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState("");
@@ -17,7 +18,6 @@ export default function ResetPasswordPage() {
     e.preventDefault();
     if (!checkFormValidity()) return;
     submitNewPassword();
-    console.log("Form submitted");
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -33,16 +33,18 @@ export default function ResetPasswordPage() {
 
   const submitNewPassword = async () => {
     try {
-      const res = await fetchWrapper("oauth/reset-password/" + email + "/", {
+      await fetchWrapper("oauth/reset-password/" + email + "/", {
         method: "PATCH",
         body: {
           password: password,
           hash: uid,
         },
       });
-      console.log(res);
+      notify({ type: "success", msg: "new password successfully updated" });
     } catch (error) {
-      console.log(error);
+      let message = "Unknown Error";
+      if (error instanceof Error) message = error.message;
+      notify({ type: "error", msg: message });
     }
   };
   const checkFormValidity = () => {
@@ -52,7 +54,7 @@ export default function ResetPasswordPage() {
     message += "Password must be valid.\n";
     if (!checkConfirmPasswordValidity()) valid = false;
     message += "Confirm password must be valid.\n";
-    if (!valid) alert(message);
+    if (!valid) notify({ type: "error", msg: message });
     return valid;
   };
 
@@ -83,8 +85,9 @@ export default function ResetPasswordPage() {
   const checkPasswordValidity = () => {
     let valid = true;
     if (password.length < 8) valid = false;
-    if (!password.match(/[\W_]/)) valid = false;
-    if (!password.match(/[A-Z]/)) valid = false;
+    // if (!password.match(/[\W_]/)) valid = false;
+    // if (!password.match(/[A-Z]/)) valid = false;
+    console.log(valid);
     return valid;
   };
 
@@ -113,7 +116,7 @@ export default function ResetPasswordPage() {
           </div>
           <div className="flex w-full h-12 border-b px-4 bg-tertiary border-quaternary focus-within:border-quinary transition-all">
             <input
-              name="currentPassword"
+              name="confirmPassword"
               className="w-full outline-none bg-tertiary text-quaternary focus:text-quinary placeholder:text-quaternary focus:border-quinary transition-all"
               type={showConfirmPassword ? "text" : "password"}
               placeholder="Password"

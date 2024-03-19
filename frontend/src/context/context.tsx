@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { fetchWrapper } from "../fetchWrapper/fetchWrapper";
-import { Props } from "../types";
+import { Props, language } from "../types";
 
 export type UserData = {
   userId: string;
@@ -20,6 +20,8 @@ interface ContextProps {
   readonly setUserData: (userData: UserData) => void;
   readonly loadUserData: () => Promise<void>;
   readonly TriggerReload: () => Promise<void>;
+  languageSelected: language;
+  setLanguageSelected: (language: language) => void;
 }
 
 /**
@@ -34,6 +36,8 @@ export const UserContext = React.createContext<ContextProps>({
   setUserData: () => null,
   reload: true,
   authenticate: false,
+  languageSelected: "en",
+  setLanguageSelected: () => {},
   setAuthenticate: () => false,
   loadUserData: async () => {},
   TriggerReload: async () => {},
@@ -43,6 +47,7 @@ const ContextProvider: React.FC<Props> = ({ children }) => {
   const [userData, setUserData] = React.useState<UserData | null>(null);
   const [authenticate, setAuthenticate] = useState<boolean>(false);
   const [reload, setReload] = useState<boolean>(true);
+  const [languageSelected, setLanguageSelected] = useState<language>("en");
   const loadUserData = async () => {
     try {
       const responseCurrentUser = await fetchWrapper("oauth/", { method: "GET" });
@@ -72,6 +77,8 @@ const ContextProvider: React.FC<Props> = ({ children }) => {
     authenticate,
     TriggerReload,
     setAuthenticate,
+    languageSelected,
+    setLanguageSelected,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

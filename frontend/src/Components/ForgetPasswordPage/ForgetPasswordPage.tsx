@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { validateEmail } from "../../utils/validateEmail";
 import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
+import { notify } from "../../utils/notifyToast";
 
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState("");
@@ -19,17 +20,25 @@ export default function ResetPasswordPage() {
     let message = "";
     if (!validateEmail) valid = false;
     message += "Email must be valid.\n";
-    if (!valid) alert(message);
+    if (email.length == 0) {
+      valid = false;
+      message += "Email must be valid.\n";
+    }
+    if (!valid) {
+      notify({ type: "warning", msg: message });
+    }
     return valid;
   };
   const resetPassword = async () => {
     try {
-      const res = await fetchWrapper("oauth/reset-password/" + email + "/", {
+      await fetchWrapper("oauth/reset-password/" + email + "/", {
         method: "GET",
       });
-      console.log(res);
+      notify({ type: "success", msg: "email successfully send" });
     } catch (error) {
-      console.log(error);
+      let message = "Unknown Error";
+      if (error instanceof Error) message = error.message;
+      notify({ type: "error", msg: message });
     }
   };
   return (

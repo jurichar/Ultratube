@@ -53,6 +53,8 @@ export default function MovieCard({ movie }: MovieCardProps) {
         <span className="text-quinary text-xs">{movie.length}min</span>
       </div>
       <span className="text-quinary">{movie.title.length > 14 ? movie.title.slice(0, 14) + "..." : movie.title}</span>
+      <h3> {movie?.language}</h3>
+      <h3> {movie?.quality}</h3>
       {movie.rating > 0.0 && (
         <div className="flex flex-row  items-center">
           {movie.rating} <FaStar />

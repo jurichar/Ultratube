@@ -99,5 +99,3 @@ class AccountTests(APITestCase):
             "http://localhost:8000/oauth/logout/", **custom_header
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        # self.assertIn('csrftoken', response.cookies)

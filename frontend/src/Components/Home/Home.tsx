@@ -8,6 +8,7 @@ import SearchResult from "../SearchResult/SearchResult";
 import Filter from "./Filter/Filter";
 import SortMovie from "./SortMovie/SortMovie";
 import TrendingMovie from "../TrendingMovie/TrendingMovie";
+import { useAuth } from "../../context/useAuth";
 // import { useTranslation } from "react-i18next";
 
 export default function Home() {
@@ -15,11 +16,11 @@ export default function Home() {
   const [showSearch, setShowSearch] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [page, setPage] = useState<number>(1);
-  const initialState = { rating: 0, genre: "all", min_year_release: 1900, duration: "all", name: "" };
+  const initialState = { rating: 0, genre: "all", min_year_release: 1900, duration: "all", name: "", genre_en: "all" };
   const [filter, setFilter] = useState<filter>(initialState);
   const [sort, setSort] = useState<keyof Movie>("rating");
   const [order, setOrder] = useState<Order>("asc");
-
+  const { languageSelected } = useAuth();
   async function handleSearch(search: string) {
     setPage(1);
     setSort("title");
@@ -71,6 +72,21 @@ export default function Home() {
 
   const sortArray = (value: keyof Movie, array: Movie[]) => {
     let movieTmp = structuredClone(array);
+    if (value == "genres") {
+      movieTmp = movieTmp.sort((firstItem, secondItem) => {
+        const valueFirstItem = firstItem[value].length > 0 && firstItem[value][0];
+        const valueSecondItem = firstItem[value].length > 0 && secondItem[value][0];
+        const orderAsc = order == "asc" && valueFirstItem && valueSecondItem && valueFirstItem > valueSecondItem;
+        const orderDesc = order == "desc" && valueFirstItem && valueSecondItem && valueFirstItem < valueSecondItem;
+        if (order == "desc" ? orderDesc : orderAsc) {
+          return 1;
+        } else if (valueFirstItem && valueSecondItem && valueFirstItem == valueSecondItem) {
+          return -0;
+        } else {
+          return -1;
+        }
+      });
+    }
     movieTmp = movieTmp.sort((firstItem, secondItem) => {
       const valueFirstItem = firstItem[value];
       const valueSecondItem = secondItem[value];
@@ -92,6 +108,10 @@ export default function Home() {
     const valueCast = value as keyof Movie;
     setSort(valueCast);
   }
+
+  useEffect(() => {
+    setPage(1);
+  }, [languageSelected]);
   /*** INFINITE SCROLL */
   useEffect(() => {
     function watchScroll() {
