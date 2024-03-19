@@ -1,22 +1,7 @@
 import { useEffect, useState } from "react";
-import { Movie } from "../../types";
+import { Movie, YtsMovie } from "../../types";
 import MovieCardTrending from "../MovieCards/MovieCardTrending";
 
-type YtsMovie = {
-  id: string;
-  title: string;
-  year: number;
-  medium_cover_image: string;
-  synopsis: string;
-  rating: number;
-  imdb_code: string;
-  summary?: string;
-  language: string;
-  yt_trailer_code?: string;
-  genres: Array<string>;
-  runtime: number;
-  torrent?: string;
-};
 export default function TrendingMovie() {
   const [moviesTrending, setMoviesTrending] = useState<Movie[]>([]);
 
@@ -27,6 +12,8 @@ export default function TrendingMovie() {
       if ("movies" in all_movies_json.data) {
         const all_Movie_Data: YtsMovie[] = all_movies_json.data.movies;
         const arrayTrending = all_Movie_Data.map((elem) => {
+          const quality = Array.isArray(elem.torrents) && elem.torrents?.length > 0 ? elem.torrents[0].quality : elem.torrents.quality;
+          const torrent_url = Array.isArray(elem.torrents) && elem.torrents?.length > 0 ? elem.torrents[0].url : elem.torrents.url;
           return {
             id: elem.id,
             title: elem.title,
@@ -40,6 +27,8 @@ export default function TrendingMovie() {
             rating: elem.rating,
             summary: elem.summary,
             length: elem.runtime,
+            quality: quality,
+            torrent: torrent_url,
           };
         });
         setMoviesTrending(arrayTrending);

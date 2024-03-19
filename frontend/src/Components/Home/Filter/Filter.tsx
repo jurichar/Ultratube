@@ -62,8 +62,8 @@ export default function Filter(props: filterProps) {
         setFilter(initialState);
         setGenre(json["genres"]);
       })
-      .catch((err) => notify({ type: "warning", msg: "error on api tmdb" }));
-  }, [languageSelected]);
+      .catch(() => notify({ type: "warning", msg: "error on api tmdb" }));
+  }, [initialState, languageSelected]);
 
   useEffect(() => {
     const url = `https://api.themoviedb.org/3/genre/movie/list?language=en`;

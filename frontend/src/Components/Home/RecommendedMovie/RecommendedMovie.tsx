@@ -22,7 +22,6 @@ export default function RecommendedMovie(props: propsRecommended) {
     try {
       const response = await fetch(url, { method: "GET", headers: { "Accept-Language": languageSelected } });
       const movieResponse = await response.json();
-      console.log(movieResponse);
       if ("movies" in movieResponse.data) {
         const all_Movie_Data: YtsMovie[] = movieResponse.data.movies;
         const arrayMovie: Movie[] = all_Movie_Data.map((elem) => {

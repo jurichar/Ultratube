@@ -91,7 +91,7 @@ export default function SearchResult(props: searchResultProps) {
         }
       }
     } catch (error) {
-      console.log(error);
+      return;
     }
   }
   const getMovieYtsSearch = async (query: string) => {

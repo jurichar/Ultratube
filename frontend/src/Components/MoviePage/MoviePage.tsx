@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { Movie, crewUser } from "../../types";
 import MemberMovie from "./MemberMovie/MemberMovie";
 import TrailerSection from "../Global/TrailerSection/TrailerSection";
@@ -9,7 +9,6 @@ import { notify } from "../../utils/notifyToast";
 import { useAuth } from "../../context/useAuth";
 
 export default function MoviePage() {
-  const { id } = useParams<{ id: string }>();
   const { state } = useLocation();
   const [movie, setMovie] = useState<Movie>();
   const [crew, setCrew] = useState<crewUser[]>();
@@ -67,7 +66,6 @@ export default function MoviePage() {
         const urlInfo = `https://api.themoviedb.org/3/movie/${movieData.id}?append_to_response=credits%2Cvideos&language=${languageSelected}`;
         const responseInfo = await fetch(urlInfo, options);
         const movieInfo = await responseInfo.json();
-        console.log(movieInfo);
         if (movieInfo && Object.keys(movieInfo).length > 0) {
           const genres = movieInfo.genres.map((elem: { id: number; name: string }) => elem.name);
           movieInfoTmp.genres = genres;
@@ -97,7 +95,6 @@ export default function MoviePage() {
         }
       }
     } catch (error) {
-      console.log(error);
       notify({ type: "error", msg: "cant get info for this movie" });
     }
   }
@@ -109,6 +106,7 @@ export default function MoviePage() {
       const { title, year, torrent, quality, language, image, trailer, length } = movieProps;
       getInfoMovie(title, year, torrent, quality, language, image, trailer, length);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
   return (

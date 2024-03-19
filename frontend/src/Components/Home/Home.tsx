@@ -72,6 +72,21 @@ export default function Home() {
 
   const sortArray = (value: keyof Movie, array: Movie[]) => {
     let movieTmp = structuredClone(array);
+    if (value == "genres") {
+      movieTmp = movieTmp.sort((firstItem, secondItem) => {
+        const valueFirstItem = firstItem[value].length > 0 && firstItem[value][0];
+        const valueSecondItem = firstItem[value].length > 0 && secondItem[value][0];
+        const orderAsc = order == "asc" && valueFirstItem && valueSecondItem && valueFirstItem > valueSecondItem;
+        const orderDesc = order == "desc" && valueFirstItem && valueSecondItem && valueFirstItem < valueSecondItem;
+        if (order == "desc" ? orderDesc : orderAsc) {
+          return 1;
+        } else if (valueFirstItem && valueSecondItem && valueFirstItem == valueSecondItem) {
+          return -0;
+        } else {
+          return -1;
+        }
+      });
+    }
     movieTmp = movieTmp.sort((firstItem, secondItem) => {
       const valueFirstItem = firstItem[value];
       const valueSecondItem = secondItem[value];

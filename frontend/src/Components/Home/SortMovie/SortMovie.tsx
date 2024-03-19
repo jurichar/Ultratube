@@ -19,7 +19,7 @@ export default function SortMovie(props: SortProps) {
       </option>
       <option value="rating">imdb rating</option>
       <option value="title">title</option>
-      {/* <option value="genre">genre</option> */}
+      <option value="genres">genre</option>
       <option value="length"> duration</option>
       <option value="year"> production year</option>
     </select>
