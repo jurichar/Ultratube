@@ -5,6 +5,18 @@ import * as ttypes from "./ft_torrent_types.js";
 const PROTOCOL_NAME = "BitTorrent protocol";
 const PROTOCOL_LENGTH = 19;
 
+enum PeerMessage {
+  choke = 0,
+  unchoke = 1,
+  interested = 2,
+  notInterested = 3,
+  have = 4,
+  bitfield = 5,
+  request = 6,
+  piece = 7,
+  cancel = 8,
+}
+
 export class Peer {
   ip: number;
   host: string;
@@ -12,6 +24,7 @@ export class Peer {
   infoHash: Uint8Array;
   peerId: string;
   buffer: Buffer;
+  bitfield: Buffer;
 
   constructor(ip: number, host: string, infoHash: Uint8Array, peerId: string) {
     this.ip = ip;
@@ -97,39 +110,45 @@ export class Peer {
     const infoHash = Buffer.from(this.infoHash).toString("hex");
     if (!this.isValidHandshake(infoHash, this.decodeHandshake(response))) {
       throw new Error("Invalid handshake");
+    } else {
+      console.log("Handshake done!");
     }
+  }
+
+  handleError(error: string) {
+    console.error(`Error: ${error}`);
+    this.client.destroy();
   }
 
   handlePeerResponse(chunk: Buffer) {
     console.log("Chunk: ", chunk);
     switch (chunk[4]) {
-      case 1: {
-        const buff = Buffer.from([0, 0, 0, 5, 2]);
-        console.log("unchoke ... send: ", buff);
-        this.client.write(buff);
+      case PeerMessage.unchoke: {
+        console.log("unchoke");
+        // request piece
         break;
       }
-      case 5:
-        console.log("bitfield: ", chunk.readUint8(4));
+      case PeerMessage.bitfield:
+        console.log("bitfield");
+        this.bitfield = chunk.subarray(5, chunk.length);
         break;
-      case 7:
+      case PeerMessage.piece:
         console.log("piece");
+        // save piece
         break;
     }
-    return chunk;
   }
 
   async connect() {
     this.client = new net.Socket();
     this.client.connect(this.ip, this.host);
+    this.client.setTimeout(2000);
 
     this.client.on("data", this.handlePeerResponse.bind(this));
-
-    this.client.on("error", (error) => {
-      throw new Error(error.message);
-    });
+    this.client.on("error", this.handlePeerResponse.bind(this));
 
     this.client.on("destroy", () => console.log("client closed"));
     await this.makeHandshake();
+    this.client.write(Buffer.from([0, 0, 0, 5, 2]));
   }
 }

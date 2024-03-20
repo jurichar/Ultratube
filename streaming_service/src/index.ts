@@ -51,7 +51,7 @@ fastify.post("/download-torrent", async (request, reply) => {
 
     await deleteTorrentMeta(torrentPath);
 
-    reply.code(200).send({ movie: torrentMetaData });
+    reply.code(200).send({ movie: trackerResponse.peers });
   } catch (error: unknown) {
     console.error(error);
     reply.code(404).send("Torrent is currently unavailable");

@@ -1,4 +1,3 @@
-"use strict";
 import * as ttypes from "./ft_torrent_types.js";
 import bencode from "bencode";
 
