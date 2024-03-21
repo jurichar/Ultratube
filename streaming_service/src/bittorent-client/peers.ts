@@ -125,7 +125,13 @@ export class Peer {
     switch (chunk[4]) {
       case PeerMessage.unchoke: {
         console.log("unchoke");
-        // request piece
+        const request = Buffer.alloc(17);
+        request.writeUint32BE(13);
+        request.writeUint8(6, 4);
+        request.writeUint32BE(0, 5);
+        request.writeUint32BE(0, 9);
+        request.writeUint32BE(2 ** 14, 13);
+        this.client.write(request);
         break;
       }
       case PeerMessage.bitfield:
