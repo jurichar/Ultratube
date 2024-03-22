@@ -1,9 +1,11 @@
 "use strict";
 import net from "node:net";
+import fs from "node:fs/promises";
 import * as ttypes from "./ft_torrent_types.js";
 
 const PROTOCOL_NAME = "BitTorrent protocol";
 const PROTOCOL_LENGTH = 19;
+const BLOCK_LENGTH = 2 ** 14;
 
 enum PeerMessage {
   choke = 0,
@@ -25,12 +27,24 @@ export class Peer {
   peerId: string;
   buffer: Buffer;
   bitfield: Buffer;
+  pieceIndex: number;
+  blockOffset: number;
+  pieceLength: number;
 
-  constructor(ip: number, host: string, infoHash: Uint8Array, peerId: string) {
+  constructor(
+    ip: number,
+    host: string,
+    infoHash: Uint8Array,
+    peerId: string,
+    pieceLength: number,
+  ) {
     this.ip = ip;
     this.host = host;
     this.infoHash = infoHash;
     this.peerId = peerId;
+    this.pieceIndex = 0;
+    this.blockOffset = 0;
+    this.pieceLength = pieceLength;
   }
 
   async waitForData(): Promise<Buffer> {
@@ -120,18 +134,30 @@ export class Peer {
     this.client.destroy();
   }
 
+  askForPieceBlock() {
+    const request = Buffer.alloc(17);
+    const blockLength =
+      this.blockOffset + BLOCK_LENGTH > this.pieceLength
+        ? this.pieceLength - this.blockOffset
+        : BLOCK_LENGTH;
+
+    request.writeUint32BE(13);
+    request.writeUint8(PeerMessage.request, 4);
+    request.writeUint32BE(this.pieceIndex, 5);
+    request.writeUint32BE(this.blockOffset, 9);
+    request.writeUint32BE(blockLength, 13);
+    this.client.write(request);
+
+    this.pieceIndex++;
+    this.blockOffset += blockLength;
+  }
+
   handlePeerResponse(chunk: Buffer) {
-    console.log("Chunk: ", chunk);
     switch (chunk[4]) {
       case PeerMessage.unchoke: {
         console.log("unchoke");
-        const request = Buffer.alloc(17);
-        request.writeUint32BE(13);
-        request.writeUint8(6, 4);
-        request.writeUint32BE(0, 5);
-        request.writeUint32BE(0, 9);
-        request.writeUint32BE(2 ** 14, 13);
-        this.client.write(request);
+        this.buffer = Buffer.alloc(this.pieceLength);
+        this.askForPieceBlock();
         break;
       }
       case PeerMessage.bitfield:
@@ -140,8 +166,17 @@ export class Peer {
         break;
       case PeerMessage.piece:
         console.log("piece");
-        // save piece
-        break;
+        console.log("chunk: ", chunk);
+        chunk.copy(
+          this.buffer,
+          this.blockOffset - BLOCK_LENGTH,
+          5,
+          chunk.length,
+        );
+        this.askForPieceBlock();
+        if (this.blockOffset >= this.pieceLength) {
+          fs.appendFile("./torrents/output.txt", this.buffer);
+        }
     }
   }
 
