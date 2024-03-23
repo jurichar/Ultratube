@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Movie, crewUser } from "../../types";
 import MemberMovie from "./MemberMovie/MemberMovie";
@@ -7,6 +7,8 @@ import Comments from "./Comments";
 import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
 import { notify } from "../../utils/notifyToast";
 import { useAuth } from "../../context/useAuth";
+import WebTorrent from "webtorrent/dist/webtorrent.min.js";
+// import WebTorrent from "https://esm.sh/webtorrent";
 
 export default function MoviePage() {
   const { state } = useLocation();
@@ -15,7 +17,6 @@ export default function MoviePage() {
   const [cast, setCast] = useState<crewUser[]>();
   const [movieIdDb, setMovieIdDb] = useState<number>(0);
   const { languageSelected } = useAuth();
-
   const options = useMemo(
     () => ({
       method: "GET",
@@ -26,6 +27,48 @@ export default function MoviePage() {
     }),
     []
   );
+  const [torrentId, setTorrentId] = useState(
+    "magnet:?xt=urn:btih:08ada5a7a6183aae1e09d831df6748d566095a10&dn=Sintel&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.fastcast.nz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&ws=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2F&xs=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2Fsintel.torrent"
+  );
+
+  const [videoUrl, setVideoUrl] = useState(""); // Video URL for streaming
+
+  useEffect(() => {
+    const client = new WebTorrent();
+
+    client.on("error", (err) => {
+      console.error("WebTorrent error:", err);
+    });
+
+    client.on("torrent", (torrent) => {
+      console.log("Torrent downloading:", torrent.name);
+
+      const file = torrent.files.find((file) => file.name.endsWith(".mp4"));
+
+      if (file) {
+        let videoBlob = null;
+        const chunks = [];
+
+        file
+          .createReadStream()
+          .on("data", (chunk) => {
+            chunks.push(chunk);
+          })
+          .on("end", () => {
+            videoBlob = new Blob(chunks, { type: "video/mp4" });
+            // with real stream from the back i need to fetch the url and get a .blob to create a object url and  show in
+            const videoBlobUrl = URL.createObjectURL(videoBlob);
+            setVideoUrl(videoBlobUrl);
+          });
+      }
+    });
+
+    client.add(torrentId);
+
+    return () => {
+      client.destroy();
+    };
+  }, [torrentId]);
 
   useEffect(() => {
     async function createMovieInDb() {
@@ -54,7 +97,7 @@ export default function MoviePage() {
   }, [movie]);
 
   async function getInfoMovie(title: string, year: number, torrent: string, quality: string, language: string, image: string, trailer: string, length: number, genres: string[]) {
-    const movieInfoTmp: Movie = { rating: 0, synopsis: "", genres: [], year: year, title: title, torrent, quality, language, image, trailer, length, genres };
+    const movieInfoTmp: Movie = { rating: 0, synopsis: "", year: year, title: title, torrent, quality, language, image, trailer, length, genres };
     const url = `https://api.themoviedb.org/3/search/movie?query=${title}&include_adult=false&language=${languageSelected}&page=1&append_to_response=credits`;
     try {
       const response = await fetch(url, options);
@@ -130,11 +173,14 @@ export default function MoviePage() {
         )
       )}
       {movie?.trailer && <TrailerSection linkEmbed={movie.trailer} />}
-
+      {videoUrl && (
+        <video controls>
+          <source src={videoUrl} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      )}
       <h1 className="text-4xl font-bold text-white">Movie</h1>
-      <div className="w-10/12 h-auto  bg-secondary">
-        <iframe className="w-full aspect-video" src="https://moacloud.com/iframe/FavoXpQrbD" allowFullScreen></iframe>
-      </div>
+      <div className="w-10/12 h-auto  bg-secondary">{/* <ifrae className="w-full aspect-video" src="https://moacloud.com/iframe/FavoXpQrbD" allowFullScreen></ifrae> */}</div>
       <h4 className="text-quinary"> genres : {movie?.genres?.join(",")}</h4>
       <MemberMovie crew={crew} cast={cast} />
       <Comments movieId={movieIdDb} />
