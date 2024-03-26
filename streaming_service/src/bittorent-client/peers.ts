@@ -1,11 +1,8 @@
 "use strict";
 import net from "node:net";
 import fs from "node:fs/promises";
+import { createHash } from "node:crypto";
 import * as ttypes from "./ft_torrent_types.js";
-
-const PROTOCOL_NAME = "BitTorrent protocol";
-const PROTOCOL_LENGTH = 19;
-const BLOCK_LENGTH = 2 ** 14;
 
 enum PeerMessage {
   choke = 0,
@@ -30,6 +27,10 @@ export class Peer {
   pieceIndex: number;
   blockOffset: number;
   pieceLength: number;
+
+  static PROTOCOL_NAME = "BitTorrent protocol";
+  static PROTOCOL_LENGTH = 19;
+  static BLOCK_LENGTH = 2 ** 14;
 
   constructor(
     ip: number,
@@ -58,8 +59,8 @@ export class Peer {
   }
 
   encodeHandshake(infoHash: Uint8Array, peerId: string): Buffer {
-    const protocolLength = Buffer.from([PROTOCOL_LENGTH]);
-    const protocol = Buffer.from(PROTOCOL_NAME);
+    const protocolLength = Buffer.from([Peer.PROTOCOL_LENGTH]);
+    const protocol = Buffer.from(Peer.PROTOCOL_NAME);
     const freeBytes = Buffer.alloc(8);
     const infoHashBuff = Buffer.from(infoHash);
 
@@ -85,9 +86,9 @@ export class Peer {
     offset += 1;
 
     const protocol = rawHandshake
-      .subarray(offset, offset + PROTOCOL_LENGTH)
+      .subarray(offset, offset + Peer.PROTOCOL_LENGTH)
       .toString();
-    offset += PROTOCOL_LENGTH;
+    offset += Peer.PROTOCOL_LENGTH;
 
     const reservedBytes = rawHandshake.subarray(offset, offset + 8);
     offset += 8;
@@ -112,8 +113,8 @@ export class Peer {
   ): boolean {
     return !(
       infoHashHex !== decodedHandshake.infoHash ||
-      decodedHandshake.protocolLength !== PROTOCOL_LENGTH ||
-      decodedHandshake.protocol !== PROTOCOL_NAME
+      decodedHandshake.protocolLength !== Peer.PROTOCOL_LENGTH ||
+      decodedHandshake.protocol !== Peer.PROTOCOL_NAME
     );
   }
 
@@ -137,9 +138,9 @@ export class Peer {
   askForPieceBlock() {
     const request = Buffer.alloc(17);
     const blockLength =
-      this.blockOffset + BLOCK_LENGTH > this.pieceLength
+      this.blockOffset + Peer.BLOCK_LENGTH > this.pieceLength
         ? this.pieceLength - this.blockOffset
-        : BLOCK_LENGTH;
+        : Peer.BLOCK_LENGTH;
 
     request.writeUint32BE(13);
     request.writeUint8(PeerMessage.request, 4);
@@ -164,19 +165,24 @@ export class Peer {
         console.log("bitfield");
         this.bitfield = chunk.subarray(5, chunk.length);
         break;
-      case PeerMessage.piece:
-        console.log("piece");
-        console.log("chunk: ", chunk);
+      case PeerMessage.piece: {
+        console.log("piece: ", chunk);
         chunk.copy(
           this.buffer,
-          this.blockOffset - BLOCK_LENGTH,
-          5,
+          this.blockOffset - Peer.BLOCK_LENGTH,
+          13,
           chunk.length,
         );
         this.askForPieceBlock();
         if (this.blockOffset >= this.pieceLength) {
+          console.log("Piece downloaded!");
+          // const hash = createHash("sha1").update(this.buffer).digest("hex");
+          // console.log("Piece hash: ", hash);
+          // console.log("Buffer: ", this.buffer);
           fs.appendFile("./torrents/output.txt", this.buffer);
         }
+        break;
+      }
     }
   }
 
