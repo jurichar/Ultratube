@@ -4,14 +4,13 @@ interface FetchOptions {
   headers?: Record<string, string>;
   method: string;
   params?: Record<string, string>;
-  body?: Record<string, string>;
+  body?: object;
 }
 
 async function fetchWrapper<T>(url: string, { headers, method, params, body }: FetchOptions): Promise<T> {
   const queryParams = new URLSearchParams(params).toString();
   const fullUrl = queryParams ? `${url}?${queryParams}` : url;
   const requestBody = body ? JSON.stringify(body) : undefined;
-  console.log(requestBody);
   console.log(headers);
   const response = await fetch("http://localhost:8000/" + fullUrl, {
     method,
@@ -21,10 +20,9 @@ async function fetchWrapper<T>(url: string, { headers, method, params, body }: F
     },
     credentials: "include",
   });
-
   if (!response.ok) {
-    console.log(response);
-    throw new Error(`HTTP error! Status: ${response.status} `);
+    const error = await response.json();
+    throw new Error(Object.values(error).join(","));
   }
 
   return response.json();

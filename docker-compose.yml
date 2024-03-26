@@ -28,6 +28,10 @@ services:
     depends_on:
       - db
     tty: true
+  streaming_service:
+    build: ./streaming_service
+    ports:
+      - "8001:8001"
   frontend:
     build: ./frontend
     container_name: frontend
@@ -38,6 +42,9 @@ services:
     ports:
       - "3000:3000"
     tty: true
-
+  api-py:
+    build: ./api-torrent
+    ports:
+      - "8009:8009"
 volumes:
   data: {}

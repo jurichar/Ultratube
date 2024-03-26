@@ -8,7 +8,7 @@ interface ButtonProps {
 }
 export default function ButtonCallToAction({ handleClick, type = "button", value, name }: ButtonProps) {
   return (
-    <button onClick={(event) => handleClick(event, name)} id={name} type={type} className={` w-full bg-secondary text-quinary rounded text-body-md font-custom  p-3.5 `}>
+    <button onClick={(event) => handleClick(event, name)} id={name} type={type} className="w-full bg-secondary text-quinary rounded text-body-md font-custom p-1 m-2">
       {value}
     </button>
   );

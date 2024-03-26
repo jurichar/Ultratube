@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Comment, FavouriteMovie, Movie, Subtitle
+from .models import Comment, FavouriteMovie, Movie, Subtitle, WatchedMovie
 
 
 class SubtitleListSerializer(serializers.ModelSerializer):
@@ -14,20 +14,56 @@ class MovieListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Movie
-        fields = ["id", "name"]
+        fields = ["id", "name", "language", "quality"]
+
+
+class MovieCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Movie
+        fields = [
+            "name",
+            "imdb_rating",
+            "production_year",
+            "duration",
+            "thumbnail_cover",
+            "quality",
+            "language",
+            "torrent",
+        ]
+
+
+class MovieDeleteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Movie
+        fields = "__all__"
 
 
 class MovieDetailSerializer(serializers.ModelSerializer):
 
     comments_number = serializers.SerializerMethodField()
-    available_subtitles = SubtitleListSerializer(many=True)
+    available_subtitles = serializers.SerializerMethodField()
 
     class Meta:
         model = Movie
-        fields = ["name", "id", "imdb_rating", "production_year", "duration", "comments_number", "available_subtitles"]
+        fields = [
+            "name",
+            "id",
+            "imdb_rating",
+            "production_year",
+            "duration",
+            "comments_number",
+            "available_subtitles",
+            "quality",
+            "language",
+            "torrent",
+        ]
 
     def get_comments_number(self, obj):
         return Comment.objects.filter(movie=obj).count()
+
+    def get_available_subtitles(self, obj):
+        subtitles = Subtitle.objects.filter(movie=obj)
+        return SubtitleListSerializer(subtitles, many=True).data
 
 
 class CommentViewSerializer(serializers.ModelSerializer):
@@ -75,3 +111,20 @@ class FavouriteMovieCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = FavouriteMovie
         fields = ["movie"]
+
+
+class WatchedMovieListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = WatchedMovie
+        fields = ["movie"]
+
+
+class WatchedMovieCreateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = WatchedMovie
+        fields = ["movie", "watcher"]
+
+    def create(self, validated_data):
+        return WatchedMovie.objects.create(**validated_data)

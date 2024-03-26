@@ -1,9 +1,12 @@
-import { ChangeEvent, MouseEvent, useReducer } from "react";
+import { MouseEvent, useReducer } from "react";
 import FormAuthenticate from "../Global/FormAuthenticate/FormAuthenticate";
 import LogoComponent from "../Global/LogoComponent/LogoComponent";
 import { FormInput, LoginType } from "../../types";
 import { reducer } from "./reducer";
 import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/useAuth";
+import { notify } from "../../utils/notifyToast";
 
 const initialState: LoginType = {
   username: "",
@@ -12,7 +15,9 @@ const initialState: LoginType = {
 
 export default function Login() {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const handleChange = (event: ChangeEvent) => {
+  const navigate = useNavigate();
+  const { TriggerReload } = useAuth();
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     dispatch({ type: "change", name: event.target.name, value: event.target.value });
   };
 
@@ -21,16 +26,17 @@ export default function Login() {
     return true;
   };
 
-  const handleSubmit = (event: MouseEvent<HTMLButtonElement>, name: string) => {
+  const handleSubmit = async (event: MouseEvent<HTMLButtonElement>, name: string) => {
     event.preventDefault();
-    console.log(event);
     if (name == "Login") {
       if (is_valid_arg({ ...state })) {
-        login();
+        await login();
+        await TriggerReload();
+        navigate("/");
+        notify({ type: "success", msg: "login successful" });
       } else {
-        console.log("cant login");
+        notify({ type: "error", msg: "information are not valid" });
       }
-      console.log("log in ");
     }
   };
 
@@ -44,13 +50,17 @@ export default function Login() {
         },
       });
     } catch (error) {
-      console.log(error);
+      let message = "Unknown Error";
+      if (error instanceof Error) message = error.message;
+      notify({ type: "error", msg: message });
     }
   };
+
   const formInput: FormInput[] = [
     { name: "username", value: state.username, placeholder: "username", handleChange },
     { name: "password", value: state.password, placeholder: "password", handleChange },
   ];
+
   return (
     <div className="flex flex-col w-full">
       <header className="w-full flex justify-center mt-12">

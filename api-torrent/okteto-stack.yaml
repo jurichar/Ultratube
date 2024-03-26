@@ -1,0 +1,14 @@
+services:
+  fastapi:
+    public: true
+    build: .
+    replicas: 1
+    ports:
+      - 8080
+    resources:
+      requests:
+        cpu: 500m
+        memory: 1500Mi
+      limits:
+        cpu: 1000m
+        memory: 3000Mi
