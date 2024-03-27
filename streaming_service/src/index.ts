@@ -11,7 +11,7 @@ import {
   generatePeerId,
 } from "./bittorent-client/trackerHandler.js";
 
-import { createHash } from "node:crypto";
+import torrentStream from "torrent-stream";
 import { toMagnetURI } from "parse-torrent";
 import { Peer } from "./bittorent-client/peers.js";
 
@@ -64,8 +64,19 @@ fastify.get("/stream/:movieId", async (request, reply) => {
   const torrentUrl = "https://webtorrent.io/torrents/big-buck-bunny.torrent";
   const torrentPath = await downloadTorrentMeta(torrentUrl);
   const torrentMetaData = await parseTorrentMeta(torrentPath);
-  // console.log(torrentMetaData);
-  reply.code(200).send({ movieId: movieId });
+  const magnetURI = toMagnetURI({
+    infoHashBuffer: Buffer.from(torrentMetaData.infoHash),
+  });
+
+  const engine = torrentStream(magnetURI);
+
+  engine.on("ready", () => {
+    engine.files.foreach((file: any) => {
+      console.log("filename", file.name);
+    });
+  });
+
+  reply.code(200).send({ movieId: movieId, magnet: magnetURI });
 });
 
 const start = async () => {

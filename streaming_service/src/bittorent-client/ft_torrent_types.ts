@@ -32,7 +32,6 @@ export interface TorrentMeta {
   creationDate?: number;
   encoding?: string;
   infoHash: Uint8Array;
-  infoHashHex: string;
 }
 
 export interface TrackerResponse {
