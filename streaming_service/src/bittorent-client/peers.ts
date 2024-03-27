@@ -5,15 +5,15 @@ import { createHash } from "node:crypto";
 import * as ttypes from "./ft_torrent_types.js";
 
 enum PeerMessage {
-  choke = 0,
-  unchoke = 1,
-  interested = 2,
-  notInterested = 3,
-  have = 4,
-  bitfield = 5,
-  request = 6,
-  piece = 7,
-  cancel = 8,
+  choke,
+  unchoke,
+  interested,
+  notInterested,
+  have,
+  bitfield,
+  request,
+  piece,
+  cancel,
 }
 
 export class Peer {
@@ -27,10 +27,11 @@ export class Peer {
   pieceIndex: number;
   blockOffset: number;
   pieceLength: number;
+  bufferBytesFilled: number;
 
   static PROTOCOL_NAME = "BitTorrent protocol";
   static PROTOCOL_LENGTH = 19;
-  static BLOCK_LENGTH = 2 ** 14;
+  static BLOCK_MAX = 2 ** 14;
 
   constructor(
     ip: number,
@@ -46,6 +47,7 @@ export class Peer {
     this.pieceIndex = 0;
     this.blockOffset = 0;
     this.pieceLength = pieceLength;
+    this.bufferBytesFilled = 0;
   }
 
   async waitForData(): Promise<Buffer> {
@@ -135,22 +137,16 @@ export class Peer {
     this.client.destroy();
   }
 
-  askForPieceBlock() {
+  askForPieceBlock(blockSize: number) {
     const request = Buffer.alloc(17);
-    const blockLength =
-      this.blockOffset + Peer.BLOCK_LENGTH > this.pieceLength
-        ? this.pieceLength - this.blockOffset
-        : Peer.BLOCK_LENGTH;
-
-    request.writeUint32BE(13);
+    request.writeUint32BE(13, 0);
     request.writeUint8(PeerMessage.request, 4);
     request.writeUint32BE(this.pieceIndex, 5);
     request.writeUint32BE(this.blockOffset, 9);
-    request.writeUint32BE(blockLength, 13);
+    request.writeUint32BE(blockSize, 13);
     this.client.write(request);
 
-    this.pieceIndex++;
-    this.blockOffset += blockLength;
+    this.blockOffset += blockSize;
   }
 
   handlePeerResponse(chunk: Buffer) {
@@ -158,7 +154,16 @@ export class Peer {
       case PeerMessage.unchoke: {
         console.log("unchoke");
         this.buffer = Buffer.alloc(this.pieceLength);
-        this.askForPieceBlock();
+        const nbBlocks = this.pieceLength / Peer.BLOCK_MAX;
+        console.log("nbBlocks", nbBlocks);
+        for (let blockIndex = 0; blockIndex < 1; blockIndex++) {
+          const blockSize =
+            blockIndex === nbBlocks
+              ? this.pieceLength % Peer.BLOCK_MAX
+              : Peer.BLOCK_MAX;
+          console.log(`Asking for piece ${blockIndex} of length ${blockSize}`);
+          this.askForPieceBlock(blockSize);
+        }
         break;
       }
       case PeerMessage.bitfield:
@@ -166,36 +171,30 @@ export class Peer {
         this.bitfield = chunk.subarray(5, chunk.length);
         break;
       case PeerMessage.piece: {
-        console.log("piece: ", chunk);
-        chunk.copy(
-          this.buffer,
-          this.blockOffset - Peer.BLOCK_LENGTH,
-          13,
-          chunk.length,
-        );
-        this.askForPieceBlock();
-        if (this.blockOffset >= this.pieceLength) {
-          console.log("Piece downloaded!");
-          // const hash = createHash("sha1").update(this.buffer).digest("hex");
-          // console.log("Piece hash: ", hash);
-          // console.log("Buffer: ", this.buffer);
-          fs.appendFile("./torrents/output.txt", this.buffer);
-        }
+        console.log("piece");
+        const payload = chunk.subarray(13);
+        console.log("Payload: ", payload);
+        console.log("Payload length: ", payload.length);
+        // await fs.appendFile("./torrents/output.txt", payload);
         break;
       }
+      case PeerMessage.have:
+        console.log("MDRRRRRRR");
+        break;
     }
   }
 
   async connect() {
     this.client = new net.Socket();
-    this.client.connect(this.ip, this.host);
-    this.client.setTimeout(2000);
 
     this.client.on("data", this.handlePeerResponse.bind(this));
     this.client.on("error", this.handlePeerResponse.bind(this));
 
+    this.client.connect(this.ip, this.host);
+    this.client.setTimeout(2000);
+
     this.client.on("destroy", () => console.log("client closed"));
     await this.makeHandshake();
-    this.client.write(Buffer.from([0, 0, 0, 5, 2]));
+    // this.client.write(Buffer.from([0, 0, 0, 5, 2]));
   }
 }

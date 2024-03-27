@@ -10,21 +10,6 @@ function generatePath(torrentUrl: string): string {
   return `./torrents/metadata/${splitedUrl[splitedUrl.length - 1].toLowerCase()}`;
 }
 
-function filterNonHtppTrackers(trackers: string[][]): string[][] {
-  const httpTrackers: string[][] = [];
-
-  for (let i = 0; i < trackers.length; i++) {
-    const tracker: string[] = trackers[i].filter((t: string) =>
-      t.startsWith("http"),
-    );
-    if (tracker.length > 0) {
-      httpTrackers.push(tracker);
-    }
-  }
-
-  return httpTrackers;
-}
-
 function normalizeTorrentMeta(
   decodedMetadata: any,
   originalMetaData: any,
@@ -66,22 +51,13 @@ function normalizeTorrentMeta(
   torrentMetaData.announce = decodedMetadata.announce;
   torrentMetaData.announceList = decodedMetadata["announce-list"];
 
-  if (torrentMetaData.announceList) {
-    torrentMetaData.announceList = filterNonHtppTrackers(
-      torrentMetaData.announceList,
-    );
-  }
-
-  if (torrentMetaData.announce.toLowerCase().startsWith("udp")) {
-    torrentMetaData.announce = torrentMetaData.announceList[0][0];
-  }
-
   torrentMetaData.createdBy = decodedMetadata["created by"];
   torrentMetaData.creationDate = decodedMetadata["creation date"];
   torrentMetaData.encoding = decodedMetadata?.encoding;
   torrentMetaData.comment = decodedMetadata?.comment;
   torrentMetaData.info = info;
   torrentMetaData.infoHash = originalMetaData.infoHashBuffer;
+  torrentMetaData.infoHashHex = originalMetaData["infoHash "] || "";
 
   return torrentMetaData;
 }

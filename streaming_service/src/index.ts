@@ -11,6 +11,8 @@ import {
   generatePeerId,
 } from "./bittorent-client/trackerHandler.js";
 
+import { createHash } from "node:crypto";
+import { toMagnetURI } from "parse-torrent";
 import { Peer } from "./bittorent-client/peers.js";
 
 const fastify: FastifyInstance = Fastify({
@@ -20,10 +22,6 @@ const fastify: FastifyInstance = Fastify({
 interface TorrentDownloadBody {
   torrentUrl: string;
 }
-
-fastify.get("/ping", async (_request, reply) => {
-  reply.code(200).send({ pong: "pong" });
-});
 
 fastify.post("/download-torrent", async (request, reply) => {
   try {
@@ -57,6 +55,17 @@ fastify.post("/download-torrent", async (request, reply) => {
     console.error(error);
     reply.code(404).send("Torrent is currently unavailable");
   }
+});
+
+fastify.get("/stream/:movieId", async (request, reply) => {
+  const { movieId } = request.params as {
+    movieId: string;
+  };
+  const torrentUrl = "https://webtorrent.io/torrents/big-buck-bunny.torrent";
+  const torrentPath = await downloadTorrentMeta(torrentUrl);
+  const torrentMetaData = await parseTorrentMeta(torrentPath);
+  // console.log(torrentMetaData);
+  reply.code(200).send({ movieId: movieId });
 });
 
 const start = async () => {
