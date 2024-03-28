@@ -17,6 +17,7 @@
     "@types/bencode": "^2.0.4",
     "@types/node": "^20.11.17",
     "@types/parse-torrent": "^5.8.7",
+    "@types/torrent-stream": "^0.0.9",
     "@typescript-eslint/eslint-plugin": "^7.0.1",
     "@typescript-eslint/parser": "^7.0.1",
     "eslint": "^8.56.0",
