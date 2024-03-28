@@ -68,11 +68,19 @@ fastify.get("/stream/:movieId", async (request, reply) => {
     infoHashBuffer: Buffer.from(torrentMetaData.infoHash),
   });
 
-  const engine = torrentStream(magnetURI);
+  console.log(torrentMetaData);
+
+  const engine = torrentStream(magnetURI, { path: "./torrents" });
 
   engine.on("ready", () => {
-    engine.files.foreach((file: any) => {
-      console.log("filename", file.name);
+    engine.files.forEach((file: any) => {
+      if (file.name.endsWith(".mp4")) {
+        file.select();
+        const stream = file.createReadStream();
+        reply.code(200).send(stream);
+      } else {
+        file.deselect();
+      }
     });
   });
 
