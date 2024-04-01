@@ -81,19 +81,17 @@ export async function downloadTorrentMeta(torrentUrl: string): Promise<string> {
   });
 }
 
-export async function parseTorrentMeta(
-  torrentPath: string,
-): Promise<ttypes.TorrentMeta> {
+export async function parseTorrentMeta(torrentPath: string) {
   try {
     const torrent = await fs.readFile(torrentPath);
     const parsed = await parseTorrent(torrent);
 
-    const decodedTorrent = normalizeTorrentMeta(
-      bencode.decode(torrent, "utf-8"),
-      parsed,
-    );
+    // const decodedTorrent = normalizeTorrentMeta(
+    //   bencode.decode(torrent, "utf-8"),
+    //   parsed,
+    // );
 
-    return decodedTorrent;
+    return parsed;
   } catch (error) {
     console.error(error.message);
   }

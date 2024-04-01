@@ -1,25 +1,23 @@
 "use strict";
-import Fastify, { FastifyInstance } from "fastify";
+import express from "express";
+const app = express();
+
 import {
   deleteTorrentMeta,
   downloadTorrentMeta,
   parseTorrentMeta,
 } from "./bittorent-client/metadataHandler.js";
 
-import fs from "node:fs";
-
 import torrentStream from "torrent-stream";
 import { toMagnetURI } from "parse-torrent";
-
-const fastify: FastifyInstance = Fastify({
-  logger: false,
-});
 
 interface TorrentDownloadBody {
   torrentUrl: string;
 }
 
-fastify.post("/download-torrent", async (request, reply) => {
+import fs from "node:fs";
+
+app.post("/download-torrent", async (request, response) => {
   try {
     const { torrentUrl }: TorrentDownloadBody =
       request.body as TorrentDownloadBody;
@@ -31,34 +29,41 @@ fastify.post("/download-torrent", async (request, reply) => {
 
     await deleteTorrentMeta(torrentPath);
 
-    reply.code(200).send({ movie: torrentMetaData });
+    response.status(200).send({ movie: torrentMetaData });
   } catch (error: unknown) {
     console.error(error);
-    reply.code(404).send("Torrent is currently unavailable");
+    response.status(404).send("Torrent is currently unavailable");
   }
 });
 
-fastify.get("/stream/:movieId", async (request, reply) => {
+app.get("/stream/:movieId", async (request, response) => {
   const { movieId } = request.params as {
     movieId: string;
   };
+
   const torrentUrl = "https://webtorrent.io/torrents/big-buck-bunny.torrent";
   const torrentPath = await downloadTorrentMeta(torrentUrl);
   const torrentMetaData = await parseTorrentMeta(torrentPath);
   const magnetURI = toMagnetURI({
-    infoHashBuffer: Buffer.from(torrentMetaData.infoHash),
+    infoHashBuffer: torrentMetaData.infoHashBuffer,
   });
 
   const engine = torrentStream(magnetURI, { path: "./torrents" });
   let filename: string;
 
   engine.on("ready", () => {
+    console.log("WE ARE READY");
     engine.files.forEach((file: any) => {
       if (file.name.endsWith(".mp4")) {
         filename = file.name;
         file.select();
+        // generate file path
+        // check if file exist
+        // if file exist create the readStream and pipeIT
+        const path = `./torrents/${torrentMetaData.name}/${file.name}`;
+        console.log(path);
         const stream = file.createReadStream();
-        reply.code(200).send(stream);
+        response.status(200).send(stream);
       } else {
         file.deselect();
       }
@@ -70,14 +75,19 @@ fastify.get("/stream/:movieId", async (request, reply) => {
   });
 
   engine.on("idle", () => {
-    console.log("We got it boy!");
+    console.log("Downloaded");
   });
+
+  await deleteTorrentMeta(torrentPath);
 
   const range = request.headers.range;
   if (!range) {
-    reply.code(400).send("Require Range header");
+    response.status(400).send("Require Range header");
   }
-  const path = `./torrents/${torrentMetaData.info.file.name}/Big Buck Bunny.mp4`;
+
+  console.log("Range: ", range);
+
+  const path = `./torrents/video.mp4`;
   const videoSize = fs.statSync(path).size;
   const chunkSize = 10 ** 6;
   const start = Number(range.replace(/\D/g, ""));
@@ -89,19 +99,13 @@ fastify.get("/stream/:movieId", async (request, reply) => {
     "Content-Length": contentLength,
     "Content-Type": "video/mp4",
   };
+
   const videoStream = fs.createReadStream(path, { start, end });
-  reply.code(206).headers(headers).send(videoStream);
+
+  response.writeHead(206, headers);
+  videoStream.pipe(response);
 });
 
-const start = async () => {
-  try {
-    await fastify.listen({
-      host: "0.0.0.0",
-      port: 8001,
-    });
-  } catch (error) {
-    fastify.log.error(`Error: ${error}`);
-  }
-};
-
-start();
+app.listen(8001, () => {
+  console.log(`Server app listening on http://localhost:8001`);
+});
