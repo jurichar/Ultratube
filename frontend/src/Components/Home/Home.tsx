@@ -9,10 +9,10 @@ import Filter from "./Filter/Filter";
 import SortMovie from "./SortMovie/SortMovie";
 import TrendingMovie from "../TrendingMovie/TrendingMovie";
 import { useAuth } from "../../context/useAuth";
-// import { useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
 
 export default function Home() {
-  // const { t } = useTranslation();
+  const { t } = useTranslation();
   const [showSearch, setShowSearch] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [page, setPage] = useState<number>(1);
@@ -141,7 +141,7 @@ export default function Home() {
       <SearchBar onSearch={handleSearch} setShowSearch={setShowSearch} showSearch={showSearch} setPage={setPage} />
       {!showSearch && <TrendingMovie />}
       <div className="w-full h-full flex pb-60 flex-col gap-4 relative">
-        <span className="w-full flex gap-4 items-center text-heading-md">{showSearch ? `Search : ${searchQuery} ` : "Recommended for you"}</span>
+        <span className="w-full flex gap-4 items-center text-heading-md">{showSearch ? `${t("search")} : ${searchQuery}` : t("recommended")}</span>
         <div className="flex flex-row gap-4">
           <SortMovie sort={sort} handleChange={handleSort} />
           <select
