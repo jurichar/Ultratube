@@ -4,6 +4,8 @@ import { FaStar } from "react-icons/fa";
 import ButtonCallToAction from "../../Global/ButtonCallToAction/ButtonCallToAction";
 import RadioInput from "../../Global/RadioInput/RadioInput";
 import { objectFilter, filter } from "../../../types";
+import { useAuth } from "../../../context/useAuth";
+import { notify } from "../../../utils/notifyToast";
 
 type filterProps = {
   initialState: filter;
@@ -14,8 +16,19 @@ export default function Filter(props: filterProps) {
   const [filter, setFilter] = useState<filter>(initialState);
   const [open, setOpen] = useState(false);
   const [genre, setGenre] = useState<objectFilter[]>([]);
+  const [genreEn, setGenreEn] = useState<objectFilter[]>([]);
+  const { languageSelected } = useAuth();
   function handleFilter(event: React.ChangeEvent<HTMLInputElement>) {
     const { name, value, type } = event.target;
+    if (name == "genre") {
+      console.log(value, genreEn, genre);
+      if (value == "all") {
+        setFilter({ ...filter, ["genre_en"]: value, ["genre"]: value });
+      } else {
+        setFilter({ ...filter, ["genre_en"]: genreEn[genre.findIndex(({ name }) => name == value)].name, ["genre"]: value });
+      }
+      return;
+    }
     if (type == "number") {
       if (!isNaN(event.target.valueAsNumber)) {
         setFilter({ ...filter, [name]: event.target.valueAsNumber });
@@ -35,7 +48,7 @@ export default function Filter(props: filterProps) {
   ];
 
   useEffect(() => {
-    const url = "https://api.themoviedb.org/3/genre/movie/list?language=en";
+    const url = `https://api.themoviedb.org/3/genre/movie/list?language=${languageSelected}`;
     const options = {
       method: "GET",
       headers: {
@@ -45,7 +58,25 @@ export default function Filter(props: filterProps) {
     };
     fetch(url, options)
       .then((res) => res.json())
-      .then((json) => setGenre(json["genres"]))
+      .then((json) => {
+        setFilter(initialState);
+        setGenre(json["genres"]);
+      })
+      .catch(() => notify({ type: "warning", msg: "error on api tmdb" }));
+  }, [initialState, languageSelected]);
+
+  useEffect(() => {
+    const url = `https://api.themoviedb.org/3/genre/movie/list?language=en`;
+    const options = {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        Authorization: `Bearer  ${import.meta.env.VITE_TIMDB_ACCESS_KEY}`,
+      },
+    };
+    fetch(url, options)
+      .then((res) => res.json())
+      .then((json) => setGenreEn(json["genres"]))
       .catch((err) => console.error("error:" + err));
   }, []);
   return (

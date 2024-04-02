@@ -1,10 +1,9 @@
-import datetime
-
 from django.contrib.auth import get_user_model
 from django.core.validators import ValidationError
 from django.test import TestCase
 
-from .models import Comment, Movie, Subtitle
+
+from .models import Comment, Movie, Subtitle, WatchedMovie
 
 
 class MovieTestCase(TestCase):
@@ -12,10 +11,9 @@ class MovieTestCase(TestCase):
         Movie.objects.create(
             name="Return of the Jedi",
             thumbnail_cover="path/to/thumbnail/",
-            duration=datetime.timedelta(days=20, hours=10),
-            genre="epic space opera",
-            peer=0,
-            casting=["Georges Lucas", "Mark Hamill"],
+            duration=100,
+            production_year=1988,
+            imdb_rating=1.0,
         )
 
     def test_str(self):
@@ -26,25 +24,22 @@ class MovieTestCase(TestCase):
         movie = Movie(
             name="A New Hope",
             thumbnail_cover="path/to/thumbnail/",
-            duration=datetime.timedelta(days=20, hours=10),
-            genre="epic space opera",
-            peer=0,
-            casting=["Georges Lucas", "Mark Hamill"],
-            imdb_rating=-42.0,
+            duration=100,
+            production_year=1988,
+            imdb_rating=-1.0,
         )
 
         with self.assertRaises(ValidationError):
             movie.full_clean()
             movie.save()
 
-    def test_negative_peer(self):
+    def test_10_imdb_rating(self):
         movie = Movie(
             name="A New Hope",
             thumbnail_cover="path/to/thumbnail/",
-            duration=datetime.timedelta(days=20, hours=10),
-            genre="epic space opera",
-            casting=["Georges Lucas", "Mark Hamill"],
-            peer=-42,
+            duration=100,
+            production_year=1988,
+            imdb_rating=11.0,
         )
 
         with self.assertRaises(ValidationError):
@@ -55,81 +50,91 @@ class MovieTestCase(TestCase):
         movie = Movie(
             name="A New Hope",
             thumbnail_cover="path/to/thumbnail/",
-            duration=datetime.timedelta(days=20, hours=10),
-            genre="epic space opera",
-            casting=["Georges Lucas", "Mark Hamill"],
-            peer=0,
-            production_year=1777
+            duration=100,
+            production_year=1688,
+            imdb_rating=1.0,
         )
 
         with self.assertRaises(ValidationError):
             movie.full_clean()
             movie.save()
 
-    def test_create_movie_with_minimum_info(self):
-        movie = Movie(
-            name="A New Hope",
-            thumbnail_cover="path/to/thumbnail/",
-            duration=datetime.timedelta(days=20, hours=10),
-            genre="epic space opera",
-            casting=["Georges Lucas", "Mark Hamill"],
-            peer=0,
-        )
-        movies_count_before_create = Movie.objects.all().count()
-        movie.full_clean()
-        movie.save()
-        self.assertEqual(movies_count_before_create + 1, Movie.objects.all().count())
-
-    def test_create_movie_with_full_infos(self):
-        movie = Movie(
-            name="A New Hope",
-            thumbnail_cover="path/to/thumbnail/",
-            duration=datetime.timedelta(days=20, hours=10),
-            genre="epic space opera",
-            casting=["Georges Lucas", "Mark Hamill"],
-            peer=0,
-            synopsis="Lorem ipsum",
-            production_year=1977,
-            imdb_rating=9.3
-        )
-        movies_count_before_create = Movie.objects.all().count()
-        movie.full_clean()
-        movie.save()
-        self.assertEqual(movies_count_before_create + 1, Movie.objects.all().count())
-
 
 class SubtitleTestCase(TestCase):
     def setUp(self) -> None:
-        Movie.objects.create(
+        self.movieMock = Movie.objects.create(
             name="Return of the Jedi",
             thumbnail_cover="path/to/thumbnail/",
-            duration=datetime.timedelta(days=20, hours=10),
-            genre="epic space opera",
-            peer=0,
-            casting=["Georges Lucas", "Mark Hamill"],
+            duration=100,
+            production_year=1988,
+            imdb_rating=1.0,
         )
 
-        Subtitle.objects.create(location="path", language="EN", movie=Movie.objects.get(name="Return of the Jedi"))
+        self.subtitle = Subtitle.objects.create(
+            location="path", language="EN", movie=self.movieMock
+        )
 
     def test_str(self):
         sub = Subtitle.objects.first()
         self.assertEqual(str(sub), f"{sub.language}: {sub.movie.name}")
 
+    def test_movie_instance(self):
+        self.assertEqual(self.movieMock, self.subtitle.movie)
+
 
 class CommentTestCase(TestCase):
     def setUp(self) -> None:
-        movie = Movie.objects.create(
+        self.movie = Movie.objects.create(
             name="Return of the Jedi",
             thumbnail_cover="path/to/thumbnail/",
-            duration=datetime.timedelta(days=20, hours=10),
-            genre="epic space opera",
-            peer=0,
-            casting=["Georges Lucas", "Mark Hamill"],
+            duration=100,
+            production_year=1988,
+            imdb_rating=1.0,
         )
-        user = get_user_model().objects.create_user(username="toto", password="tata")
+        self.user = get_user_model().objects.create_user(
+            username="toto", password="tata"
+        )
 
-        Comment.objects.create(author=user, movie=movie, content="Lorem ipsum")
+        Comment.objects.create(
+            author=self.user, movie=self.movie, content="Lorem ipsum"
+        )
 
     def test_str(self):
         comment = Comment.objects.first()
+        self.assertEqual(self.movie, comment.movie)
         self.assertEqual(str(comment), comment.content)
+
+
+class WatchedTestCase(TestCase):
+    def setUp(self) -> None:
+        self.movie = Movie.objects.create(
+            name="Return of the Jedi",
+            thumbnail_cover="path/to/thumbnail/",
+            duration=100,
+            production_year=1988,
+            imdb_rating=1.0,
+        )
+        self.movie1 = Movie.objects.create(
+            name="Returnddddd of the Jedi",
+            thumbnail_cover="path/to/thumbnail/",
+            duration=100,
+            production_year=1988,
+            imdb_rating=1.0,
+        )
+        self.movie2 = Movie.objects.create(
+            name="Retu of the Jedi",
+            thumbnail_cover="path/to/thumbnail/",
+            duration=100,
+            production_year=1988,
+            imdb_rating=1.0,
+        )
+        self.user = get_user_model().objects.create_user(
+            username="toto", password="tata"
+        )
+        WatchedMovie.objects.create(watcher=self.user, movie=self.movie)
+        WatchedMovie.objects.create(watcher=self.user, movie=self.movie1)
+
+    def test_str(self):
+        watched = WatchedMovie.objects.last()
+        self.assertEqual(watched.movie, self.movie1)
+        self.assertEqual(watched.watcher, self.user)

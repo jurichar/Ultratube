@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.http import Http404
 import requests
 import hashlib
+from rest_framework.decorators import action
 from .sendEmail import sendEmail
 from rest_framework import viewsets
 from django.contrib.auth import authenticate, login, logout
@@ -10,6 +11,7 @@ import copy
 from .serializer import (
     AccessTokenSerializer,
     UserDetailSerializer,
+    UserLanguageSerializer,
     UserListSerializer,
     UserLoginSerializer,
     UserModelSerializer,
@@ -63,7 +65,7 @@ class UserRegister(APIView):
                 },
                 status=status.HTTP_201_CREATED,
             )
-            if len(access_token):
+            if access_token and len(access_token):
                 response_serializer.set_cookie(
                     "token",
                     access_token,
@@ -151,7 +153,7 @@ class ResetPassword(APIView):
             message=f"go reset your password http://localhost:3000/reset-password/{hashlib.sha256(str.encode(user.email + user.username)).hexdigest()}",
             mailReceiver=user.email,
         )
-        return Response(status=status.HTTP_200_OK)
+        return Response("email send successfully", status=status.HTTP_200_OK)
 
     def patch(self, request, email):
         if "hash" in request.data and "password" in request.data:
@@ -405,6 +407,16 @@ class UserViewSet(MultipleSerializerMixin, viewsets.ModelViewSet):
             instance.set_password(request.data["password"])
             instance.save()
         return Response("update successful")
+
+    @action(detail=True, methods=["patch"])
+    def change_language(self, request, pk=None):
+        user = get_object_or_404(User, pk=pk)
+        serializer = UserLanguageSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"language change successfully"})
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserList(generics.ListAPIView):

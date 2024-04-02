@@ -51,6 +51,8 @@ export default function MovieCardTrending({ movie }: MovieCardProps) {
           <span className="text-quaternary text-xs ">Movie</span>
         </div>
         <span className="text-quinary">{movie.title.length > 25 ? movie.title.slice(0, 25) + "..." : movie.title}</span>
+        <h3> {movie?.language}</h3>
+        <h3> {movie?.quality}</h3>
         {movie.rating > 0.0 && (
           <div className="flex flex-row  items-center">
             {movie.rating} <FaStar />

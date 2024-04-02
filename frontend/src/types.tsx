@@ -3,7 +3,7 @@
 import { ChangeEvent, ReactElement, ReactPortal } from "react";
 
 export interface Movie {
-  id: string;
+  id?: string;
   title: string;
   year: number;
   image: string;
@@ -16,8 +16,14 @@ export interface Movie {
   trailer?: string;
   genres: Array<string>;
   length: number;
-  torrent?: string;
+  torrent: string;
+  quality: string;
 }
+
+type torrent = {
+  url: string;
+  quality: string;
+};
 export type YtsMovie = {
   id: string;
   title: string;
@@ -28,10 +34,11 @@ export type YtsMovie = {
   imdb_code: string;
   summary?: string;
   language: string;
+  quality: string;
   yt_trailer_code?: string;
   genres: Array<string>;
   runtime: number;
-  torrent?: string;
+  torrents: torrent[] | torrent;
 };
 export interface User {
   id: string;
@@ -40,7 +47,7 @@ export interface User {
   password: string;
   avatar: string;
 }
-
+export type language = "en" | "fr" | "es" | "de" | "it" | "jp" | "ru" | string;
 export interface Comment {
   id: string;
   user_id: string;
@@ -51,11 +58,18 @@ export interface Comment {
   movie?: Movie;
 }
 
+export interface CommentMovie {
+  id: number;
+  author: string;
+  created_at: string;
+  content: string;
+}
+
 export type FormInput = {
   name: string;
   value: string;
   placeholder: string;
-  handleChange: (event: ChangeEvent<HTMLInputElement>) => void
+  handleChange: (event: ChangeEvent<HTMLInputElement>) => void;
 };
 
 export type ReducerAction = {
@@ -93,7 +107,7 @@ export type ApiTorrentMovie = {
   category: string;
   name: string;
   videos?: TorrentMovieTrailer[];
-  torrent?: string;
+  torrent: string;
 };
 export type ProfileForm = {
   username?: string;
@@ -141,4 +155,5 @@ export type filter = {
   min_year_release: number;
   duration: string | "all" | "u_60" | "60-120" | "a_120";
   name: string;
+  genre_en: string;
 };

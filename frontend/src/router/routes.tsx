@@ -71,19 +71,15 @@ export const router = createBrowserRouter([
       },
       {
         path: "movie/:id",
-        element: (
-          <ProtectedRoute>
-            <MoviePage />
-          </ProtectedRoute>
-        ),
+        element: <MoviePage />,
       },
       {
         path: "/forget-password",
         element: (
           <UnAuthenticateRoutes>
             <ForgetPasswordPage />
-          </UnAuthenticateRoutes >
-        )
+          </UnAuthenticateRoutes>
+        ),
       },
       {
         path: "/reset-password/:uid",
@@ -91,7 +87,7 @@ export const router = createBrowserRouter([
           <UnAuthenticateRoutes>
             <ResetPasswordPage />
           </UnAuthenticateRoutes>
-        )
+        ),
       },
     ],
   },
