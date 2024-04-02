@@ -26,6 +26,7 @@ class MovieAPITestCase(APITestCase):
             quality="1080p",
             language="en",
             torrent="eeeee",
+            torrent_hash="dd",
         )
         cls.movie = Movie.objects.create(
             name="Return of the Jedi",
@@ -36,6 +37,7 @@ class MovieAPITestCase(APITestCase):
             quality="1080p",
             language="en",
             torrent="eeeee",
+            torrent_hash="dd",
         )
 
         cls.subtitle = Subtitle.objects.create(
@@ -106,6 +108,7 @@ class TestMovie(MovieAPITestCase):
             "quality": "1080p",
             "language": "en",
             "torrent": "eeeee",
+            "torrent_hash": "dd",
         }
         response = self.client.post(
             "http://localhost:8000/api/movies/create_movie/", movie
@@ -149,6 +152,7 @@ class TestMovie(MovieAPITestCase):
             "quality": "1080p",
             "language": "en",
             "torrent": "eeeee",
+            "torrent_hash": "dd",
         }
         response = self.client.post(
             "http://localhost:8000/api/movies/create_movie/", data=movie
@@ -187,6 +191,7 @@ class TestMovie(MovieAPITestCase):
             "quality": movie.quality,
             "language": movie.language,
             "torrent": movie.torrent,
+            "torrent_hash": movie.torrent_hash,
         }
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), expected)

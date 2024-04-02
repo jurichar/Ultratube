@@ -31,13 +31,7 @@ export class Peer {
   blockOffset: number;
   pieceLength: number;
 
-  constructor(
-    ip: number,
-    host: string,
-    infoHash: Uint8Array,
-    peerId: string,
-    pieceLength: number,
-  ) {
+  constructor(ip: number, host: string, infoHash: Uint8Array, peerId: string, pieceLength: number) {
     this.ip = ip;
     this.host = host;
     this.infoHash = infoHash;
@@ -65,17 +59,9 @@ export class Peer {
 
     const peerIdBuff = Buffer.from(peerId);
 
-    const totalLength =
-      protocolLength.length +
-      protocol.length +
-      freeBytes.length +
-      infoHashBuff.length +
-      peerIdBuff.length;
+    const totalLength = protocolLength.length + protocol.length + freeBytes.length + infoHashBuff.length + peerIdBuff.length;
 
-    return Buffer.concat(
-      [protocolLength, protocol, freeBytes, infoHashBuff, peerIdBuff],
-      totalLength,
-    );
+    return Buffer.concat([protocolLength, protocol, freeBytes, infoHashBuff, peerIdBuff], totalLength);
   }
 
   decodeHandshake(rawHandshake: Buffer): ttypes.PeerHandshake {
@@ -84,9 +70,7 @@ export class Peer {
     const protocolLength = rawHandshake[0];
     offset += 1;
 
-    const protocol = rawHandshake
-      .subarray(offset, offset + PROTOCOL_LENGTH)
-      .toString();
+    const protocol = rawHandshake.subarray(offset, offset + PROTOCOL_LENGTH).toString();
     offset += PROTOCOL_LENGTH;
 
     const reservedBytes = rawHandshake.subarray(offset, offset + 8);
@@ -106,15 +90,8 @@ export class Peer {
     } as ttypes.PeerHandshake;
   }
 
-  isValidHandshake(
-    infoHashHex: string,
-    decodedHandshake: ttypes.PeerHandshake,
-  ): boolean {
-    return !(
-      infoHashHex !== decodedHandshake.infoHash ||
-      decodedHandshake.protocolLength !== PROTOCOL_LENGTH ||
-      decodedHandshake.protocol !== PROTOCOL_NAME
-    );
+  isValidHandshake(infoHashHex: string, decodedHandshake: ttypes.PeerHandshake): boolean {
+    return !(infoHashHex !== decodedHandshake.infoHash || decodedHandshake.protocolLength !== PROTOCOL_LENGTH || decodedHandshake.protocol !== PROTOCOL_NAME);
   }
 
   async makeHandshake() {
@@ -136,10 +113,7 @@ export class Peer {
 
   askForPieceBlock() {
     const request = Buffer.alloc(17);
-    const blockLength =
-      this.blockOffset + BLOCK_LENGTH > this.pieceLength
-        ? this.pieceLength - this.blockOffset
-        : BLOCK_LENGTH;
+    const blockLength = this.blockOffset + BLOCK_LENGTH > this.pieceLength ? this.pieceLength - this.blockOffset : BLOCK_LENGTH;
 
     request.writeUint32BE(13);
     request.writeUint8(PeerMessage.request, 4);
@@ -167,12 +141,7 @@ export class Peer {
       case PeerMessage.piece:
         console.log("piece");
         console.log("chunk: ", chunk);
-        chunk.copy(
-          this.buffer,
-          this.blockOffset - BLOCK_LENGTH,
-          5,
-          chunk.length,
-        );
+        chunk.copy(this.buffer, this.blockOffset - BLOCK_LENGTH, 5, chunk.length);
         this.askForPieceBlock();
         if (this.blockOffset >= this.pieceLength) {
           fs.appendFile("./torrents/output.txt", this.buffer);
@@ -184,10 +153,8 @@ export class Peer {
     this.client = new net.Socket();
     this.client.connect(this.ip, this.host);
     this.client.setTimeout(2000);
-
     this.client.on("data", this.handlePeerResponse.bind(this));
     this.client.on("error", this.handlePeerResponse.bind(this));
-
     this.client.on("destroy", () => console.log("client closed"));
     await this.makeHandshake();
     this.client.write(Buffer.from([0, 0, 0, 5, 2]));

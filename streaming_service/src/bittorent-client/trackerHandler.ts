@@ -10,18 +10,13 @@ function urlencode(t: Uint8Array): string {
 }
 
 export function generatePeerId(): string {
-  const randomAlpha = Math.round(
-    Math.pow(36, 12 + 1) - Math.random() * Math.pow(36, 12),
-  )
+  const randomAlpha = Math.round(Math.pow(36, 12 + 1) - Math.random() * Math.pow(36, 12))
     .toString(36)
     .slice(1);
   return "-FT1000-" + encodeURIComponent(randomAlpha);
 }
 
-async function generateQuery(
-  torrentMetaData: ttypes.TorrentMeta,
-  peerId: string,
-): Promise<string> {
+async function generateQuery(torrentMetaData: ttypes.TorrentMeta, peerId: string): Promise<string> {
   const infoHash = urlencode(torrentMetaData.infoHash);
 
   const uploaded = 0;
@@ -41,10 +36,7 @@ async function generateQuery(
   return query;
 }
 
-async function queryTracker(
-  torrentMetaData: ttypes.TorrentMeta,
-  peerId: string,
-) {
+async function queryTracker(torrentMetaData: ttypes.TorrentMeta, peerId: string) {
   const query = await generateQuery(torrentMetaData, peerId);
 
   const response = await fetch(query);
@@ -101,12 +93,8 @@ function parsePeersFromTrackerResponse(rawPeers: any): string[] {
   return peers;
 }
 
-export async function discoverPeers(
-  torrentMetaData: ttypes.TorrentMeta,
-  peerId: string,
-) {
+export async function discoverPeers(torrentMetaData: ttypes.TorrentMeta, peerId: string) {
   const trackerResponse = await queryTracker(torrentMetaData, peerId);
-
   const parsedResponse: ttypes.TrackerResponse = {
     interval: trackerResponse.interval,
     peers: parsePeersFromTrackerResponse(trackerResponse.peers),

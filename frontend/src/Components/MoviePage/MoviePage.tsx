@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useEffect, useMemo, useState, useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Movie, crewUser } from "../../types";
 import MemberMovie from "./MemberMovie/MemberMovie";
 import TrailerSection from "../Global/TrailerSection/TrailerSection";
@@ -14,6 +14,7 @@ export default function MoviePage() {
   const [crew, setCrew] = useState<crewUser[]>();
   const [cast, setCast] = useState<crewUser[]>();
   const [movieIdDb, setMovieIdDb] = useState<number>(0);
+  const navigate = useNavigate();
   const { languageSelected } = useAuth();
 
   const options = useMemo(
@@ -29,6 +30,7 @@ export default function MoviePage() {
 
   useEffect(() => {
     async function createMovieInDb() {
+      console.log(movie);
       const dataObject = {
         name: movie?.title,
         thumbnail_cover: movie?.image,
@@ -38,6 +40,7 @@ export default function MoviePage() {
         quality: movie?.quality,
         language: movie?.language,
         torrent: movie?.torrent,
+        torrent_hash: movie?.torrent_hash,
       };
       try {
         const result: { id: number } = await fetchWrapper("api/movies/create_movie/", { method: "POST", body: dataObject });
@@ -53,8 +56,8 @@ export default function MoviePage() {
     }
   }, [movie]);
 
-  async function getInfoMovie(title: string, year: number, torrent: string, quality: string, language: string, image: string, trailer: string, length: number, genres: string[]) {
-    const movieInfoTmp: Movie = { rating: 0, synopsis: "", genres: [], year: year, title: title, torrent, quality, language, image, trailer, length, genres };
+  async function getInfoMovie(title: string, year: number, torrent: string, quality: string, language: string, image: string, trailer: string, length: number, genres: string[], hash: string) {
+    const movieInfoTmp: Movie = { rating: 0, synopsis: "", year: year, title: title, torrent, quality, language, image, trailer, length, genres, torrent_hash: hash };
     const url = `https://api.themoviedb.org/3/search/movie?query=${title}&include_adult=false&language=${languageSelected}&page=1&append_to_response=credits`;
     try {
       const response = await fetch(url, options);
@@ -98,15 +101,57 @@ export default function MoviePage() {
   }
 
   useEffect(() => {
+    if (state == null) {
+      navigate("/");
+      return;
+    }
     const { movieProps } = state;
     // check if all key is present
     if ("title" in movieProps && movieProps["title"] && movieProps["title"].length > 0) {
-      const { title, year, torrent, quality, language, image, trailer, length, genres } = movieProps;
-      getInfoMovie(title, year, torrent, quality, language, image, trailer, length, genres);
+      const { title, year, torrent, quality, language, image, trailer, length, genres, torrent_hash } = movieProps;
+      getInfoMovie(title, year, torrent, quality, language, image, trailer, length, genres, torrent_hash);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
+  const videoRef = useRef(null);
 
+  // useEffect(() => {
+  //   fetch(`http://localhost:8001/download/dd`, {
+  //     headers: {
+  //       Range: "bytes=0-",
+  //     },
+  //   })
+  //     .then((response) => {
+  //       if (!response.ok) {
+  //         throw new Error("Network response was not ok");
+  //       }
+  //       return response.body;
+  //     })
+  //     .then((body) => {
+  //       const mediaSource = new MediaSource();
+  //       videoRef.current.src = URL.createObjectURL(mediaSource);
+  //       mediaSource.addEventListener("sourceopen", () => {
+  //         const sourceBuffer = mediaSource.addSourceBuffer("video/mp4");
+  //         const pump = async () => {
+  //           const reader = body.getReader();
+  //           while (true) {
+  //             const { done, value } = await reader.read();
+  //             console.log(done, value);
+  //             if (done) {
+  //               mediaSource.endOfStream();
+  //               break;
+  //             }
+  //             sourceBuffer.appendBuffer(value);
+  //           }
+  //         };
+  //         pump();
+  //       });
+  //     })
+  //     .catch((error) => {
+  //       console.error("Fetch error:", error);
+  //     });
+  // }, []);
+  // }, []);
   return (
     <div className="flex flex-col  gap-20 justify-center items-center ">
       <div className="w-full h-40 text-quinary opacity-100 relative flex flex-col justify-center items-center">
@@ -130,11 +175,27 @@ export default function MoviePage() {
         )
       )}
       {movie?.trailer && <TrailerSection linkEmbed={movie.trailer} />}
-
       <h1 className="text-4xl font-bold text-white">Movie</h1>
-      <div className="w-10/12 h-auto  bg-secondary">
+      {/* <video ref={videoRef} controls>
+        <source src="" type="video/mp4" />
+        Votre navigateur ne supporte pas la lecture de vidéos en streaming.
+      </video> */}
+      {/* <div className="w-10/12 h-auto  bg-secondary">
         <iframe className="w-full aspect-video" src="https://moacloud.com/iframe/FavoXpQrbD" allowFullScreen></iframe>
-      </div>
+      </div> */}
+      {/* <video ref={videoRef} controls autoPlay> */}
+      {movieIdDb && (
+        <video id="videoPlayer" controls>
+          {" "}
+          <source src={`http://localhost:8001/download/${movieIdDb}`} type="video/mp4" />
+        </video>
+      )}
+      {/* <video ref={videoRef} controls>
+        Votre navigateur ne supporte pas la lecture de vidéos en streaming.
+      </video> */}
+      {/* <video id="videoPlayer" controls>
+        <source src="http://localhost:8001/download/dd" type="video/mp4" />
+      </video> */}
       <h4 className="text-quinary"> genres : {movie?.genres?.join(",")}</h4>
       <MemberMovie crew={crew} cast={cast} />
       <Comments movieId={movieIdDb} />

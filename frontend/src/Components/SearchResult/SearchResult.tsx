@@ -31,7 +31,7 @@ export default function SearchResult(props: searchResultProps) {
     const parsedInfo = ptt.parse(name);
     return { nameNormalize: parsedInfo.title, movieResolution: parsedInfo.resolution };
   };
-  const get_info_movie = async (name: string, movieResoluton: string, torrentUrl: string) => {
+  const get_info_movie = async (name: string, movieResoluton: string, torrentUrl: string, hash: string) => {
     try {
       const response = await fetch(`https://api.themoviedb.org/3/search/movie?query=${name}`, options);
       const json = await response.json();
@@ -58,6 +58,7 @@ export default function SearchResult(props: searchResultProps) {
           length: jsonTmdb.runtime,
           trailer: trailer,
           torrent: torrentUrl,
+          torrent_hash: hash,
         };
       }
     } catch (error) {
@@ -78,9 +79,8 @@ export default function SearchResult(props: searchResultProps) {
           const moviePromise = Promise.all(
             movieResponse.map(async (elem) => {
               const { nameNormalize, movieResolution } = normalize_name_movie(elem.name);
-              console.log(nameNormalize, movieResolution);
               if (movieResolution) {
-                const movieFormatted: Movie | undefined = await get_info_movie(nameNormalize, movieResolution, elem.torrent);
+                const movieFormatted: Movie | undefined = await get_info_movie(nameNormalize, movieResolution, elem.torrent, elem.hash);
                 return movieFormatted;
               }
             })
@@ -104,6 +104,7 @@ export default function SearchResult(props: searchResultProps) {
         const arrayMovie: Movie[] = all_Movie_Data.map((elem) => {
           const quality = Array.isArray(elem.torrents) && elem.torrents?.length > 0 ? elem.torrents[0].quality : elem.torrents.quality;
           const torrent_url = Array.isArray(elem.torrents) && elem.torrents?.length > 0 ? elem.torrents[0].url : elem.torrents.url;
+          const torrent_hash = Array.isArray(elem.torrents) && elem.torrents?.length > 0 ? elem.torrents[0].hash : elem.torrents.hash;
           return {
             id: elem.id,
             title: elem.title,
@@ -119,6 +120,7 @@ export default function SearchResult(props: searchResultProps) {
             length: elem.runtime,
             quality: quality,
             torrent: torrent_url,
+            torrent_hash: torrent_hash,
           };
         });
         return arrayMovie;
@@ -143,6 +145,7 @@ export default function SearchResult(props: searchResultProps) {
   const updateMoviesSearch = async (query: string) => {
     try {
       const res = await requestExternalSourceSearch(query);
+      console.log(res);
       setMovies(res);
     } catch (error) {
       setMovies([]);

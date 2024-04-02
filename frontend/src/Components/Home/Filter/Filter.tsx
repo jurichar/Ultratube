@@ -21,7 +21,6 @@ export default function Filter(props: filterProps) {
   function handleFilter(event: React.ChangeEvent<HTMLInputElement>) {
     const { name, value, type } = event.target;
     if (name == "genre") {
-      console.log(value, genreEn, genre);
       if (value == "all") {
         setFilter({ ...filter, ["genre_en"]: value, ["genre"]: value });
       } else {

@@ -29,6 +29,7 @@ export default function TrendingMovie() {
             length: elem.runtime,
             quality: quality,
             torrent: torrent_url,
+            torrent_hash: elem.hash,
           };
         });
         setMoviesTrending(arrayTrending);

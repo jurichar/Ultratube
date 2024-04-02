@@ -87,7 +87,6 @@ export default function ResetPasswordPage() {
     if (password.length < 8) valid = false;
     // if (!password.match(/[\W_]/)) valid = false;
     // if (!password.match(/[A-Z]/)) valid = false;
-    console.log(valid);
     return valid;
   };
 

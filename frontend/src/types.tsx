@@ -17,6 +17,7 @@ export interface Movie {
   genres: Array<string>;
   length: number;
   torrent: string;
+  torrent_hash: string;
   quality: string;
 }
 
@@ -39,6 +40,7 @@ export type YtsMovie = {
   genres: Array<string>;
   runtime: number;
   torrents: torrent[] | torrent;
+  hash: string;
 };
 export interface User {
   id: string;
@@ -109,6 +111,7 @@ export type ApiTorrentMovie = {
   name: string;
   videos?: TorrentMovieTrailer[];
   torrent: string;
+  hash: string;
 };
 export type ProfileForm = {
   username?: string;

@@ -1,22 +1,21 @@
 "use strict";
 import * as fs from "fs/promises";
+// import fs from "fs";
 import https from "https";
 import bencode from "bencode";
 import * as ttypes from "./ft_torrent_types.js";
-import parseTorrent from "parse-torrent";
-
+import parseTorrent, { toMagnetURI } from "parse-torrent";
+import path from "path";
 function generatePath(torrentUrl: string): string {
   const splitedUrl: string[] = torrentUrl.split("/");
-  return `./torrents/metadata/${splitedUrl[splitedUrl.length - 1].toLowerCase()}`;
+  return `./torrents/metadata/${splitedUrl[splitedUrl.length - 1].toLowerCase()}.torrent`;
 }
 
 function filterNonHtppTrackers(trackers: string[][]): string[][] {
   const httpTrackers: string[][] = [];
 
   for (let i = 0; i < trackers.length; i++) {
-    const tracker: string[] = trackers[i].filter((t: string) =>
-      t.startsWith("http"),
-    );
+    const tracker: string[] = trackers[i].filter((t: string) => t.startsWith("http"));
     if (tracker.length > 0) {
       httpTrackers.push(tracker);
     }
@@ -25,13 +24,9 @@ function filterNonHtppTrackers(trackers: string[][]): string[][] {
   return httpTrackers;
 }
 
-function normalizeTorrentMeta(
-  decodedMetadata: any,
-  originalMetaData: any,
-): ttypes.TorrentMeta {
+function normalizeTorrentMeta(decodedMetadata: any, originalMetaData: any): ttypes.TorrentMeta {
   const torrentMetaData = {} as ttypes.TorrentMeta;
   const info = {} as ttypes.Info;
-
   // Determine if the .torrent file have one or multiples files
   if (Object.prototype.hasOwnProperty.call(decodedMetadata?.info, "length")) {
     const file: ttypes.SingleFileMode = {
@@ -41,9 +36,7 @@ function normalizeTorrentMeta(
     };
 
     info.file = file;
-  } else if (
-    Object.prototype.hasOwnProperty.call(decodedMetadata?.info, "files")
-  ) {
+  } else if (Object.prototype.hasOwnProperty.call(decodedMetadata?.info, "files")) {
     const file: ttypes.MultiFileMode = {
       name: decodedMetadata?.info?.name,
       files: decodedMetadata?.info?.files.map((rawFile: any) => ({
@@ -60,20 +53,17 @@ function normalizeTorrentMeta(
   info.pieceLength = decodedMetadata?.info["piece length"];
   info.pieces = originalMetaData.pieces;
   info.piecesBuffer = originalMetaData.info.pieces;
-  info.private =
-    parseInt(decodedMetadata?.info?.private, 10) === 1 ? true : false;
+  info.private = parseInt(decodedMetadata?.info?.private, 10) === 1 ? true : false;
 
   torrentMetaData.announce = decodedMetadata.announce;
   torrentMetaData.announceList = decodedMetadata["announce-list"];
 
   if (torrentMetaData.announceList) {
-    torrentMetaData.announceList = filterNonHtppTrackers(
-      torrentMetaData.announceList,
-    );
+    torrentMetaData.announceList = filterNonHtppTrackers(torrentMetaData.announceList);
   }
 
   if (torrentMetaData.announce.toLowerCase().startsWith("udp")) {
-    torrentMetaData.announce = torrentMetaData.announceList[0][0];
+    torrentMetaData.announce = torrentMetaData?.announceList[0][0];
   }
 
   torrentMetaData.createdBy = decodedMetadata["created by"];
@@ -81,6 +71,7 @@ function normalizeTorrentMeta(
   torrentMetaData.encoding = decodedMetadata?.encoding;
   torrentMetaData.comment = decodedMetadata?.comment;
   torrentMetaData.info = info;
+  torrentMetaData.infoHashHex = originalMetaData.infoHash;
   torrentMetaData.infoHash = originalMetaData.infoHashBuffer;
 
   return torrentMetaData;
@@ -105,25 +96,31 @@ export async function downloadTorrentMeta(torrentUrl: string): Promise<string> {
     });
   });
 }
+function announceToMagnet(announce: string[]): string {
+  let announceUrl = "";
+  for (const tracker of announce) {
+    announceUrl = announceUrl.concat(`&tr=${encodeURI(tracker)}`);
+  }
+  return announceUrl;
+}
 
-export async function parseTorrentMeta(
-  torrentPath: string,
-): Promise<ttypes.TorrentMeta> {
+// TODO change meta for the type of the metadata Object (result of: parseTorrent(bytes))
+export function generateMagnetURI(meta: any, source: string): string {
+  const magnetURI = toMagnetURI({
+    infoHash: meta.infoHash,
+  });
+  return `${magnetURI}&dn=${encodeURI(meta.name)}${announceToMagnet(meta.announce)}&xs=${encodeURI(source)}`;
+}
+export async function parseTorrentMeta(torrentPath: string) {
   try {
     const torrent = await fs.readFile(torrentPath);
     const parsed = await parseTorrent(torrent);
-
-    const decodedTorrent = normalizeTorrentMeta(
-      bencode.decode(torrent, "utf-8"),
-      parsed,
-    );
-
-    return decodedTorrent;
+    return parsed;
   } catch (error) {
     console.error(error.message);
   }
 }
 
-export async function deleteTorrentMeta(torrentPath: string) {
-  await fs.unlink(torrentPath);
-}
+// export async function deleteTorrentMeta(torrentPath: string) {
+//   await fs.unlink(torrentPath);
+// }

@@ -29,6 +29,7 @@ class MovieCreateSerializer(serializers.ModelSerializer):
             "quality",
             "language",
             "torrent",
+            "torrent_hash",
         ]
 
 
@@ -56,6 +57,7 @@ class MovieDetailSerializer(serializers.ModelSerializer):
             "quality",
             "language",
             "torrent",
+            "torrent_hash",
         ]
 
     def get_comments_number(self, obj):
