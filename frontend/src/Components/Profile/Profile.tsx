@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import ImagePopup from "./ImagePopup";
 import { useTranslation } from "react-i18next";
 import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
-import { useLoaderData, useNavigate, useParams } from "react-router-dom";
+import { useLoaderData, useParams } from "react-router-dom";
 import { useAuth } from "../../context/useAuth";
 import { ProfileForm, UserData, UserPatchInterface } from "../../types";
 import { validateEmail } from "../../utils/validateEmail";
@@ -13,7 +13,6 @@ import InputPassword from "../Global/InputPassword/InputPassword";
 
 export default function Profile() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const param = useParams(); // get params from the url
   const userLoader = useLoaderData(); // get data (user) from the loader ( see routes.tsx to see the loader)
   const { userData, loadUserData } = useAuth();
