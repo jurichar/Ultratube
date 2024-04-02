@@ -1,4 +1,3 @@
-import email
 from django.contrib.auth import get_user_model
 from django.urls import reverse, reverse_lazy
 from rest_framework.test import APITestCase
