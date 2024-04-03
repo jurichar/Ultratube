@@ -1,9 +1,10 @@
 "use strict";
-import * as fs from "fs/promises";
+import fs from "node:fs/promises";
 import https from "https";
 import bencode from "bencode";
 import * as ttypes from "./ft_torrent_types.js";
 import parseTorrent from "parse-torrent";
+import ParseTorrent from "parse-torrent";
 
 function generatePath(torrentUrl: string): string {
   const splitedUrl: string[] = torrentUrl.split("/");
@@ -61,37 +62,20 @@ function normalizeTorrentMeta(
   return torrentMetaData;
 }
 
-export async function downloadTorrentMeta(torrentUrl: string): Promise<string> {
+export async function downloadTorrentMeta(torrentUrl: string) {
   const path = generatePath(torrentUrl);
-
-  return new Promise((resolve, reject) => {
-    https.get(torrentUrl, (response) => {
-      response.on("data", (chunk) => {
-        fs.appendFile(path, chunk);
-      });
-
-      response.on("end", () => {
-        resolve(path);
-      });
-
-      response.on("error", (err: Error) => {
-        reject(err.message);
-      });
-    });
-  });
+  const response = await fetch(torrentUrl);
+  const buffer = await response.arrayBuffer();
+  await fs.writeFile(path, Buffer.from(buffer));
+  return path;
 }
 
 export async function parseTorrentMeta(torrentPath: string) {
+  const torrent = await fs.readFile(torrentPath);
+  console.log("My length boy: ", torrent.length);
   try {
-    const torrent = await fs.readFile(torrentPath);
-    const parsed = await parseTorrent(torrent);
-
-    // const decodedTorrent = normalizeTorrentMeta(
-    //   bencode.decode(torrent, "utf-8"),
-    //   parsed,
-    // );
-
-    return parsed;
+    const metadata = ParseTorrent(torrent);
+    return metadata;
   } catch (error) {
     console.error(error.message);
   }
@@ -99,4 +83,18 @@ export async function parseTorrentMeta(torrentPath: string) {
 
 export async function deleteTorrentMeta(torrentPath: string) {
   await fs.unlink(torrentPath);
+}
+
+function announceToMagnet(announce: string[]): string {
+  let announceUrl = "";
+  if (announce) {
+    for (const tracker of announce) {
+      announceUrl = announceUrl.concat(`&tr=${encodeURI(tracker)}`);
+    }
+  }
+  return announceUrl;
+}
+
+export function generateMagnetURI(meta: any, source: string): string {
+  return `magnet:?xt=urn:btih:${meta?.infoHash}&dn=${encodeURI(meta?.name)}${announceToMagnet(meta?.announce)}&xs=${encodeURI(source)}`;
 }
