@@ -36,8 +36,6 @@ export default function Navbar() {
           </option>
           <option value="fr">FR</option>
           <option value="es">ES</option>
-          <option value="pt">PT</option>
-          <option value="NL">NL</option>
         </select>
         {userData && (
           <>

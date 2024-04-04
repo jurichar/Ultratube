@@ -182,12 +182,17 @@ export default function Profile() {
             <>
               {!user?.omniauth && <InputPassword name="password" handleChange={handleChange} />}
               <button className="w-32 h-12 transition-all bg-quaternary text-quinary rounded-full hover:bg-quinary hover:text-tertiary" type="submit">
-                Save
+                {t("save")}
               </button>
             </>
           )}
         </form>
       </div>
+      {ourProfile && (
+        <button className="w-32 h-12 transition-all  text-quinary rounded-full hover:bg-secondary" onClick={handleDisconnect}>
+          {t("disconnect")}
+        </button>
+      )}
     </div>
   );
 }
