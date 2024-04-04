@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import ImagePopup from "./ImagePopup";
 import { useTranslation } from "react-i18next";
 import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
-import { useLoaderData, useNavigate, useParams } from "react-router-dom";
+import { useLoaderData, useParams } from "react-router-dom";
 import { useAuth } from "../../context/useAuth";
 import { ProfileForm, UserData, UserPatchInterface } from "../../types";
 import { validateEmail } from "../../utils/validateEmail";
@@ -13,7 +13,6 @@ import InputPassword from "../Global/InputPassword/InputPassword";
 
 export default function Profile() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const param = useParams(); // get params from the url
   const userLoader = useLoaderData(); // get data (user) from the loader ( see routes.tsx to see the loader)
   const { userData, loadUserData } = useAuth();
@@ -60,20 +59,11 @@ export default function Profile() {
   if (loading) {
     return <div className="bg-red-600 text-white">loading</div>;
   }
-  const handleDisconnect = async () => {
-    try {
-      await fetchWrapper("oauth/logout/", { method: "POST" });
-      await loadUserData();
-      navigate("/");
-      notify({ type: "success", msg: "disconnection successfully" });
-    } catch (error) {
-      let message = "Unknown Error";
-      if (error instanceof Error) message = error.message;
-      notify({ type: "error", msg: message });
-    }
-  };
 
   const handleImageEdit = () => {
+    if (!ourProfile) {
+      return;
+    }
     setShowImagePopup(true);
   };
 
@@ -143,7 +133,7 @@ export default function Profile() {
       >
         <img className="absolute -right-1 -bottom-1 h-12 w-12" src="https://static-assets.bamgrid.com/product/disneyplus/images/edit.0a8445c2cff0e80361b2e66906aaeca0.svg" alt="edit-svg" />
       </button>
-      {showImagePopup && <ImagePopup user={user} setShowImagePopup={setShowImagePopup} setSelectedImage={setSelectedImage} />}
+      {showImagePopup && ourProfile && <ImagePopup user={user} setShowImagePopup={setShowImagePopup} setSelectedImage={setSelectedImage} />}
       <div className="w-full rounded p-6 flex flex-col items-center gap-6 bg-tertiary">
         <h2 className="text-quinary mb-4 text-heading-md">{t("personalInfo")}</h2>
         <form className="w-full flex flex-col gap-4 justify-center items-center" onSubmit={handleFormSubmit}>
@@ -157,7 +147,7 @@ export default function Profile() {
             onChange={handleChange}
             disabled={user?.omniauth || !ourProfile}
           />
-          {ourProfile && (
+          {ourProfile && !user?.omniauth && (
             <input
               name="email"
               className="w-full h-12 outline-none px-4 bg-tertiary border-b border-quaternary text-quaternary focus:text-quinary placeholder:text-quaternary focus:border-quinary transition-all"
@@ -190,7 +180,7 @@ export default function Profile() {
           />
           {ourProfile && (
             <>
-              {!user?.omniauth && <InputPassword handleChange={handleChange} />}
+              {!user?.omniauth && <InputPassword name="password" handleChange={handleChange} />}
               <button className="w-32 h-12 transition-all bg-quaternary text-quinary rounded-full hover:bg-quinary hover:text-tertiary" type="submit">
                 {t("save")}
               </button>

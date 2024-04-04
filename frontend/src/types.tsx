@@ -63,6 +63,7 @@ export interface CommentMovie {
   author: string;
   created_at: string;
   content: string;
+  author_id: number;
 }
 
 export type FormInput = {

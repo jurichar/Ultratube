@@ -53,8 +53,8 @@ export default function MoviePage() {
     }
   }, [movie]);
 
-  async function getInfoMovie(title: string, year: number, torrent: string, quality: string, language: string, image: string, trailer: string, length: number) {
-    const movieInfoTmp: Movie = { rating: 0, synopsis: "", genres: [], year: year, title: title, torrent, quality, language, image, trailer, length };
+  async function getInfoMovie(title: string, year: number, torrent: string, quality: string, language: string, image: string, trailer: string, length: number, genres: string[]) {
+    const movieInfoTmp: Movie = { rating: 0, synopsis: "", genres: [], year: year, title: title, torrent, quality, language, image, trailer, length, genres };
     const url = `https://api.themoviedb.org/3/search/movie?query=${title}&include_adult=false&language=${languageSelected}&page=1&append_to_response=credits`;
     try {
       const response = await fetch(url, options);
@@ -67,8 +67,6 @@ export default function MoviePage() {
         const responseInfo = await fetch(urlInfo, options);
         const movieInfo = await responseInfo.json();
         if (movieInfo && Object.keys(movieInfo).length > 0) {
-          const genres = movieInfo.genres.map((elem: { id: number; name: string }) => elem.name);
-          movieInfoTmp.genres = genres;
           setMovie(movieInfoTmp);
           if ("credits" in movieInfo && "cast" in movieInfo["credits"]) {
             const cast = movieInfo["credits"]["cast"].map((elem: crewUser) => {
@@ -103,8 +101,8 @@ export default function MoviePage() {
     const { movieProps } = state;
     // check if all key is present
     if ("title" in movieProps && movieProps["title"] && movieProps["title"].length > 0) {
-      const { title, year, torrent, quality, language, image, trailer, length } = movieProps;
-      getInfoMovie(title, year, torrent, quality, language, image, trailer, length);
+      const { title, year, torrent, quality, language, image, trailer, length, genres } = movieProps;
+      getInfoMovie(title, year, torrent, quality, language, image, trailer, length, genres);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);

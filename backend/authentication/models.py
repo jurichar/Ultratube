@@ -8,7 +8,7 @@ class User(AbstractUser):
     woman1 = "http://localhost:3000/src/assets/profiles/3.svg"
     woman2 = "http://localhost:3000/src/assets/profiles/4.svg"
     woman3 = "http://localhost:3000/src/assets/profiles/5.svg"
-    women4 = "http://localhost:3000/src/assets/profiles/6.svg"
+    woman4 = "http://localhost:3000/src/assets/profiles/6.svg"
     bear = "http://localhost:3000/src/assets/profiles/7.svg"
     man2 = "http://localhost:3000/src/assets/profiles/8.svg"
     man3 = "http://localhost:3000/src/assets/profiles/9.svg"
@@ -22,7 +22,7 @@ class User(AbstractUser):
         (woman1, woman1),
         (woman2, woman2),
         (woman3, woman3),
-        (woman3, woman3),
+        (woman4, woman4),
         (bear, bear),
         (man2, man2),
         (man3, man3),
@@ -42,6 +42,7 @@ class User(AbstractUser):
         (russe, russe),
         (german, german),
     }
+    email = models.EmailField(max_length=254, unique=True, null=True, blank=True)
     avatar = models.CharField(blank=True, choices=avatars_user)
     language = models.CharField(default="en", choices=language_user)
     omniauth = models.BooleanField(default=False)
