@@ -38,16 +38,15 @@ export function getStreamingHeaders(
   range: string,
   videoFile: TorrentStream.TorrentFile,
 ) {
-  const parts = range.replace(/bytes=/, "").split("-");
-  const start = parseInt(parts[0], 10);
-  const fileSize = videoFile.length;
-  const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-  const chunksize = Number(end - start + 1);
+  const chunksize = 20e6;
+  const start = Number(range.replace(/\D/g, ""));
+  const end = Math.min(start + chunksize, videoFile.length - 1);
+  const contentLength = end - start + 1;
 
   const headers = {
-    "Content-Range": `bytes ${start}-${end}/${fileSize}`,
+    "Content-Range": `bytes ${start}-${end}/${videoFile.length}`,
     "Accept-Ranges": "bytes",
-    "Content-Length": chunksize,
+    "Content-Length": contentLength,
     "Content-Type": "video/mp4",
   };
 
