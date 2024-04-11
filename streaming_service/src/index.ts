@@ -37,10 +37,11 @@ app.get("/stream", async (request, response) => {
     "Content-Type": `video/${extension}`,
   };
 
+  response.writeHead(206, headers);
+
   const videoStream = videoFile.createReadStream({ start, end });
 
-  response.writeHead(206, headers);
-  if (extension.match(/mp4|webm|ogg/).length > 0) {
+  if (extension.match(/mp4|webm|ogg/)) {
     pump(videoStream, response);
   } else {
     const converted = ffmpeg(videoStream)
