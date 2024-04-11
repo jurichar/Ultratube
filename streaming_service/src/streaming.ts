@@ -15,7 +15,8 @@ export async function downloadMovie(
 
     engine.on("ready", () => {
       engine.files.forEach((file) => {
-        if (file.name.endsWith(".mp4")) {
+        const extension = file.name.split(".").pop();
+        if (extension.match(/mp4|ogg|webm/)) {
           videoFile = file;
           videoFile.select();
           resolve(videoFile);

@@ -42,8 +42,10 @@ app.get("/stream", async (request, response) => {
   const videoStream = videoFile.createReadStream({ start, end });
 
   if (extension.match(/mp4|webm|ogg/)) {
+    console.log("streaming movie");
     pump(videoStream, response);
   } else {
+    console.log("Converting and streaming movie");
     const converted = ffmpeg(videoStream)
       .videoCodec("libx64")
       .videoBitrate(1024)
