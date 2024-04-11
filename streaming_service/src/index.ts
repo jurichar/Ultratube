@@ -44,22 +44,17 @@ app.get("/stream", async (request, response) => {
     pump(videoStream, response);
   } else {
     const converted = ffmpeg(videoStream)
-      .videoCodec("libvpx")
+      .videoCodec("libx64")
       .videoBitrate(1024)
       .audioCodec("libopus")
       .audioBitrate(128)
+      .inputFormat(extension)
       .format("webm")
-      .outputOptions([
-        "-crf 30",
-        "-deadline realtime",
-        "-cpu-used 2",
-        "-threads 3",
-      ])
+      .outputOptions(["-crf 30", "-deadline realtime"])
       .on("error", (error) => {
         console.error("Error: ", error);
       });
-    // can't pump a cleaner solution could be really cool
-    converted.pipe(response);
+    pump(converted as any, response);
   }
 });
 
