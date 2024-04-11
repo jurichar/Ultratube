@@ -7,7 +7,7 @@ function generatePath(torrentUrl: string): string {
   return `./torrents/metadata/${splitedUrl[splitedUrl.length - 1].toLowerCase()}`;
 }
 
-export async function downloadTorrentMeta(torrentUrl: string) {
+async function downloadTorrentMeta(torrentUrl: string) {
   const path = generatePath(torrentUrl);
   const response = await fetch(torrentUrl);
   const buffer = await response.arrayBuffer();
@@ -15,7 +15,7 @@ export async function downloadTorrentMeta(torrentUrl: string) {
   return path;
 }
 
-export async function parseTorrentMeta(torrentPath: string) {
+async function parseTorrentMeta(torrentPath: string) {
   const torrent = await fs.readFile(torrentPath);
   try {
     const metadata = ParseTorrent(torrent);
@@ -25,7 +25,7 @@ export async function parseTorrentMeta(torrentPath: string) {
   }
 }
 
-export async function deleteTorrentMeta(torrentPath: string) {
+async function deleteTorrentMeta(torrentPath: string) {
   await fs.unlink(torrentPath);
 }
 
@@ -37,6 +37,13 @@ function announceToMagnet(announce: string[]): string {
     }
   }
   return announceUrl;
+}
+
+export async function getTorrentMetadata(torrentUrl: string) {
+  const torrentPath = await downloadTorrentMeta(torrentUrl);
+  const torrentMeta = parseTorrentMeta(torrentPath);
+  await deleteTorrentMeta(torrentPath);
+  return torrentMeta;
 }
 
 export function generateMagnetURI(meta: any, source: string): string {

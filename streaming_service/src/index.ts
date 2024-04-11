@@ -2,11 +2,11 @@
 import express from "express";
 const app = express();
 import pump from "pump";
+import process from "node:process";
+import ffmpeg from "fluent-ffmpeg";
 
 import {
-  deleteTorrentMeta,
-  downloadTorrentMeta,
-  parseTorrentMeta,
+  getTorrentMetadata,
   generateMagnetURI,
 } from "./bittorent-client/metadataHandler.js";
 
@@ -19,30 +19,52 @@ app.get("/stream", async (request, response) => {
   }
 
   const torrentUrl = "https://webtorrent.io/torrents/big-buck-bunny.torrent";
-  const torrentPath = await downloadTorrentMeta(torrentUrl);
-  const torrentMetaData = await parseTorrentMeta(torrentPath);
+  const torrentMetaData = await getTorrentMetadata(torrentUrl);
   const magnetURI = generateMagnetURI(torrentMetaData, torrentUrl);
-  await deleteTorrentMeta(torrentPath);
 
   const videoFile = await downloadMovie(magnetURI, torrentMetaData.announce);
 
-  const CHUNK_SIZE = 10 ** 6;
-  const start = Number(range.replace(/\D/g, ""));
-  const end = Math.min(start + CHUNK_SIZE, videoFile.length - 1);
+  const parts = range.replace(/bytes=/, "").split("-");
+  const start = parseInt(parts[0], 10);
+  const end = parts[1] ? parseInt(parts[1], 10) : videoFile.length - 1;
+  const chunksize = Number(end - start + 1);
+  const extension = videoFile.name.split(".").pop();
 
   const headers = {
     "Content-Range": `bytes ${start}-${end}/${videoFile.length}`,
     "Accept-Ranges": "bytes",
-    "Content-Length": end - start + 1,
-    "Content-Type": "video/mp4",
+    "Content-Length": chunksize,
+    "Content-Type": `video/${extension}`,
   };
 
   const videoStream = videoFile.createReadStream({ start, end });
 
   response.writeHead(206, headers);
-  pump(videoStream, response);
+  if (extension.match(/mp4|webm|ogg/).length > 0) {
+    pump(videoStream, response);
+  } else {
+    const converted = ffmpeg(videoStream)
+      .videoCodec("libvpx")
+      .videoBitrate(1024)
+      .audioCodec("libopus")
+      .audioBitrate(128)
+      .format("webm")
+      .outputOptions([
+        "-crf 30",
+        "-deadline realtime",
+        "-cpu-used 2",
+        "-threads 3",
+      ])
+      .on("error", (error) => {
+        console.error("Error: ", error);
+      });
+    // can't pump a cleaner solution could be really cool
+    converted.pipe(response);
+  }
 });
 
-app.listen(8001, async () => {
-  console.log(`Server app listening on http://localhost:8001`);
+const PORT = process.env.PORT || 8001;
+
+app.listen(PORT, async () => {
+  console.log(`Server app listening on http://localhost:${PORT}`);
 });

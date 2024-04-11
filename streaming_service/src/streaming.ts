@@ -26,7 +26,7 @@ export async function downloadMovie(
     });
 
     engine.on("idle", () => {
-      engine.destroy(() => console.log("Movie is ready"));
+      engine.destroy(() => {});
     });
   });
 }
