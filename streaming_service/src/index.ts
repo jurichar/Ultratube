@@ -34,29 +34,31 @@ app.get("/stream", async (request, response) => {
     "Content-Range": `bytes ${start}-${end}/${videoFile.length}`,
     "Accept-Ranges": "bytes",
     "Content-Length": chunksize,
-    "Content-Type": `video/${extension}`,
+    "Content-Type": `video/${extension.match(/mp4|webm|ogg/) ? extension : "webm"}`,
   };
-
-  response.writeHead(206, headers);
 
   const videoStream = videoFile.createReadStream({ start, end });
 
   if (extension.match(/mp4|webm|ogg/)) {
     console.log("streaming movie");
+    response.writeHead(206, headers);
     pump(videoStream, response);
   } else {
     console.log("Converting and streaming movie");
     const converted = ffmpeg(videoStream)
-      .videoCodec("libx64")
+      .format(extension)
+      .videoCodec("libvpx")
       .videoBitrate(1024)
       .audioCodec("libopus")
       .audioBitrate(128)
-      .inputFormat(extension)
       .format("webm")
-      .outputOptions(["-crf 30", "-deadline realtime"])
-      .on("error", (error) => {
-        console.error("Error: ", error);
-      });
+      .outputOptions([
+        "-crf 30",
+        "-deadline realtime",
+        "-cpu-used 2",
+        "-threads 3",
+      ])
+      .on("error", () => {});
     pump(converted as any, response);
   }
 });
