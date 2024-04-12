@@ -45,7 +45,6 @@ app.get("/stream", async (request, response) => {
   } else {
     console.log("Converting and streaming movie");
     const converted = ffmpeg(videoStream)
-      .format(extension)
       .videoCodec("libvpx")
       .videoBitrate(1024)
       .audioCodec("libopus")
