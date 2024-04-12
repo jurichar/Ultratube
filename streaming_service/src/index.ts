@@ -21,7 +21,6 @@ app.get("/stream", async (request, response) => {
   const torrentUrl = "https://webtorrent.io/torrents/big-buck-bunny.torrent";
   const torrentMetaData = await getTorrentMetadata(torrentUrl);
   const magnetURI = generateMagnetURI(torrentMetaData, torrentUrl);
-
   const videoFile = await downloadMovie(magnetURI, torrentMetaData.announce);
 
   const parts = range.replace(/bytes=/, "").split("-");
@@ -52,12 +51,7 @@ app.get("/stream", async (request, response) => {
       .audioCodec("libopus")
       .audioBitrate(128)
       .format("webm")
-      .outputOptions([
-        "-crf 30",
-        "-deadline realtime",
-        "-cpu-used 2",
-        "-threads 3",
-      ])
+      .outputOptions(["-crf 50", "-deadline realtime"])
       .on("error", () => {});
     pump(converted as any, response);
   }
