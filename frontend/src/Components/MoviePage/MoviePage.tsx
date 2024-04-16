@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useRef } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Movie, crewUser, subtitles } from "../../types";
 import MemberMovie from "./MemberMovie/MemberMovie";
 import TrailerSection from "../Global/TrailerSection/TrailerSection";
@@ -61,6 +61,7 @@ export default function MoviePage() {
       // subtitlesSrcs.forEach(URL.revokeObjectURL);
       URL.revokeObjectURL(subtitlesSrc);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subtitles]);
 
   useEffect(() => {
@@ -163,7 +164,7 @@ export default function MoviePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
-  async function handleClick(event) {
+  async function handleClick() {
     if (videoRef) {
       if (videoRef.current && videoRef.current.currentTime > 0 && !watch && Object.keys(userData)) {
         watch = true;

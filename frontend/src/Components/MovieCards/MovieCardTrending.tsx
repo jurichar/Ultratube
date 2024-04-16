@@ -1,6 +1,5 @@
 // src/Components/MovieCards/MovieCardTrending.tsx
 
-import BookmarkIcon from "./BookmarkIcon";
 import { Movie } from "../../types";
 import { useState } from "react";
 import Loading from "../Loading/Loading";
