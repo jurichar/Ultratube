@@ -20,6 +20,7 @@ export default function MoviePage() {
   const [subtitlesSrc, setSubtitlesSrc] = useState<[{ blob: string; language: string }]>();
   const navigate = useNavigate();
   const { languageSelected } = useAuth();
+  const [videoStarted, setVideoStarted] = useState<boolean>(false);
   const videoRef = useRef(null);
   let watch = false;
 
@@ -33,6 +34,20 @@ export default function MoviePage() {
     }),
     []
   );
+  const handleTimeUpdate = async () => {
+    try {
+      await fetchWrapper("api/watched-movies/", {
+        method: "POST",
+        body: {
+          movie: movieIdDb,
+        },
+      });
+      setVideoStarted(true);
+    } catch (error) {
+      return;
+    }
+  };
+
   useEffect(() => {
     async function fetchSubtitles() {
       if (!subtitles) {
@@ -58,8 +73,9 @@ export default function MoviePage() {
     fetchSubtitles();
 
     return () => {
-      // subtitlesSrcs.forEach(URL.revokeObjectURL);
-      URL.revokeObjectURL(subtitlesSrc);
+      subtitlesSrc?.map((elem) => {
+        URL.revokeObjectURL(elem.blob);
+      });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subtitles]);
@@ -221,7 +237,7 @@ export default function MoviePage() {
       {movie?.trailer && <TrailerSection linkEmbed={movie.trailer} />}
       <h1 className="text-4xl font-bold text-white">Movie</h1>
       {movieIdDb && (
-        <video ref={videoRef} onPlay={handleClick} onEnded={() => console.log("end")} id="videoPlayer" controls>
+        <video ref={videoRef} onPlay={handleTimeUpdate} onEnded={() => console.log("end")} id="videoPlayer" controls>
           <source src={`http://localhost:8001/download/${movieIdDb}`} type="video/mp4" />
           {subtitlesSrc &&
             subtitlesSrc.map((elem, index) => {
