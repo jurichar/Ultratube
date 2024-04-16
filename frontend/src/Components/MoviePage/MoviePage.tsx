@@ -20,10 +20,7 @@ export default function MoviePage() {
   const [subtitlesSrc, setSubtitlesSrc] = useState<[{ blob: string; language: string }]>();
   const navigate = useNavigate();
   const { languageSelected } = useAuth();
-  const [videoStarted, setVideoStarted] = useState<boolean>(false);
   const videoRef = useRef(null);
-  let watch = false;
-
   const options = useMemo(
     () => ({
       method: "GET",
@@ -42,7 +39,6 @@ export default function MoviePage() {
           movie: movieIdDb,
         },
       });
-      setVideoStarted(true);
     } catch (error) {
       return;
     }
@@ -179,25 +175,6 @@ export default function MoviePage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
-
-  async function handleClick() {
-    if (videoRef) {
-      if (videoRef.current && videoRef.current.currentTime > 0 && !watch && Object.keys(userData)) {
-        watch = true;
-        try {
-          await fetchWrapper("api/watched-movies/", {
-            method: "POST",
-            body: {
-              movie: movieIdDb,
-            },
-          });
-        } catch (error) {
-          return;
-        }
-        console.log(videoRef.current, videoRef.current.currentTime);
-      }
-    }
-  }
 
   const handleBookMark = async () => {
     try {
