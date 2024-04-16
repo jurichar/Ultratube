@@ -49,6 +49,9 @@ export default function Navbar() {
                 />
               </svg>
             </NavLink>
+            <NavLink to="/watched-list">
+              <img src="http://localhost:3000/src/assets/image.png" />
+            </NavLink>
             <div className="flex flex-row gap-4 justify-center items-center text-sm md:flex-col">
               <NavLink to="/profile">
                 <div

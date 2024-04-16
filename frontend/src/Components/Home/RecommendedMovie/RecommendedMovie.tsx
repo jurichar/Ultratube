@@ -27,6 +27,7 @@ export default function RecommendedMovie(props: propsRecommended) {
         const arrayMovie: Movie[] = all_Movie_Data.map((elem) => {
           const quality = Array.isArray(elem.torrents) && elem.torrents?.length > 0 ? elem.torrents[0].quality : elem.torrents.quality;
           const torrent_url = Array.isArray(elem.torrents) && elem.torrents?.length > 0 ? elem.torrents[0].url : elem.torrents.url;
+          const torrent_hash = Array.isArray(elem.torrents) && elem.torrents?.length > 0 ? elem.torrents[0].hash : elem.torrents.hash;
           return {
             id: elem.id,
             title: elem.title,
@@ -42,6 +43,7 @@ export default function RecommendedMovie(props: propsRecommended) {
             length: elem.runtime,
             quality: quality,
             torrent: torrent_url,
+            torrent_hash: torrent_hash,
           };
         });
         return arrayMovie;
@@ -62,6 +64,7 @@ export default function RecommendedMovie(props: propsRecommended) {
     }
     setUpMovies();
   }, [filter, page, getMoviesJson, sort]);
+  // create when movie is cliking here to get only the id of movie
 
   return (
     <div className="w-full h-full flex  pb-60 flex-col gap-4  relative">

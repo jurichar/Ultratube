@@ -17,6 +17,7 @@ export interface Movie {
   genres: Array<string>;
   length: number;
   torrent: string;
+  torrent_hash: string;
   quality: string;
 }
 
@@ -39,6 +40,7 @@ export type YtsMovie = {
   genres: Array<string>;
   runtime: number;
   torrents: torrent[] | torrent;
+  hash: string;
 };
 export interface User {
   id: string;
@@ -47,7 +49,7 @@ export interface User {
   password: string;
   avatar: string;
 }
-export type language = "en" | "fr" | "es" | "de" | "it" | "jp" | "ru" | string;
+export type language = "en" | "fr" | "es" | string;
 export interface Comment {
   id: string;
   user_id: string;
@@ -57,7 +59,11 @@ export interface Comment {
   user?: User;
   movie?: Movie;
 }
-
+export interface subtitles {
+  location: string;
+  language: string;
+  id: number;
+}
 export interface CommentMovie {
   id: number;
   author: string;
@@ -109,6 +115,7 @@ export type ApiTorrentMovie = {
   name: string;
   videos?: TorrentMovieTrailer[];
   torrent: string;
+  hash: string;
 };
 export type ProfileForm = {
   username?: string;

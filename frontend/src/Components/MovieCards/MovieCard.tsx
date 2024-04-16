@@ -1,13 +1,14 @@
 // src/Components/MovieCards/MovieCard.tsx
 
-import BookmarkIcon from "./BookmarkIcon";
 import { Movie } from "../../types";
 import { useState } from "react";
 import Loading from "../Loading/Loading";
 import { FaStar } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { notify } from "../../utils/notifyToast";
 interface MovieCardProps {
   movie: Movie;
+  idMovie?: number;
 }
 
 export default function MovieCard({ movie }: MovieCardProps) {
@@ -17,9 +18,12 @@ export default function MovieCard({ movie }: MovieCardProps) {
   const handleImageLoad = () => {
     setLoading(false);
   };
-
-  const handleMovieClick = () => {
-    navigate(`/movie/${movie.id}`, { state: { movieProps: movie } });
+  const handleMovieClick = async () => {
+    try {
+      navigate(`/movie/${movie.id}`, { state: { movieProps: movie } });
+    } catch (error) {
+      notify({ type: "error", msg: " cant access to this movie please retry" });
+    }
   };
 
   return (
@@ -36,7 +40,6 @@ export default function MovieCard({ movie }: MovieCardProps) {
         <button className="transition-all z-10 opacity-0 w-full h-full bg-tertiary hover:opacity-50 rounded flex justify-center items-center" onClick={handleMovieClick}>
           Play
         </button>
-        <BookmarkIcon />
       </div>
       <div className="flex flex-row items-center gap-2">
         <span className="text-quinary text-xs">{movie.year}</span>

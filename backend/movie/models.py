@@ -18,6 +18,8 @@ class Movie(models.Model):
     quality = models.CharField(null=False, default="720p")
     duration = models.IntegerField(validators=[MinValueValidator(0)])
     torrent = models.CharField(null=False, default="")
+    torrent_hash = models.CharField(null=False, default="")
+    imdb_code = models.CharField(null=False, default="", blank=True)
 
     def __str__(self):
         return self.name
@@ -27,7 +29,9 @@ class Subtitle(models.Model):
 
     location = models.CharField(max_length=255)
     language = models.CharField(max_length=5)
-    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name="subtitles")
+    movie = models.ForeignKey(
+        Movie, on_delete=models.CASCADE, related_name="available_subtitles"
+    )
 
     def __str__(self):
         return f"{self.language}: {self.movie.name}"

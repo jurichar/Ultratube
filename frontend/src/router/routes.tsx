@@ -15,6 +15,7 @@ import UnAuthenticateRoutes from "./UnAuthenticateRoutes";
 import { fetchWrapper } from "../fetchWrapper/fetchWrapper";
 import { UserData } from "../types";
 import Bookmarks from "../Components/Bookmarks/Bookmarks";
+import WatchedList from "../Components/WatchedList/WatchedList";
 
 export const router = createBrowserRouter([
   {
@@ -47,6 +48,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Profile />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/watched-list",
+        element: (
+          <ProtectedRoute>
+            <WatchedList />
           </ProtectedRoute>
         ),
       },
