@@ -13,10 +13,7 @@ class MovieAPITestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
 
-        cls.user = User.objects.create_user(
-            username="RottenTomatoes", password="secret"
-        )
-
+        cls.user = User.objects.create(username="RottenTomatoes", password="secret")
         Movie.objects.create(
             name="Return of the Jediddd",
             thumbnail_cover="path/to/thumbnail/",
@@ -251,6 +248,7 @@ class TestComment(MovieAPITestCase):
             "id": self.comment.id,
             "created_at": self.format_datetime(self.comment.created_at),
             "content": self.comment.content,
+            "author_id": self.comment.author.id,
         }
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), expected)
@@ -375,7 +373,7 @@ class TestWatchedMovie(MovieAPITestCase):
             production_year=1988,
             imdb_rating=1.0,
         )
-        self.user = User.objects.create_user(username="tata", password="secret")
+        # self.user = User.objects.create_user(username="tata", password="secret")
 
     def test_create(self):
         access_token, client, user = setUpAuth(self)

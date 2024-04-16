@@ -59,7 +59,7 @@ export default function Filter(props: filterProps) {
     fetch(url, options)
       .then((res) => res.json())
       .then((json) => {
-        setFilter(initialState);
+        // setFilter(initialState);
         setGenre(json["genres"]);
       })
       .catch(() => notify({ type: "warning", msg: "error on api tmdb" }));
@@ -82,9 +82,7 @@ export default function Filter(props: filterProps) {
   return (
     <div className="h-fit transition-all ">
       <button onClick={() => setOpen(!open)}> open filter</button>
-      <div
-        className={`${open ? "opacity-100  h-3/5" : "h-0   opacity-0"} transition-all transition[height] ease-linear duration-300 w-full flex flex-col gap-8 rounded-md p-4 bg-tertiary `}
-      >
+      <div className={`${open ? "opacity-100  h-3/5" : "h-0   opacity-0"} transition-all transition[height] ease-linear duration-300 w-full flex flex-col gap-8 rounded-md p-4 bg-tertiary `}>
         <div className="flex flex-col gap-4 ">
           <label htmlFor="rating" className="text-heading-sm flex gap-1">
             Choose minimum rating : {filter.rating} <FaStar />
