@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { Movie, YtsMovie } from "../../types";
 import MovieCardTrending from "../MovieCards/MovieCardTrending";
+import { useTranslation } from "react-i18next";
 
 export default function TrendingMovie() {
+  const { t } = useTranslation();
   const [moviesTrending, setMoviesTrending] = useState<Movie[]>([]);
 
   async function get_trending_movie() {
@@ -46,7 +48,7 @@ export default function TrendingMovie() {
   }, []);
   return (
     <div className="w-full h-full flex flex-col gap-4 ">
-      <span>Trending</span>
+      <span>{t("trending")}</span>
       <div className="overflow-x-auto w-full flex flex-row gap-4">
         {moviesTrending.map((movie) => (
           <MovieCardTrending key={movie.id} movie={movie} />

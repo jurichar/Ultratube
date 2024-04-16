@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import ImagePopup from "./ImagePopup";
 import { useTranslation } from "react-i18next";
 import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
-import { useLoaderData, useNavigate, useParams } from "react-router-dom";
+import { useLoaderData, useParams } from "react-router-dom";
 import { useAuth } from "../../context/useAuth";
 import { ProfileForm, UserData, UserPatchInterface } from "../../types";
 import { validateEmail } from "../../utils/validateEmail";
@@ -13,7 +13,6 @@ import InputPassword from "../Global/InputPassword/InputPassword";
 
 export default function Profile() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const param = useParams(); // get params from the url
   const userLoader = useLoaderData(); // get data (user) from the loader ( see routes.tsx to see the loader)
   const { userData, loadUserData } = useAuth();
@@ -183,12 +182,17 @@ export default function Profile() {
             <>
               {!user?.omniauth && <InputPassword name="password" handleChange={handleChange} />}
               <button className="w-32 h-12 transition-all bg-quaternary text-quinary rounded-full hover:bg-quinary hover:text-tertiary" type="submit">
-                Save
+                {t("save")}
               </button>
             </>
           )}
         </form>
       </div>
+      {ourProfile && (
+        <button className="w-32 h-12 transition-all  text-quinary rounded-full hover:bg-secondary" onClick={handleDisconnect}>
+          {t("disconnect")}
+        </button>
+      )}
     </div>
   );
 }

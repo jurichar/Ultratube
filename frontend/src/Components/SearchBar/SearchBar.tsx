@@ -54,7 +54,7 @@ const SearchBar = ({ onSearch, setShowSearch, showSearch }: SearchBarProps) => {
           }}
         />
         <div className="w-24">
-          <ButtonCallToAction handleClick={handleSubmitSearch} type="button" value="search" name="search" />
+          <ButtonCallToAction handleClick={handleSubmitSearch} type="button" value={t("search-button")} name="search" />
         </div>
       </div>
       {showSearch && (
