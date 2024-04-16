@@ -158,7 +158,7 @@ export default function SearchResult(props: searchResultProps) {
       updateMoviesSearch(querySearch);
     }
   }, [querySearch, filter, sort]);
-
+  //  create here in the db or get
   return (
     <div className="flex  flex-row flex-wrap gap-5">
       {movies.map((movie, index) => {

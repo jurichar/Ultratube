@@ -19,6 +19,7 @@ from movie.views import (
     CommentViewSet,
     FavouriteListCreateDeleteViewSet,
     MovieViewSet,
+    SubtitleMovieViewSet,
     WatchedMovieViewSet,
 )
 from rest_framework import routers
@@ -36,6 +37,7 @@ router.register(
     "favourite-movies", FavouriteListCreateDeleteViewSet, basename="favourite-movies"
 )
 router.register("watched-movies", WatchedMovieViewSet, basename="watched-movies")
+router.register("subtitles", SubtitleMovieViewSet, basename="subtitles")
 
 
 urlpatterns = [

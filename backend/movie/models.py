@@ -19,6 +19,7 @@ class Movie(models.Model):
     duration = models.IntegerField(validators=[MinValueValidator(0)])
     torrent = models.CharField(null=False, default="")
     torrent_hash = models.CharField(null=False, default="")
+    imdb_code = models.CharField(null=False, default="", blank=True)
 
     def __str__(self):
         return self.name

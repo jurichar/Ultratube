@@ -3,6 +3,7 @@ from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.mixins import Response
+
 from rest_framework.viewsets import (
     GenericViewSet,
     ModelViewSet,
@@ -17,7 +18,7 @@ from oauth2_provider.contrib.rest_framework import (
     TokenHasReadWriteScope,
 )
 
-from .models import Comment, FavouriteMovie, Movie, WatchedMovie
+from .models import Comment, FavouriteMovie, Movie, Subtitle, WatchedMovie
 from .serializers import (
     CommentCreateSerializer,
     CommentUpdateSerializer,
@@ -28,6 +29,9 @@ from .serializers import (
     MovieDeleteSerializer,
     MovieDetailSerializer,
     MovieListSerializer,
+    SubtitleCreateSerializer,
+    SubtitleDetailsSerializer,
+    SubtitleListSerializer,
     WatchedMovieCreateSerializer,
     WatchedMovieListSerializer,
 )
@@ -67,6 +71,16 @@ class MovieViewSet(MultipleSerializerMixin, ReadOnlyModelViewSet):
 
     def get_queryset(self):
         return Movie.objects.all()
+
+    @action(
+        detail=True,
+        methods=["GET"],
+    )
+    def subtitles_movie(self, request, pk=None):
+        get_object_or_404(Movie, pk=pk)
+        queryset = Subtitle.objects.filter(movie__pk=pk).all()
+        serializer = SubtitleListSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     #  Post and GET  for comment
     @action(
@@ -148,7 +162,8 @@ class FavouriteListCreateDeleteViewSet(
     mixins.DestroyModelMixin,
     GenericViewSet,
 ):
-    permission_classes = [AllowAny]
+    authentication_classes = [OAuth2Authentication]
+    permission_classes = [IsAuthenticated, TokenHasReadWriteScope]
     serializer_class = FavouriteMovieSerializer
     create_serializer_class = FavouriteMovieCreateSerializer
 
@@ -158,6 +173,42 @@ class FavouriteListCreateDeleteViewSet(
 
     def get_queryset(self):
         return FavouriteMovie.objects.filter(user=self.request.user).all()
+
+    def create(self, request):
+        dataSerializer = {
+            "user": self.request.user.id,
+            "movie": request.data["movie"],
+        }
+        serializer = FavouriteMovieCreateSerializer(data=dataSerializer)
+        if serializer.is_valid():
+            check_instance = FavouriteMovie.objects.filter(
+                user=self.request.user.id, movie_id=request.data["movie"]
+            ).exists()
+            if check_instance:
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class SubtitleMovieViewSet(ModelViewSet):
+    permission_classes = [AllowAny]
+    serializer_class = SubtitleDetailsSerializer
+    queryset = Subtitle.objects.all()
+
+    def create(self, request):
+        serializer = SubtitleCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            check_instance = Subtitle.objects.filter(
+                location=request.data["location"], movie_id=request.data["movie"]
+            ).exists()
+            print(check_instance)
+            if check_instance:
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class WatchedMovieViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, ViewSet):

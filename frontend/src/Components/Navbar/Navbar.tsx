@@ -36,8 +36,6 @@ export default function Navbar() {
           </option>
           <option value="fr">FR</option>
           <option value="es">ES</option>
-          <option value="pt">PT</option>
-          <option value="NL">NL</option>
         </select>
         {userData && (
           <>
@@ -50,6 +48,9 @@ export default function Navbar() {
                   strokeWidth="1.5"
                 />
               </svg>
+            </NavLink>
+            <NavLink to="/watched-list">
+              <img src="http://localhost:3000/src/assets/image.png" />
             </NavLink>
             <div className="flex flex-row gap-4 justify-center items-center text-sm md:flex-col">
               <NavLink to="/profile">

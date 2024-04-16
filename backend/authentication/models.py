@@ -1,4 +1,3 @@
-import email
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -34,14 +33,11 @@ class User(AbstractUser):
     english = "en"
     spanish = "es"
     french = "fr"
-    russe = "ru"
-    german = "gb"
+
     language_user = {
         (english, english),
         (spanish, spanish),
         (french, french),
-        (russe, russe),
-        (german, german),
     }
     email = models.EmailField(max_length=254, unique=True, null=True, blank=True)
     avatar = models.CharField(blank=True, choices=avatars_user)

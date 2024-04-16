@@ -49,7 +49,7 @@ export interface User {
   password: string;
   avatar: string;
 }
-export type language = "en" | "fr" | "es" | "de" | "it" | "jp" | "ru" | string;
+export type language = "en" | "fr" | "es" | string;
 export interface Comment {
   id: string;
   user_id: string;
@@ -59,7 +59,11 @@ export interface Comment {
   user?: User;
   movie?: Movie;
 }
-
+export interface subtitles {
+  location: string;
+  language: string;
+  id: number;
+}
 export interface CommentMovie {
   id: number;
   author: string;

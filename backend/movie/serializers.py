@@ -7,6 +7,20 @@ class SubtitleListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Subtitle
+        fields = ["id", "location", "language"]
+
+
+class SubtitleCreateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Subtitle
+        fields = ["location", "language", "movie"]
+
+
+class SubtitleDetailsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Subtitle
         fields = ["location", "language"]
 
 
@@ -30,6 +44,7 @@ class MovieCreateSerializer(serializers.ModelSerializer):
             "language",
             "torrent",
             "torrent_hash",
+            "imdb_code",
         ]
 
 
@@ -52,6 +67,7 @@ class MovieDetailSerializer(serializers.ModelSerializer):
             "imdb_rating",
             "production_year",
             "duration",
+            "thumbnail_cover",
             "comments_number",
             "available_subtitles",
             "quality",
@@ -107,8 +123,7 @@ class CommentCreateSerializer(serializers.ModelSerializer):
 
 
 class FavouriteMovieSerializer(serializers.ModelSerializer):
-
-    movie = MovieListSerializer()
+    movie = MovieDetailSerializer()
 
     class Meta:
         model = FavouriteMovie
@@ -119,10 +134,11 @@ class FavouriteMovieCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FavouriteMovie
-        fields = ["movie"]
+        fields = ["movie", "user"]
 
 
 class WatchedMovieListSerializer(serializers.ModelSerializer):
+    movie = MovieDetailSerializer()
 
     class Meta:
         model = WatchedMovie

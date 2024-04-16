@@ -35,7 +35,6 @@ export default function MovieCardTrending({ movie }: MovieCardProps) {
       <button className="z-10 opacity-0 w-full h-full bg-tertiary hover:opacity-50 rounded flex justify-center items-center transition-all" onClick={handleMovieClick}>
         Play
       </button>
-      <BookmarkIcon />
       <div className="absolute left-2 bottom-2">
         <div className="flex flex-row items-center gap-2">
           <span className="text-quinary text-xs">{movie.year}</span>
