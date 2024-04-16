@@ -31,6 +31,9 @@ export default function Login() {
     if (name == "Login") {
       if (is_valid_arg({ ...state })) {
         await login();
+        await TriggerReload();
+        navigate("/");
+        notify({ type: "success", msg: "login successful" });
       } else {
         notify({ type: "error", msg: "information are not valid" });
       }
@@ -46,9 +49,6 @@ export default function Login() {
           password: state.password,
         },
       });
-      await TriggerReload();
-      navigate("/");
-      notify({ type: "success", msg: "login successful" });
     } catch (error) {
       let message = "Unknown Error";
       if (error instanceof Error) message = error.message;
