@@ -4,12 +4,13 @@ WORKDIR /app
 
 COPY . .
 
+RUN mkdir -p /app/torrents/metadata
+
 RUN npm install \
-  && npm run build \
-  && mkdir -p /app/torrents/metadata
+  && npm run build
 
-EXPOSE 8001 6881
+EXPOSE 8001
 
-ENV ADDRESS=0.0.0.0 PORT=8001
+ENV PORT=8001
 
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "start:prod"]
