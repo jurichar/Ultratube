@@ -73,6 +73,7 @@ class MovieDetailSerializer(serializers.ModelSerializer):
             "quality",
             "language",
             "torrent",
+            "imdb_code",
             "torrent_hash",
         ]
 

@@ -194,6 +194,7 @@ class TestMovie(MovieAPITestCase):
             "torrent": movie.torrent,
             "torrent_hash": movie.torrent_hash,
             "imdb_code": movie.imdb_code,
+            "thumbnail_cover": movie.thumbnail_cover,
         }
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), expected)
@@ -321,12 +322,18 @@ class TestFavouriteMovie(MovieAPITestCase):
         )
 
     def test_list(self):
-
-        self.client.force_login(self.user)
-
-        response = self.client.get(reverse("favourite-movies-list"))
+        self.favouriteList = []
+        access_token, client, user = setUpAuth(self)
+        self.favouriteList.append(
+            FavouriteMovie.objects.create(user=user, movie=self.movie)
+        )
+        self.favouriteList.append(
+            FavouriteMovie.objects.create(user=user, movie=Movie.objects.last())
+        )
+        # self.client.force_login(self.user)
+        custom_header = {"Authorization": f"Bearer {access_token}"}
+        response = client.get(reverse("favourite-movies-list"), **custom_header)
         response_content = response.json()["results"]
-
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response_content[0]["movie"]["name"], self.favouriteList[0].movie.name
@@ -342,17 +349,20 @@ class TestFavouriteMovie(MovieAPITestCase):
         )
 
     def test_delete(self):
-
+        access_token, client, user = setUpAuth(self)
+        custom_header = {"Authorization": f"Bearer {access_token}"}
         self.assertEqual(FavouriteMovie.objects.all().count(), 2)
-        response = self.client.delete(
-            reverse("favourite-movies-detail", args=[self.favouriteList[0].id])
+        response = client.delete(
+            reverse("favourite-movies-detail", args=[self.favouriteList[0].id]),
+            **custom_header,
         )
 
         self.assertEqual(response.status_code, 204)
         self.assertEqual(FavouriteMovie.objects.all().count(), 1)
 
-    # TODO implement creates tests
     def test_create(self):
+        access_token, client, user = setUpAuth(self)
+        custom_header = {"Authorization": f"Bearer {access_token}"}
         new_movie = Movie.objects.create(
             name="dune",
             thumbnail_cover="path/to/thumbnail/",
@@ -362,7 +372,7 @@ class TestFavouriteMovie(MovieAPITestCase):
         )
 
         response = self.client.post(
-            reverse("favourite-movies-list"), {"movie": new_movie.id}
+            reverse("favourite-movies-list"), {"movie": new_movie.id}, **custom_header
         )
         self.assertEqual(response.status_code, 201)
 
@@ -436,5 +446,41 @@ class TestWatchedMovie(MovieAPITestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            response.json(), [{"movie": self.movie.id}, {"movie": self.movie1.id}]
+            response.json(),
+            [
+                {
+                    "movie": {
+                        "name": self.movie.name,
+                        "id": self.movie.id,
+                        "imdb_rating": self.movie.imdb_rating,
+                        "production_year": self.movie.production_year,
+                        "duration": self.movie.duration,
+                        "thumbnail_cover": self.movie.thumbnail_cover,
+                        "comments_number": 0,
+                        "available_subtitles": [],
+                        "quality": self.movie.quality,
+                        "language": self.movie.language,
+                        "torrent": self.movie.torrent,
+                        "imdb_code": self.movie.imdb_code,
+                        "torrent_hash": self.movie.torrent_hash,
+                    },
+                },
+                {
+                    "movie": {
+                        "name": self.movie1.name,
+                        "id": self.movie1.id,
+                        "imdb_rating": self.movie1.imdb_rating,
+                        "production_year": self.movie1.production_year,
+                        "duration": self.movie1.duration,
+                        "thumbnail_cover": self.movie1.thumbnail_cover,
+                        "comments_number": 0,
+                        "available_subtitles": [],
+                        "quality": self.movie1.quality,
+                        "language": self.movie1.language,
+                        "torrent": self.movie1.torrent,
+                        "imdb_code": self.movie1.imdb_code,
+                        "torrent_hash": self.movie1.torrent_hash,
+                    },
+                },
+            ],
         )

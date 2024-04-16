@@ -190,6 +190,11 @@ class FavouriteListCreateDeleteViewSet(
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def destroy(self, request, pk=None):
+        favouriteMovie = get_object_or_404(FavouriteMovie, pk=pk)
+        favouriteMovie.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class SubtitleMovieViewSet(ModelViewSet):
     permission_classes = [AllowAny]
