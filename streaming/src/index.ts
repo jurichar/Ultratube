@@ -7,6 +7,7 @@ import ffmpeg from "fluent-ffmpeg";
 import cors from "cors";
 import bodyparser from "body-parser";
 import fs from "node:fs";
+import torrentStream from "torrent-stream";
 import yifysubtitles from "./api-subtitle.js";
 
 app.use(cors());
@@ -23,9 +24,10 @@ import { downloadMovie } from "./streaming.js";
 
 app.get("/stream/:id", async (request, response) => {
   const { id: torrentId } = request.params;
+
   const range = request.headers.range;
   if (!range) {
-    response.status(400).send("range header required");
+    return response.status(400).send("range header required");
   }
 
   const torrentUrl = await getTorrentUrl(torrentId);
@@ -38,9 +40,9 @@ app.get("/stream/:id", async (request, response) => {
 
   let videoFile;
   try {
-    videoFile = await downloadMovie(response, engine);
-  } catch(error) {
-      return response.status(404).send(error.message)
+    videoFile = await downloadMovie(engine);
+  } catch (error) {
+    return response.status(404).send(error.message);
   }
   const parts = range.replace(/bytes=/, "").split("-");
   const start = parseInt(parts[0], 10);
@@ -58,47 +60,47 @@ app.get("/stream/:id", async (request, response) => {
 
   const videoStream = videoFile.createReadStream({ start, end });
 
-    try {
-      await fs.promises.writeFile(`./torrents/${videoFile.path}`, "", {
-        flag: "a+",
-      });
-    } catch (error) {}
-  });
+  try {
+    await fs.promises.writeFile(`./torrents/${videoFile.path}`, "", {
+      flag: "a+",
+    });
+  } catch (error) {
+    console.error(error);
+  }
 
   let isStreaming = false;
 
   engine.on("download", async () => {
-    console.log(Math.floor(engine.swarm.downloaded * videoFile.length) / 100);
+    // console.log(Math.floor(engine.swarm.downloaded * videoFile.length) / 100);
+    if (!isStreaming && engine.swarm.downloaded > 4936832) {
       const fileTmp = fs.createReadStream("./torrents/" + videoFile.path, {
         start: start,
         end: end,
       });
 
-    if (extension.match(/mp4|webm|ogg/)) {
-      response.writeHead(206, headers);
-      pump(fileTmp, response);
-    } else {
-      const converted = ffmpeg(videoStream)
-      .videoCodec("libvpx")
-      .videoBitrate(1024)
-      .audioCodec("libopus")
-      .audioBitrate(128)
-      .format("webm")
-      .outputOptions(["-crf 50", "-deadline realtime"])
-      .on("error", () => {});
-    pump(converted as any, response);
-  }
+      if (extension.match(/mp4|webm|ogg/)) {
+        response.writeHead(206, headers);
+        pump(fileTmp, response);
+      } else {
+        const converted = ffmpeg(videoStream)
+          .videoCodec("libvpx")
+          .videoBitrate(1024)
+          .audioCodec("libopus")
+          .audioBitrate(128)
+          .format("webm")
+          .outputOptions(["-crf 50", "-deadline realtime"])
+          .on("error", () => {});
+        pump(converted as any, response);
+      }
       isStreaming = true;
     }
-    response.on("close", () => {
-      console.log("Connexion closed, stop streaming...");
-      engine.destroy();
-      response.end();
-    });
   });
 
-
-
+  response.on("close", () => {
+    console.log("Connexion closed, stop streaming...");
+    engine.destroy(() => {});
+    response.end();
+  });
 });
 
 type MovieObject = {
@@ -122,9 +124,12 @@ async function getTorrentUrl(idTorrent) {
 app.get("/subtitles/:id", async (request, response) => {
   const { id: subTitleId } = request.params;
   try {
-    const res = await fetch(`http://localhost:8000/api/subtitles/${subTitleId}/`, {
-      method: "GET",
-    });
+    const res = await fetch(
+      `http://localhost:8000/api/subtitles/${subTitleId}/`,
+      {
+        method: "GET",
+      },
+    );
     const resSubtitles: { location: string } = await res.json();
 
     const stream = fs.createReadStream(resSubtitles.location);
@@ -148,7 +153,7 @@ app.post("/subtitles", async (request, response) => {
         body: JSON.stringify({
           location: sub.path,
           language: sub.langShort,
-              movie: movie_id,
+          movie: movie_id,
         }),
         headers: {
           "content-type": "application/json;charset=utf-8",
@@ -159,13 +164,9 @@ app.post("/subtitles", async (request, response) => {
       return response.status(200).send("subtitles created");
     }
   } catch (error) {
+    console.error(error);
   }
   return response.status(200).send("no subtitles ");
-});
-
-const port = process.env.PORT || 8001;
-app.listen(port, () => {
-  console.log(`Server is listening on port ${port}`);
 });
 
 const PORT = process.env.PORT || 8001;

@@ -1,9 +1,4 @@
-import torrentStream from "torrent-stream";
-
-const TORRENT_PATH = "./torrents";
-
 export async function downloadMovie(
-  response: any,
   engine: any,
 ): Promise<TorrentStream.TorrentFile | string> {
   return new Promise((resolve, reject) => {
@@ -18,12 +13,8 @@ export async function downloadMovie(
         } else {
           file.deselect();
         }
-        reject(new Error("Video file not found"))
+        reject(new Error("Video file not found"));
       });
     });
-
-    response.on("close", () => {
-      engine.destroy();
-      response.end();
-    });
+  });
 }
