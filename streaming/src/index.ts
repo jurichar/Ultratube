@@ -110,7 +110,7 @@ type MovieObject = {
 
 async function getTorrentUrl(idTorrent) {
   try {
-    const res = await fetch(`http://localhost:8000/api/movies/${idTorrent}/`, {
+    const res = await fetch(`http://backend:8000/api/movies/${idTorrent}/`, {
       method: "GET",
     });
     const responseJson: MovieObject = await res.json();
