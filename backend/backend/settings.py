@@ -59,6 +59,8 @@ DJANGO_CLIENT_TYPE = os.getenv("DJANGO_CLIENT_TYPE")
 DJANGO_GRANT_AUTHORIZATION = os.getenv("DJANGO_GRANT_AUTHORIZATION")
 DJANGO_SUPERUSER_USERNAME = os.getenv("DJANGO_SUPERUSER_USERNAME")
 DJANGO_SUPERUSER_PASSWORD = os.getenv("DJANGO_SUPERUSER_PASSWORD")
+DJANGO_EMAIL_USERNAME = os.getenv("EMAIL_HOST_USER")
+DJANGO_EMAIL_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
     "oauth2_provider.backends.OAuth2Backend",
@@ -73,8 +75,13 @@ OAUTH2_PROVIDER = {
         "groups": "Access to your groups",
     }
 }
-
-
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_HOST_USER = DJANGO_EMAIL_USERNAME
+EMAIL_HOST_PASSWORD = DJANGO_EMAIL_PASSWORD
+EMAIL_USE_TLS = False
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
 LOGIN_URL = "/admin/login/"
 
 CORS_ALLOW_HEADERS = [

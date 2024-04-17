@@ -3,14 +3,10 @@ import torrentStream from "torrent-stream";
 const TORRENT_PATH = "./torrents";
 
 export async function downloadMovie(
-  magnetURI: string,
-  trackers: string[],
-): Promise<TorrentStream.TorrentFile> {
-  return new Promise((resolve) => {
-    const engine = torrentStream(magnetURI, {
-      path: TORRENT_PATH,
-      trackers: trackers,
-    });
+  response: any,
+  engine: any,
+): Promise<TorrentStream.TorrentFile | string> {
+  return new Promise((resolve, reject) => {
     let videoFile: TorrentStream.TorrentFile;
 
     engine.on("ready", () => {
@@ -18,16 +14,16 @@ export async function downloadMovie(
         const extension = file.name.split(".").pop();
         if (extension.match(/mp4|ogg|webm/)) {
           videoFile = file;
-          videoFile.select();
           resolve(videoFile);
         } else {
           file.deselect();
         }
+        reject(new Error("Video file not found"))
       });
     });
 
-    engine.on("idle", () => {
-      engine.destroy(() => {});
+    response.on("close", () => {
+      engine.destroy();
+      response.end();
     });
-  });
 }

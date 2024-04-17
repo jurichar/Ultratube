@@ -4,6 +4,15 @@ const app = express();
 import pump from "pump";
 import process from "node:process";
 import ffmpeg from "fluent-ffmpeg";
+import cors from "cors";
+import bodyparser from "body-parser";
+import fs from "node:fs";
+import yifysubtitles from "./api-subtitle.js";
+
+app.use(cors());
+app.use(bodyparser.json());
+
+const TORRENT_PATH = "./torrents";
 
 import {
   getTorrentMetadata,
@@ -12,17 +21,27 @@ import {
 
 import { downloadMovie } from "./streaming.js";
 
-app.get("/stream", async (request, response) => {
+app.get("/stream/:id", async (request, response) => {
+  const { id: torrentId } = request.params;
   const range = request.headers.range;
   if (!range) {
     response.status(400).send("range header required");
   }
 
-  const torrentUrl = "https://webtorrent.io/torrents/big-buck-bunny.torrent";
+  const torrentUrl = await getTorrentUrl(torrentId);
   const torrentMetaData = await getTorrentMetadata(torrentUrl);
   const magnetURI = generateMagnetURI(torrentMetaData, torrentUrl);
-  const videoFile = await downloadMovie(magnetURI, torrentMetaData.announce);
+  const engine = torrentStream(magnetURI, {
+    path: TORRENT_PATH,
+    trackers: torrentMetaData.announce,
+  });
 
+  let videoFile;
+  try {
+    videoFile = await downloadMovie(response, engine);
+  } catch(error) {
+      return response.status(404).send(error.message)
+  }
   const parts = range.replace(/bytes=/, "").split("-");
   const start = parseInt(parts[0], 10);
   const end = parts[1] ? parseInt(parts[1], 10) : videoFile.length - 1;
@@ -34,15 +53,32 @@ app.get("/stream", async (request, response) => {
     "Accept-Ranges": "bytes",
     "Content-Length": chunksize,
     "Content-Type": `video/${extension.match(/mp4|webm|ogg/) ? extension : "webm"}`,
+    "Keep-alive": "timeout=10000",
   };
 
   const videoStream = videoFile.createReadStream({ start, end });
 
-  if (extension.match(/mp4|webm|ogg/)) {
-    response.writeHead(206, headers);
-    pump(videoStream, response);
-  } else {
-    const converted = ffmpeg(videoStream)
+    try {
+      await fs.promises.writeFile(`./torrents/${videoFile.path}`, "", {
+        flag: "a+",
+      });
+    } catch (error) {}
+  });
+
+  let isStreaming = false;
+
+  engine.on("download", async () => {
+    console.log(Math.floor(engine.swarm.downloaded * videoFile.length) / 100);
+      const fileTmp = fs.createReadStream("./torrents/" + videoFile.path, {
+        start: start,
+        end: end,
+      });
+
+    if (extension.match(/mp4|webm|ogg/)) {
+      response.writeHead(206, headers);
+      pump(fileTmp, response);
+    } else {
+      const converted = ffmpeg(videoStream)
       .videoCodec("libvpx")
       .videoBitrate(1024)
       .audioCodec("libopus")
@@ -52,6 +88,84 @@ app.get("/stream", async (request, response) => {
       .on("error", () => {});
     pump(converted as any, response);
   }
+      isStreaming = true;
+    }
+    response.on("close", () => {
+      console.log("Connexion closed, stop streaming...");
+      engine.destroy();
+      response.end();
+    });
+  });
+
+
+
+});
+
+type MovieObject = {
+  torrent_hash: string;
+  torrent: string;
+};
+
+async function getTorrentUrl(idTorrent) {
+  try {
+    const res = await fetch(`http://localhost:8000/api/movies/${idTorrent}/`, {
+      method: "GET",
+    });
+    const responseJson: MovieObject = await res.json();
+    console.log("hello", responseJson, idTorrent);
+    return responseJson.torrent_hash;
+  } catch (error) {
+    return null;
+  }
+}
+
+app.get("/subtitles/:id", async (request, response) => {
+  const { id: subTitleId } = request.params;
+  try {
+    const res = await fetch(`http://localhost:8000/api/subtitles/${subTitleId}/`, {
+      method: "GET",
+    });
+    const resSubtitles: { location: string } = await res.json();
+
+    const stream = fs.createReadStream(resSubtitles.location);
+    response.setHeader("Content-Type", "text/vtt");
+    pump(stream, response);
+  } catch (error) {
+    return response.status(500).send("Erreur Subtitles");
+  }
+});
+
+app.post("/subtitles", async (request, response) => {
+  const { imdb_code, movie_id } = request.body;
+  try {
+    const results = await yifysubtitles(imdb_code, {
+      path: "./subtitles",
+      langs: ["en", "fr", "es"],
+    });
+    for (const sub of results) {
+      await fetch("http://localhost:8000/api/subtitles/", {
+        method: "POST",
+        body: JSON.stringify({
+          location: sub.path,
+          language: sub.langShort,
+              movie: movie_id,
+        }),
+        headers: {
+          "content-type": "application/json;charset=utf-8",
+        },
+      });
+    }
+    if (results.length > 0) {
+      return response.status(200).send("subtitles created");
+    }
+  } catch (error) {
+  }
+  return response.status(200).send("no subtitles ");
+});
+
+const port = process.env.PORT || 8001;
+app.listen(port, () => {
+  console.log(`Server is listening on port ${port}`);
 });
 
 const PORT = process.env.PORT || 8001;

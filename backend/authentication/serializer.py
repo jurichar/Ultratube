@@ -12,7 +12,16 @@ class AccessTokenSerializer(serializers.ModelSerializer):
 class UserModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "username", "email", "password", "first_name", "last_name"]
+        fields = [
+            "id",
+            "username",
+            "email",
+            "password",
+            "first_name",
+            "last_name",
+            "avatar",
+            "omniauth",
+        ]
 
     def create(self, validated_data):
         try:
@@ -21,6 +30,7 @@ class UserModelSerializer(serializers.ModelSerializer):
                 username=validated_data["username"],
                 first_name=validated_data["first_name"],
                 last_name=validated_data["last_name"],
+                avatar="",
             )
             user.set_password(validated_data["password"])
             user.save()
@@ -30,13 +40,16 @@ class UserModelSerializer(serializers.ModelSerializer):
             raise e
 
 
+class UserLanguageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["language"]
+
+
 class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = [
-            "username",
-            "email",
-        ]
+        fields = ["username", "email", "avatar"]
 
 
 class UserListSerializer(serializers.ModelSerializer):
@@ -48,7 +61,7 @@ class UserListSerializer(serializers.ModelSerializer):
 class UserPatchSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["username", "email", "password"]
+        fields = ["username", "email", "password", "first_name", "last_name", "avatar"]
 
 
 class UserLoginSerializer(serializers.ModelSerializer):
