@@ -147,6 +147,7 @@ app.get("/download/:id", async (request, response) => {
     response.on("close", () => {
       console.log("Connexion closed, stop streaming...");
       engine.destroy();
+      response.end();
     });
   });
 });
