@@ -115,7 +115,7 @@ async function getTorrentUrl(idTorrent) {
     });
     const responseJson: MovieObject = await res.json();
     console.log("hello", responseJson, idTorrent);
-    return responseJson.torrent_hash;
+    return responseJson.torrent;
   } catch (error) {
     return null;
   }
@@ -125,10 +125,10 @@ app.get("/subtitles/:id", async (request, response) => {
   const { id: subTitleId } = request.params;
   try {
     const res = await fetch(
-      `http://localhost:8000/api/subtitles/${subTitleId}/`,
+      `http://backend:8000/api/subtitles/${subTitleId}/`,
       {
         method: "GET",
-      },
+      }
     );
     const resSubtitles: { location: string } = await res.json();
 
@@ -148,7 +148,7 @@ app.post("/subtitles", async (request, response) => {
       langs: ["en", "fr", "es"],
     });
     for (const sub of results) {
-      await fetch("http://localhost:8000/api/subtitles/", {
+      await fetch("http://backend:8000/api/subtitles/", {
         method: "POST",
         body: JSON.stringify({
           location: sub.path,

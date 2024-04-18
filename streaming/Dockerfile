@@ -4,7 +4,8 @@ WORKDIR /app
 
 COPY . .
 
-RUN mkdir -p /app/torrents/metadata
+RUN mkdir -p /app/torrents/metadata \
+    && mkdir -p /app/subtitles
 
 RUN npm install \
   && npm run build

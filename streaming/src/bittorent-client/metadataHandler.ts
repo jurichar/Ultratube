@@ -9,9 +9,14 @@ function generatePath(torrentUrl: string): string {
 
 async function downloadTorrentMeta(torrentUrl: string) {
   const path = generatePath(torrentUrl);
-  const response = await fetch(torrentUrl);
-  const buffer = await response.arrayBuffer();
-  await fs.writeFile(path, Buffer.from(buffer));
+  try {
+    const response = await fetch(torrentUrl);
+    console.log(response);
+    const buffer = await response.arrayBuffer();
+    await fs.writeFile(path, Buffer.from(buffer));
+  } catch (err) {
+    console.log("errpr fetch", err);
+  }
   return path;
 }
 
