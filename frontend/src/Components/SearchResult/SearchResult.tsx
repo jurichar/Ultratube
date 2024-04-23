@@ -11,11 +11,12 @@ type searchResultProps = {
   sort: string;
   order: Order;
   page: number;
+  movieSeen?: [{ movie: Movie }];
   filterSort: (currentMovie: Movie[], arrayMovie: Movie[]) => Movie[];
 };
 
 export default function SearchResult(props: searchResultProps) {
-  const { querySearch, filter, sort, filterSort, order, page } = props;
+  const { querySearch, filter, sort, filterSort, order, page, movieSeen } = props;
   const [loading, setLoading] = useState<boolean>(false);
   const [movies, setMovies] = useState<Movie[]>([]);
   const { languageSelected } = useAuth();
@@ -162,7 +163,7 @@ export default function SearchResult(props: searchResultProps) {
   return (
     <div className="flex  flex-row flex-wrap gap-5">
       {movies.map((movie, index) => {
-        return <MovieCard key={index} movie={movie} />;
+        return <MovieCard key={index} movie={movie} movieSeen={movieSeen} />;
       })}
       {movies.length == 0 && !loading && <div> no result</div>}
       {movies.length == 0 && loading && <div> loading</div>}
