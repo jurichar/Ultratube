@@ -40,7 +40,7 @@ services:
     container_name: streaming_engine
     command: npm run start:prod
     volumes:
-      - ./streaming/torrents:/app/torrents
+      - ./streaming:/app/streaming
     ports:
       - "8001:8001"
     environment:
