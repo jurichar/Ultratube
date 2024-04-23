@@ -1,11 +1,11 @@
 export async function downloadMovie(
   engine: any,
-): Promise<TorrentStream.TorrentFile | string> {
+): Promise<TorrentStream.TorrentFile> {
   return new Promise((resolve, reject) => {
     let videoFile: TorrentStream.TorrentFile;
 
     engine.on("ready", () => {
-      engine.files.forEach((file) => {
+      engine.files.forEach((file: TorrentStream.TorrentFile) => {
         const extension = file.name.split(".").pop();
         if (extension.match(/mp4|ogg|webm/)) {
           videoFile = file;

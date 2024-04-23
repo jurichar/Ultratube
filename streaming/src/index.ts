@@ -38,17 +38,19 @@ app.get("/stream/:id", async (request, response) => {
     trackers: torrentMetaData.announce,
   });
 
-  let videoFile;
+  let videoFile: TorrentStream.TorrentFile;
   try {
     videoFile = await downloadMovie(engine);
   } catch (error) {
     return response.status(404).send(error.message);
   }
+
   const parts = range.replace(/bytes=/, "").split("-");
   const start = parseInt(parts[0], 10);
   const end = parts[1] ? parseInt(parts[1], 10) : videoFile.length - 1;
   const chunksize = Number(end - start + 1);
   const extension = videoFile.name.split(".").pop();
+  const videoStream = videoFile.createReadStream({ start, end });
 
   const headers = {
     "Content-Range": `bytes ${start}-${end}/${videoFile.length}`,
@@ -57,8 +59,6 @@ app.get("/stream/:id", async (request, response) => {
     "Content-Type": `video/${extension.match(/mp4|webm|ogg/) ? extension : "webm"}`,
     "Keep-alive": "timeout=10000",
   };
-
-  const videoStream = videoFile.createReadStream({ start, end });
 
   try {
     await fs.promises.writeFile(`./torrents/${videoFile.path}`, "", {
@@ -108,13 +108,12 @@ type MovieObject = {
   torrent: string;
 };
 
-async function getTorrentUrl(idTorrent) {
+async function getTorrentUrl(idTorrent: string) {
   try {
     const res = await fetch(`http://backend:8000/api/movies/${idTorrent}/`, {
       method: "GET",
     });
     const responseJson: MovieObject = await res.json();
-    console.log("hello", responseJson, idTorrent);
     return responseJson.torrent;
   } catch (error) {
     return null;
@@ -128,7 +127,7 @@ app.get("/subtitles/:id", async (request, response) => {
       `http://backend:8000/api/subtitles/${subTitleId}/`,
       {
         method: "GET",
-      }
+      },
     );
     const resSubtitles: { location: string } = await res.json();
 
