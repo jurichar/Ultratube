@@ -1,17 +1,19 @@
 // src/Components/MovieCards/MovieCardTrending.tsx
 
 import { Movie } from "../../types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Loading from "../Loading/Loading";
 import { FaStar } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 interface MovieCardProps {
   movie: Movie;
+  moviesSeen?: [{ movie: Movie }];
 }
 
-export default function MovieCardTrending({ movie }: MovieCardProps) {
+export default function MovieCardTrending({ movie, moviesSeen }: MovieCardProps) {
   const [loading, setLoading] = useState(true);
+  const [watch, setWatch] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const handleImageLoad = () => {
@@ -20,10 +22,21 @@ export default function MovieCardTrending({ movie }: MovieCardProps) {
   const handleMovieClick = () => {
     navigate(`/movie/${movie.id}`, { state: { movieProps: movie } });
   };
-
+  useEffect(() => {
+    console.log(moviesSeen);
+    if (moviesSeen && moviesSeen?.length > 0) {
+      moviesSeen.forEach((elem) => {
+        const movieToCompare: Movie = elem.movie;
+        if (movieToCompare.imdb_code == movie.imdb_link) {
+          setWatch(true);
+          console.log(movieToCompare, movie);
+        }
+      });
+    }
+  }, [moviesSeen]);
   return (
     <div
-      className="flex-shrink-0 w-60 h-32 rounded flex flex-col justify-between relative md:w-[29.375rem] md:h-[14.375rem]"
+      className={`flex-shrink-0 w-60 h-32 rounded flex flex-col justify-between relative md:w-[29.375rem] md:h-[14.375rem] ${watch ? "border-2 border-red-500 opacity-30" : ""}`}
       style={{
         backgroundImage: `url(${movie.image})`,
         backgroundSize: "cover",
@@ -32,7 +45,7 @@ export default function MovieCardTrending({ movie }: MovieCardProps) {
     >
       {loading && <Loading />}
       <button className="z-10 opacity-0 w-full h-full bg-tertiary hover:opacity-50 rounded flex justify-center items-center transition-all" onClick={handleMovieClick}>
-        Play
+        {watch ? "re watch" : "Play"}
       </button>
       <div className="absolute left-2 bottom-2">
         <div className="flex flex-row items-center gap-2">

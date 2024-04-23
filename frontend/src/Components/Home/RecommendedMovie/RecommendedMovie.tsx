@@ -9,7 +9,7 @@ type propsRecommended = {
   order: Order;
   page: number;
   sort: string;
-  moviesSeen: Movie[];
+  moviesSeen?: [{ movie: Movie }];
   filterSort: (currentMovie: Movie[], arrayMovie: Movie[]) => Movie[];
 };
 

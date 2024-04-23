@@ -22,7 +22,7 @@ export default function Home() {
   const [filter, setFilter] = useState<filter>(initialState);
   const [sort, setSort] = useState<keyof Movie>("rating");
   const [order, setOrder] = useState<Order>("asc");
-  const [moviesSeen, setMoviesSeen] = useState<[{ movie: Movie }]>([]);
+  const [moviesSeen, setMoviesSeen] = useState<[{ movie: Movie }]>();
   const { languageSelected, userData } = useAuth();
   async function handleSearch(search: string) {
     setPage(1);
@@ -38,7 +38,7 @@ export default function Home() {
   }, [userData]);
   async function getListSeenMovie() {
     try {
-      const res: Movie[] = await fetchWrapper("api/watched-movies/", { method: "GET" });
+      const res: [{ movie: Movie }] = await fetchWrapper("api/watched-movies/", { method: "GET" });
       setMoviesSeen(res);
     } catch (error) {
       notify({ type: "warning", msg: "cant get list watched movie" });

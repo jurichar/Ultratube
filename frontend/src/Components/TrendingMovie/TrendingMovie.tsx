@@ -3,7 +3,7 @@ import { Movie, YtsMovie } from "../../types";
 import MovieCardTrending from "../MovieCards/MovieCardTrending";
 import { useTranslation } from "react-i18next";
 
-export default function TrendingMovie() {
+export default function TrendingMovie({ moviesSeen }: [{ movie: Movie }]) {
   const { t } = useTranslation();
   const [moviesTrending, setMoviesTrending] = useState<Movie[]>([]);
 
@@ -58,7 +58,7 @@ export default function TrendingMovie() {
       <span>{t("trending")}</span>
       <div className="overflow-x-auto w-full flex flex-row gap-4">
         {moviesTrending.map((movie) => (
-          <MovieCardTrending key={movie.id} movie={movie} />
+          <MovieCardTrending key={movie.id} movie={movie} moviesSeen={moviesSeen} />
         ))}
       </div>
     </div>
