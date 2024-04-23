@@ -1,11 +1,12 @@
 FROM node:21.5.0
 
-WORKDIR /app
+WORKDIR /app/streaming
 
-COPY . .
+COPY package.json .
 
-RUN mkdir -p /app/torrents/metadata \
-    && mkdir -p /app/subtitles
+RUN mkdir /app/torrents \
+  && mkdir /app/torrents/metadata \
+  && mkdir -p /app/subtitles
 
 RUN npm install \
   && npm run build
