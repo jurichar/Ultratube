@@ -38,13 +38,14 @@ services:
   streaming:
     build: ./streaming
     container_name: streaming_engine
-    command: npm run start:prod
+    command: yarn start:prod
     volumes:
       - ./streaming:/app/streaming
     ports:
       - "8001:8001"
     environment:
       - PORT=8001
+    restart: always
   api-py:
     build: ./api-torrent
     ports:

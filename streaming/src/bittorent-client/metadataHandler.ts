@@ -11,11 +11,10 @@ async function downloadTorrentMeta(torrentUrl: string) {
   const path = generatePath(torrentUrl);
   try {
     const response = await fetch(torrentUrl);
-    console.log(response);
     const buffer = await response.arrayBuffer();
     await fs.writeFile(path, Buffer.from(buffer));
-  } catch (err) {
-    console.log("errpr fetch", err);
+  } catch (_err) {
+    console.log("error fetch");
   }
   return path;
 }
