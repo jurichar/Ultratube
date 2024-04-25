@@ -71,7 +71,6 @@ app.get("/stream/:id", async (request, response) => {
   let isStreaming = false;
 
   engine.on("download", async () => {
-    // console.log(Math.floor(engine.swarm.downloaded * videoFile.length) / 100);
     if (!isStreaming && engine.swarm.downloaded > 4936832) {
       const fileTmp = fs.createReadStream("./torrents/" + videoFile.path, {
         start: start,
@@ -80,7 +79,7 @@ app.get("/stream/:id", async (request, response) => {
 
       if (extension.match(/mp4|webm|ogg/)) {
         response.writeHead(206, headers);
-        pump(fileTmp, response);
+        pump(videoStream, response);
       } else {
         const converted = ffmpeg(videoStream)
           .videoCodec("libvpx")
