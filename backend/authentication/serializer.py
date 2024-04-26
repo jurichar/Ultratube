@@ -9,6 +9,13 @@ class AccessTokenSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class AccesTokenCreateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ["username", "password"]
+
+
 class UserModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

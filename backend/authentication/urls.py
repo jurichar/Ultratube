@@ -1,11 +1,13 @@
 from django.urls import include, path
 from .views import (
+    AccesTokenList,
     AccessTokenDetail,
     DiscordAuthView,
     FortyTwoAuthView,
     GithubAUthView,
     ResetPassword,
     sendEmailAPI,
+    test,
 )
 from .views import UserLogin, UserLogout, UserRegister, UserViewSet
 from .views import get_csrf_token, CurrentUser
@@ -26,6 +28,8 @@ urlpatterns = [
     path("", include(router.urls)),
     path("get-csrf-token/", get_csrf_token, name="get-csrf-token"),
     path("update-token/<str:token>/", AccessTokenDetail.as_view(), name="token-api"),
+    path("token/", AccesTokenList.as_view(), name="token-list"),
+    path("test/", test.as_view(), name="token-"),
     path("email", sendEmailAPI.as_view(), name="email"),
     path("reset-password/<str:email>/", ResetPassword.as_view(), name="reset-password"),
 ]
