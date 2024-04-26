@@ -9,9 +9,12 @@ import bodyparser from "body-parser";
 import fs from "node:fs";
 import torrentStream from "torrent-stream";
 import yifysubtitles from "./api-subtitle.js";
+import { flushMoviesJob } from "./jobs/flushMovies.js";
 
 app.use(cors());
 app.use(bodyparser.json());
+
+flushMoviesJob();
 
 const TORRENT_PATH = "./torrents";
 
