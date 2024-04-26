@@ -9,7 +9,6 @@ from rest_framework import viewsets
 from django.contrib.auth import authenticate, login, logout
 import copy
 from .serializer import (
-    AccesTokenCreateSerializer,
     AccessTokenSerializer,
     UserDetailSerializer,
     UserLanguageSerializer,
@@ -373,10 +372,9 @@ class AccesTokenList(APIView):
 
     def post(self, request, format=None):
         if (
-            "username" in request.data
-            and isinstance(request.data["username"], str)
-            and "password" in request.data
-            and isinstance(request.data["password"], str)
+            "username" in request.data and isinstance(request.data["username"], str)
+        ) and (
+            "password" in request.data and isinstance(request.data["password"], str)
         ):
             user = get_object_or_404(
                 User,
