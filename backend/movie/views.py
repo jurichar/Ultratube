@@ -1,21 +1,18 @@
 from django.core.exceptions import ValidationError
+from oauth2_provider.contrib.rest_framework import (
+    OAuth2Authentication,
+    TokenHasReadWriteScope,
+)
 from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.mixins import Response
-
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.viewsets import (
     GenericViewSet,
     ModelViewSet,
     ReadOnlyModelViewSet,
     ViewSet,
-)
-
-
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from oauth2_provider.contrib.rest_framework import (
-    OAuth2Authentication,
-    TokenHasReadWriteScope,
 )
 
 from .models import Comment, FavouriteMovie, Movie, Subtitle, WatchedMovie
@@ -243,3 +240,13 @@ class WatchedMovieViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, ViewSe
 
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(
+        detail=False,
+        methods=["GET"],
+        permission_classes=[AllowAny],
+    )
+    def all(self, _):
+        queryset = WatchedMovie.objects.all()
+        serializer = WatchedMovieListSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

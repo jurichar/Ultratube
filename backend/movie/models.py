@@ -20,6 +20,7 @@ class Movie(models.Model):
     torrent = models.CharField(null=False, default="")
     torrent_hash = models.CharField(null=False, default="")
     imdb_code = models.CharField(null=False, default="", blank=True)
+    path = models.CharField(null=True, default="", blank=True)
 
     def __str__(self):
         return self.name

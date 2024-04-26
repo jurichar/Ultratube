@@ -143,7 +143,7 @@ class WatchedMovieListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WatchedMovie
-        fields = ["movie"]
+        fields = ["movie", "watched_at"]
 
 
 class WatchedMovieCreateSerializer(serializers.ModelSerializer):
