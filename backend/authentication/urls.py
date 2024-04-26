@@ -7,7 +7,6 @@ from .views import (
     GithubAUthView,
     ResetPassword,
     sendEmailAPI,
-    test,
 )
 from .views import UserLogin, UserLogout, UserRegister, UserViewSet
 from .views import get_csrf_token, CurrentUser
