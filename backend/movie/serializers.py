@@ -75,6 +75,7 @@ class MovieDetailSerializer(serializers.ModelSerializer):
             "torrent",
             "imdb_code",
             "torrent_hash",
+            "path",
         ]
 
     def get_comments_number(self, obj):

@@ -174,6 +174,7 @@ class TestMovie(MovieAPITestCase):
             "torrent_hash": movie.torrent_hash,
             "imdb_code": movie.imdb_code,
             "thumbnail_cover": movie.thumbnail_cover,
+            "path": "",
         }
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), expected)
@@ -442,6 +443,7 @@ class TestWatchedMovie(MovieAPITestCase):
                 "torrent": self.movie.torrent,
                 "imdb_code": self.movie.imdb_code,
                 "torrent_hash": self.movie.torrent_hash,
+                "path": "",
             },
         )
         self.assertEqual(
@@ -460,6 +462,7 @@ class TestWatchedMovie(MovieAPITestCase):
                 "torrent": self.movie1.torrent,
                 "imdb_code": self.movie1.imdb_code,
                 "torrent_hash": self.movie1.torrent_hash,
+                "path": "",
             },
         )
 
@@ -501,6 +504,7 @@ class TestWatchedMovie(MovieAPITestCase):
                 "torrent": self.movie.torrent,
                 "imdb_code": self.movie.imdb_code,
                 "torrent_hash": self.movie.torrent_hash,
+                "path": "",
             },
         )
         self.assertEqual(
@@ -519,5 +523,6 @@ class TestWatchedMovie(MovieAPITestCase):
                 "torrent": self.movie1.torrent,
                 "imdb_code": self.movie1.imdb_code,
                 "torrent_hash": self.movie1.torrent_hash,
+                "path": "",
             },
         )
