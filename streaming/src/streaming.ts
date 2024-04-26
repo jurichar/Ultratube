@@ -7,7 +7,7 @@ export async function downloadMovie(
     engine.on("ready", () => {
       engine.files.forEach((file: TorrentStream.TorrentFile) => {
         const extension = file.name.split(".").pop();
-        if (extension.match(/mp4|ogg|webm/)) {
+        if (extension.match(/mp4|ogg|webm|mkv|mov|avi|ogg/)) {
           videoFile = file;
           resolve(videoFile);
         } else {

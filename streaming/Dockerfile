@@ -5,11 +5,12 @@ WORKDIR /app/streaming
 COPY package.json .
 COPY . .
 
+RUN apt update && apt upgrade -y && apt install ffmpeg -y
 RUN yarn install
 
 RUN mkdir -p torrents \
-      && mkdir -p torrents/metadata \
-      && mkdir -p subtitles
+  && mkdir -p torrents/metadata \
+  && mkdir -p subtitles
 
 EXPOSE 8001
 
