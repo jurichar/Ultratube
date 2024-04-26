@@ -17,8 +17,7 @@ export default function MoviePage() {
   const [subtitles, setSubtitles] = useState<subtitles[]>();
   const [movieIdDb, setMovieIdDb] = useState<number>(0);
   const { userData } = useAuth();
-  const [subtitlesSrc, setSubtitlesSrc] =
-    useState<[{ blob: string; language: string }]>();
+  const [subtitlesSrc, setSubtitlesSrc] = useState<[{ blob: string; language: string }]>();
   const navigate = useNavigate();
   const { languageSelected } = useAuth();
   const videoRef = useRef(null);
@@ -30,7 +29,7 @@ export default function MoviePage() {
         Authorization: `Bearer  ${import.meta.env.VITE_TIMDB_ACCESS_KEY}`,
       },
     }),
-    [],
+    []
   );
   const handleTimeUpdate = async () => {
     try {
@@ -54,9 +53,7 @@ export default function MoviePage() {
         const urls = [];
         for (const sub of subtitles) {
           console.log(sub);
-          const response = await fetch(
-            `http://localhost:8001/subtitles/${sub?.id}`,
-          );
+          const response = await fetch(`http://localhost:8001/subtitles/${sub?.id}`);
           if (!response.ok) {
             throw new Error("Error to get subtitles");
           }
@@ -84,7 +81,6 @@ export default function MoviePage() {
 
   useEffect(() => {
     async function createMovieInDb() {
-      console.log(movie);
       const dataObject = {
         name: movie?.title,
         thumbnail_cover: movie?.image,
@@ -98,10 +94,7 @@ export default function MoviePage() {
         imdb_code: movie?.imdb_link,
       };
       try {
-        const result: { id: number } = await fetchWrapper(
-          "api/movies/create_movie/",
-          { method: "POST", body: dataObject },
-        );
+        const result: { id: number } = await fetchWrapper("api/movies/create_movie/", { method: "POST", body: dataObject });
 
         setMovieIdDb(result.id);
         await fetch("http://localhost:8001/subtitles", {
@@ -115,10 +108,7 @@ export default function MoviePage() {
             "content-type": "application/json;charset=utf-8",
           },
         });
-        const responseSubtitles: subtitles[] = await fetchWrapper(
-          `api/movies/${result.id}/subtitles_movie/`,
-          { method: "GET" },
-        );
+        const responseSubtitles: subtitles[] = await fetchWrapper(`api/movies/${result.id}/subtitles_movie/`, { method: "GET" });
         setSubtitles(responseSubtitles);
       } catch (error) {
         let message = "Unknown Error";
@@ -131,18 +121,7 @@ export default function MoviePage() {
     }
   }, [movie]);
 
-  async function getInfoMovie(
-    title: string,
-    year: number,
-    torrent: string,
-    quality: string,
-    language: string,
-    image: string,
-    trailer: string,
-    length: number,
-    genres: string[],
-    hash: string,
-  ) {
+  async function getInfoMovie(title: string, year: number, torrent: string, quality: string, language: string, image: string, trailer: string, length: number, genres: string[], hash: string) {
     const movieInfoTmp: Movie = {
       rating: 0,
       synopsis: "",
@@ -177,10 +156,7 @@ export default function MoviePage() {
                 character: elem.character,
                 known_for_department: elem.known_for_department,
                 name: elem.name,
-                profile_path:
-                  elem.profile_path &&
-                  "https://image.tmdb.org/t/p/w138_and_h175_face/" +
-                    elem.profile_path,
+                profile_path: elem.profile_path && "https://image.tmdb.org/t/p/w138_and_h175_face/" + elem.profile_path,
               };
             });
             setCast(cast);
@@ -191,10 +167,7 @@ export default function MoviePage() {
                 character: "",
                 known_for_department: elem?.known_for_department,
                 name: elem.name,
-                profile_path:
-                  elem.profile_path &&
-                  "https://image.tmdb.org/t/p/w138_and_h175_face/" +
-                    elem.profile_path,
+                profile_path: elem.profile_path && "https://image.tmdb.org/t/p/w138_and_h175_face/" + elem.profile_path,
               };
             });
             setCrew(crew);
@@ -213,36 +186,10 @@ export default function MoviePage() {
     }
     const { movieProps } = state;
     console.log(movieProps);
-    if (
-      "title" in movieProps &&
-      movieProps["title"] &&
-      movieProps["title"].length > 0
-    ) {
+    if ("title" in movieProps && movieProps["title"] && movieProps["title"].length > 0) {
       console.log("here");
-      const {
-        title,
-        year,
-        torrent,
-        quality,
-        language,
-        image,
-        trailer,
-        length,
-        genres,
-        torrent_hash,
-      } = movieProps;
-      getInfoMovie(
-        title,
-        year,
-        torrent,
-        quality,
-        language,
-        image,
-        trailer,
-        length,
-        genres,
-        torrent_hash,
-      );
+      const { title, year, torrent, quality, language, image, trailer, length, genres, torrent_hash } = movieProps;
+      getInfoMovie(title, year, torrent, quality, language, image, trailer, length, genres, torrent_hash);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
@@ -263,18 +210,13 @@ export default function MoviePage() {
     <div className="flex flex-col  gap-20 justify-center items-center ">
       cc
       <div className="w-full h-40 text-quinary opacity-100 relative flex flex-col justify-center items-center">
-        <div
-          className="w-full h-full bg-cover bg-center bg-no-repeat opacity-30 absolute"
-          style={{ backgroundImage: `url(${movie?.image})` }}
-        ></div>
+        <div className="w-full h-full bg-cover bg-center bg-no-repeat opacity-30 absolute" style={{ backgroundImage: `url(${movie?.image})` }}></div>
         <div className="relative flex flex-row align-middle">
           <h1 className="text-4xl font-bold opacity-100">{movie?.title}</h1>
           {userData && <BookmarkIcon handleClick={handleBookMark} />}
         </div>
         <h2 className="text-2xl">{movie?.year}</h2>
-        {movie && movie?.rating > 0.0 && (
-          <h3>imb rating : {movie?.rating} /10 </h3>
-        )}
+        {movie && movie?.rating > 0.0 && <h3>imb rating : {movie?.rating} /10 </h3>}
         <h3> {movie?.length} minutes</h3>
       </div>
       {movie?.summary ? (
@@ -293,28 +235,11 @@ export default function MoviePage() {
       {movie?.trailer && <TrailerSection linkEmbed={movie.trailer} />}
       <h1 className="text-4xl font-bold text-white">Movie</h1>
       {movieIdDb && (
-        <video
-          ref={videoRef}
-          onPlay={handleTimeUpdate}
-          onEnded={() => console.log("end")}
-          id="videoPlayer"
-          controls
-        >
-          <source
-            src={`http://localhost:8001/stream/${movieIdDb}`}
-            type="video/mp4"
-          />
+        <video ref={videoRef} onPlay={handleTimeUpdate} onEnded={() => console.log("end")} id="videoPlayer" controls>
+          <source src={`http://localhost:8001/stream/${movieIdDb}`} type="video/mp4" />
           {subtitlesSrc &&
             subtitlesSrc.map((elem, index) => {
-              return (
-                <track
-                  key={index}
-                  src={elem.blob}
-                  kind="subtitles"
-                  srcLang={elem.language}
-                  label={elem.language}
-                />
-              );
+              return <track key={index} src={elem.blob} kind="subtitles" srcLang={elem.language} label={elem.language} />;
             })}
         </video>
       )}

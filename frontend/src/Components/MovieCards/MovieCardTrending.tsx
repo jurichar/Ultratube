@@ -33,6 +33,7 @@ export default function MovieCardTrending({ movie, moviesSeen }: MovieCardProps)
         }
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [moviesSeen]);
   return (
     <div

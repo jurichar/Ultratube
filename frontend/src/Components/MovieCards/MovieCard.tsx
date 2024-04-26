@@ -1,6 +1,6 @@
 // src/Components/MovieCards/MovieCard.tsx
 
-import { Movie, YtsMovie } from "../../types";
+import { Movie } from "../../types";
 import { useEffect, useState } from "react";
 import Loading from "../Loading/Loading";
 import { FaStar } from "react-icons/fa";
@@ -38,6 +38,7 @@ export default function MovieCard({ movie, movieSeen }: MovieCardProps) {
         }
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [movieSeen]);
 
   return (
