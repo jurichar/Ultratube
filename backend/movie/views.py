@@ -11,7 +11,6 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.viewsets import (
     GenericViewSet,
     ModelViewSet,
-    ReadOnlyModelViewSet,
     ViewSet,
 )
 
@@ -26,6 +25,7 @@ from .serializers import (
     MovieDeleteSerializer,
     MovieDetailSerializer,
     MovieListSerializer,
+    MovieUpdateSerializer,
     SubtitleCreateSerializer,
     SubtitleDetailsSerializer,
     SubtitleListSerializer,
@@ -52,12 +52,20 @@ class MultipleSerializerMixin:
         return super().get_serializer_class() if not opt else opt
 
 
-class MovieViewSet(MultipleSerializerMixin, ReadOnlyModelViewSet):
+class MovieViewSet(
+    MultipleSerializerMixin,
+    GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.UpdateModelMixin,
+):
     permission_classes = [AllowAny]
     authentication_classes = [OAuth2Authentication]
     serializer_class = MovieListSerializer
     detail_serializer_class = MovieDetailSerializer
     destroy_serializer_class = MovieDeleteSerializer
+    update_serializer_class = MovieUpdateSerializer
 
     def get_permissions(self):
         if self.action == "destroy":
@@ -73,7 +81,7 @@ class MovieViewSet(MultipleSerializerMixin, ReadOnlyModelViewSet):
         detail=True,
         methods=["GET"],
     )
-    def subtitles_movie(self, request, pk=None):
+    def subtitles_movie(self, _, pk=None):
         get_object_or_404(Movie, pk=pk)
         queryset = Subtitle.objects.filter(movie__pk=pk).all()
         serializer = SubtitleListSerializer(queryset, many=True)
@@ -130,12 +138,6 @@ class MovieViewSet(MultipleSerializerMixin, ReadOnlyModelViewSet):
                 return Response({"id": movie_db.first().id}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    #  need to be auth to do that
-    def destroy(self, request, pk=None):
-        movie = get_object_or_404(Movie, pk=pk)
-        movie.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
 
 class CommentViewSet(MultipleSerializerMixin, ModelViewSet):
     http_method_names = ["get", "post", "patch", "delete"]
@@ -187,7 +189,7 @@ class FavouriteListCreateDeleteViewSet(
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def destroy(self, request, pk=None):
+    def destroy(self, _, pk=None):
         favouriteMovie = get_object_or_404(FavouriteMovie, pk=pk)
         favouriteMovie.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

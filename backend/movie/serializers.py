@@ -86,6 +86,13 @@ class MovieDetailSerializer(serializers.ModelSerializer):
         return SubtitleListSerializer(subtitles, many=True).data
 
 
+class MovieUpdateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Movie
+        fields = ["path"]
+
+
 class CommentViewSerializer(serializers.ModelSerializer):
 
     author = serializers.SerializerMethodField()

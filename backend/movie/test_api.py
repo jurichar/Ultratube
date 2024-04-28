@@ -179,6 +179,16 @@ class TestMovie(MovieAPITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), expected)
 
+    def test_update_path(self):
+        movie = Movie.objects.first()
+
+        response = self.client.patch(
+            reverse("movies-detail", args=[movie.id]), {"path": "well_done"}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"path": "well_done"})
+
     def test_movie_comments_get(self):
         access_token, client, user = setUpAuth(self)
         custom_header = {"Authorization": f"Bearer {access_token}"}
