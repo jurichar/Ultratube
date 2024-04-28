@@ -98,6 +98,13 @@ app.get("/stream/:id", async (request, response) => {
     }
   });
 
+  engine.on("idle", async () => {
+    await fetch(`http://backend:8000/api/movie/${torrentId}/`, {
+      method: "PATCH",
+      body: JSON.stringify({ path: "./torrents/" + videoFile.path }),
+    });
+  });
+
   response.on("close", () => {
     console.log("Connexion closed, stop streaming...");
     engine.destroy(() => {});

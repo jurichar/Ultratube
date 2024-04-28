@@ -47,8 +47,15 @@ export function flushMoviesJob() {
         },
       );
       // TODO update db path to blank
+      const payload = {
+        path: "",
+      };
+
+      await fetch(`http://backend:8000/api/movie/${movie.movie.id}/`, {
+        method: "PATCH",
+        body: JSON.stringify(payload),
+      });
     }
-    console.log("Running job: ", toFlush);
   });
 
   job.start();
