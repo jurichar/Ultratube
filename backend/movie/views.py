@@ -217,8 +217,8 @@ class SubtitleMovieViewSet(ModelViewSet):
 
 
 class WatchedMovieViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, ViewSet):
+    permission_classes = [AllowAny]
     authentication_classes = [OAuth2Authentication]
-    permission_classes = [IsAuthenticated, TokenHasReadWriteScope]
 
     def list(self, request):
         queryset = WatchedMovie.objects.filter(watcher=request.user).all()
@@ -226,12 +226,16 @@ class WatchedMovieViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, ViewSe
         return Response(serializer.data)
 
     def create(self, request):
+
         dataSerializer = {
-            "watcher": self.request.user.id,
+            "watcher": None,
             "movie": request.data["movie"],
         }
+        if request.user.id:
+            dataSerializer["watcher"] = request.user.id
         serializer = WatchedMovieCreateSerializer(data=dataSerializer)
-        if serializer.is_valid():
+
+        if serializer.is_valid() and request.user.id:
             queryset = WatchedMovie.objects.filter(
                 watcher=request.user, movie=serializer.validated_data["movie"]
             ).exists()
@@ -240,6 +244,9 @@ class WatchedMovieViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, ViewSe
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             else:
                 return Response("already seen", status=status.HTTP_400_BAD_REQUEST)
+        elif serializer.is_valid() and not request.user.id:
+            serializer.create(serializer.validated_data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

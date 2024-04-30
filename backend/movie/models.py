@@ -38,12 +38,14 @@ class Subtitle(models.Model):
 
 
 class WatchedMovie(models.Model):
-    watcher = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    watcher = models.ForeignKey(
+        get_user_model(), on_delete=models.CASCADE, null=True, blank=True
+    )
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     watched_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.watcher.username}: {self.movie.name}"
+        return f"{self.watched_at}: {self.movie.name}"
 
 
 class Comment(models.Model):

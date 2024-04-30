@@ -39,8 +39,9 @@ export default function Home() {
   /** FILTER AND SORT UTILS */
   const filteredArray = (arrayMovie: Movie[]) => {
     let tmpArrayMovie = arrayMovie;
-
+    console.log(filter);
     tmpArrayMovie = tmpArrayMovie.filter(({ rating }) => rating >= filter.rating);
+    tmpArrayMovie = tmpArrayMovie.filter(({ year }) => year >= filter.min_year_release);
     if (filter.name != "") {
       tmpArrayMovie = tmpArrayMovie.filter(({ title }) => title.includes(filter.name));
     }
@@ -74,32 +75,53 @@ export default function Home() {
     let movieTmp = structuredClone(array);
     if (value == "genres") {
       movieTmp = movieTmp.sort((firstItem, secondItem) => {
-        const valueFirstItem = firstItem[value].length > 0 && firstItem[value][0];
-        const valueSecondItem = firstItem[value].length > 0 && secondItem[value][0];
-        const orderAsc = order == "asc" && valueFirstItem && valueSecondItem && valueFirstItem > valueSecondItem;
-        const orderDesc = order == "desc" && valueFirstItem && valueSecondItem && valueFirstItem < valueSecondItem;
-        if (order == "desc" ? orderDesc : orderAsc) {
-          return 1;
-        } else if (valueFirstItem && valueSecondItem && valueFirstItem == valueSecondItem) {
-          return -0;
+        let valueFirstItem;
+        let valueSecondItem;
+        if (firstItem[value] && firstItem[value].length > 0 && secondItem[value] && secondItem[value].length > 0) {
+          valueFirstItem = firstItem[value][0];
+          valueSecondItem = secondItem[value][0];
+        }
+        if (valueFirstItem && valueSecondItem) {
+          if (order == "asc") {
+            if (valueFirstItem > valueSecondItem) {
+              return 1;
+            } else {
+              return -1;
+            }
+          } else {
+            if (valueFirstItem < valueSecondItem) {
+              return 1;
+            } else {
+              return -1;
+            }
+          }
         } else {
-          return -1;
+          return 0;
+        }
+      });
+    } else {
+      movieTmp = movieTmp.sort((firstItem, secondItem) => {
+        const valueFirstItem = firstItem[value];
+        const valueSecondItem = secondItem[value];
+        if (valueFirstItem != undefined && valueSecondItem != undefined) {
+          if (order == "asc") {
+            if (valueFirstItem >= valueSecondItem) {
+              return 1;
+            } else {
+              return -1;
+            }
+          } else {
+            if (valueFirstItem <= valueSecondItem) {
+              return 1;
+            } else {
+              return -1;
+            }
+          }
+        } else {
+          return 0;
         }
       });
     }
-    movieTmp = movieTmp.sort((firstItem, secondItem) => {
-      const valueFirstItem = firstItem[value];
-      const valueSecondItem = secondItem[value];
-      const orderAsc = order == "asc" && valueFirstItem && valueSecondItem && valueFirstItem > valueSecondItem;
-      const orderDesc = order == "desc" && valueFirstItem && valueSecondItem && valueFirstItem < valueSecondItem;
-      if (order == "desc" ? orderDesc : orderAsc) {
-        return 1;
-      } else if (valueFirstItem && valueSecondItem && valueFirstItem == valueSecondItem) {
-        return -0;
-      } else {
-        return -1;
-      }
-    });
     return movieTmp;
   };
 
