@@ -39,7 +39,6 @@ export default function Home() {
   /** FILTER AND SORT UTILS */
   const filteredArray = (arrayMovie: Movie[]) => {
     let tmpArrayMovie = arrayMovie;
-    console.log(filter);
     tmpArrayMovie = tmpArrayMovie.filter(({ rating }) => rating >= filter.rating);
     tmpArrayMovie = tmpArrayMovie.filter(({ year }) => year >= filter.min_year_release);
     if (filter.name != "") {

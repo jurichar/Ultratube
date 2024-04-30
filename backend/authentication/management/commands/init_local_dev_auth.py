@@ -48,7 +48,6 @@ class Command(BaseCommand):
                 print("cant create application please retry")
 
         try:
-            print("hello")
             if superuser is None:
                 if superuser:
                     application = Application.objects.get(

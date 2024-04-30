@@ -53,7 +53,6 @@ export default function MoviePage() {
       try {
         const urls = [];
         for (const sub of subtitles) {
-          console.log(sub);
           const response = await fetch(`http://localhost:8001/subtitles/${sub?.id}`);
           if (!response.ok) {
             throw new Error("Error to get subtitles");
@@ -82,7 +81,6 @@ export default function MoviePage() {
 
   useEffect(() => {
     async function createMovieInDb() {
-      console.log(movie);
       const dataObject = {
         name: movie?.title,
         thumbnail_cover: movie?.image,
@@ -188,7 +186,6 @@ export default function MoviePage() {
       return;
     }
     const { movieProps } = state;
-    console.log(movieProps);
     if ("title" in movieProps && movieProps["title"] && movieProps["title"].length > 0) {
       const { title, year, torrent, quality, language, image, trailer, length, genres, torrent_hash } = movieProps;
       getInfoMovie(title, year, torrent, quality, language, image, trailer, length, genres, torrent_hash);
@@ -198,7 +195,6 @@ export default function MoviePage() {
 
   const handleBookMark = async () => {
     try {
-      console.log(movieIdDb);
       await fetchWrapper("api/favourite-movies/", {
         method: "POST",
         body: { movie: movieIdDb },
@@ -206,7 +202,6 @@ export default function MoviePage() {
     } catch (error) {
       notify({ type: "error", msg: "Cant add this movie in favorite" });
     }
-    console.log("hello");
   };
   return (
     <div className="flex flex-col  gap-20 justify-center items-center ">
