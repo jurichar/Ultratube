@@ -432,7 +432,6 @@ class sendEmailAPI(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        print(request.GET.get("email"))
         sendEmail(subject="cc", message="cc", mailReceiver=request.GET.get("email"))
 
         return Response("ok")
