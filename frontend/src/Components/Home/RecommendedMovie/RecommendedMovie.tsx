@@ -9,11 +9,12 @@ type propsRecommended = {
   order: Order;
   page: number;
   sort: string;
+  moviesSeen?: [{ movie: Movie }];
   filterSort: (currentMovie: Movie[], arrayMovie: Movie[]) => Movie[];
 };
 
 export default function RecommendedMovie(props: propsRecommended) {
-  const { filter, order, page, sort, filterSort } = props;
+  const { filter, order, page, sort, filterSort, moviesSeen } = props;
   const [movies, setMovies] = useState<Movie[]>([]);
   const { languageSelected } = useAuth();
 
@@ -69,7 +70,7 @@ export default function RecommendedMovie(props: propsRecommended) {
     <div className="w-full h-full flex  pb-60 flex-col gap-4  relative">
       <div className="flex  flex-row flex-wrap gap-5">
         {movies.map((movie) => (
-          <MovieCard key={movie.id} movie={movie} />
+          <MovieCard key={movie.id} movie={movie} movieSeen={moviesSeen} />
         ))}
       </div>
     </div>

@@ -3,7 +3,7 @@ import { Movie, YtsMovie } from "../../types";
 import MovieCardTrending from "../MovieCards/MovieCardTrending";
 import { useTranslation } from "react-i18next";
 
-export default function TrendingMovie() {
+export default function TrendingMovie({ moviesSeen }: [{ movie: Movie }]) {
   const { t } = useTranslation();
   const [moviesTrending, setMoviesTrending] = useState<Movie[]>([]);
 
@@ -14,6 +14,10 @@ export default function TrendingMovie() {
       if ("movies" in all_movies_json.data) {
         const all_Movie_Data: YtsMovie[] = all_movies_json.data.movies;
         const arrayTrending = all_Movie_Data.map((elem) => {
+          if ("torrents" in elem == false) {
+            return {};
+          }
+          console.log(elem);
           const quality = Array.isArray(elem.torrents) && elem.torrents?.length > 0 ? elem.torrents[0].quality : elem.torrents.quality;
           const torrent_url = Array.isArray(elem.torrents) && elem.torrents?.length > 0 ? elem.torrents[0].url : elem.torrents.url;
           return {
@@ -34,7 +38,10 @@ export default function TrendingMovie() {
             torrent_hash: elem.hash,
           };
         });
-        setMoviesTrending(arrayTrending);
+        const tmp: Movie[] = arrayTrending.filter((elem) => {
+          return elem != undefined && Object.keys(elem).length > 0;
+        });
+        setMoviesTrending(tmp);
       }
     } catch (error) {
       console.log(error);
@@ -51,7 +58,7 @@ export default function TrendingMovie() {
       <span>{t("trending")}</span>
       <div className="overflow-x-auto w-full flex flex-row gap-4">
         {moviesTrending.map((movie) => (
-          <MovieCardTrending key={movie.id} movie={movie} />
+          <MovieCardTrending key={movie.id} movie={movie} moviesSeen={moviesSeen} />
         ))}
       </div>
     </div>

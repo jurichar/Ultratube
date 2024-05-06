@@ -1,7 +1,7 @@
 // src/Components/MovieCards/MovieCard.tsx
 
 import { Movie } from "../../types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Loading from "../Loading/Loading";
 import { FaStar } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -9,10 +9,12 @@ import { notify } from "../../utils/notifyToast";
 interface MovieCardProps {
   movie: Movie;
   idMovie?: number;
+  movieSeen?: [{ movie: Movie }];
 }
 
-export default function MovieCard({ movie }: MovieCardProps) {
+export default function MovieCard({ movie, movieSeen }: MovieCardProps) {
   const [loading, setLoading] = useState(true);
+  const [watch, setWatch] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const handleImageLoad = () => {
@@ -25,11 +27,24 @@ export default function MovieCard({ movie }: MovieCardProps) {
       notify({ type: "error", msg: " cant access to this movie please retry" });
     }
   };
+  useEffect(() => {
+    console.log(movieSeen);
+    if (movieSeen && movieSeen?.length > 0) {
+      movieSeen.forEach((elem) => {
+        const movieToCompare: Movie = elem.movie;
+        if (movieToCompare.imdb_code == movie.imdb_link) {
+          setWatch(true);
+          console.log(movieToCompare, movie);
+        }
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [movieSeen]);
 
   return (
     <div className="flex flex-col">
       <div
-        className="flex-shrink-0 mb-2 w-40 h-28 flex justify-end rounded relative"
+        className={`flex-shrink-0 mb-2 w-40 h-28 flex justify-end rounded relative ${watch ? "border-2 border-red-500 opacity-30" : ""}`}
         style={{
           backgroundImage: `url(${movie.image})`,
           backgroundSize: "cover",
@@ -38,7 +53,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
       >
         {loading && <Loading />}
         <button className="transition-all z-10 opacity-0 w-full h-full bg-tertiary hover:opacity-50 rounded flex justify-center items-center" onClick={handleMovieClick}>
-          Play
+          {watch ? "re watch" : "Play"}
         </button>
       </div>
       <div className="flex flex-row items-center gap-2">

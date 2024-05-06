@@ -10,6 +10,8 @@ import SortMovie from "./SortMovie/SortMovie";
 import TrendingMovie from "../TrendingMovie/TrendingMovie";
 import { useAuth } from "../../context/useAuth";
 import { useTranslation } from "react-i18next";
+import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
+import { notify } from "../../utils/notifyToast";
 
 export default function Home() {
   const { t } = useTranslation();
@@ -20,7 +22,8 @@ export default function Home() {
   const [filter, setFilter] = useState<filter>(initialState);
   const [sort, setSort] = useState<keyof Movie>("rating");
   const [order, setOrder] = useState<Order>("asc");
-  const { languageSelected } = useAuth();
+  const [moviesSeen, setMoviesSeen] = useState<[{ movie: Movie }]>();
+  const { languageSelected, userData } = useAuth();
   async function handleSearch(search: string) {
     setPage(1);
     setSort("title");
@@ -28,6 +31,19 @@ export default function Home() {
     setSearchQuery(search);
   }
 
+  useEffect(() => {
+    if (userData) {
+      getListSeenMovie();
+    }
+  }, [userData]);
+  async function getListSeenMovie() {
+    try {
+      const res: [{ movie: Movie }] = await fetchWrapper("api/watched-movies/", { method: "GET" });
+      setMoviesSeen(res);
+    } catch (error) {
+      notify({ type: "warning", msg: "cant get list watched movie" });
+    }
+  }
   const filterSort = (currentMovie: Movie[], arrayMovie: Movie[]) => {
     const array = [...currentMovie, ...arrayMovie];
     const filtered_movies = filteredArray(array);
@@ -160,7 +176,7 @@ export default function Home() {
   return (
     <div className="w-full h-max text-quinary p-4 flex flex-col items-center justify-around gap-6 md:p-0 md:pt-4 ">
       <SearchBar onSearch={handleSearch} setShowSearch={setShowSearch} showSearch={showSearch} setPage={setPage} />
-      {!showSearch && <TrendingMovie />}
+      {!showSearch && <TrendingMovie moviesSeen={moviesSeen} />}
       <div className="w-full h-full flex pb-60 flex-col gap-4 relative">
         <span className="w-full flex gap-4 items-center text-heading-md">{showSearch ? `${t("search")} : ${searchQuery}` : t("recommended")}</span>
         <div className="flex flex-row gap-4">
@@ -176,8 +192,8 @@ export default function Home() {
           </select>
         </div>
         <Filter initialState={initialState} handleSubmitFilter={handleSubmitFilter} />
-        {!showSearch && <RecommendedMovie order={order} filter={filter} page={page} sort={sort} filterSort={filterSort} />}
-        {showSearch && <SearchResult showSearch={showSearch} querySearch={searchQuery} filter={filter} sort={sort} filterSort={filterSort} order={order} page={page} />}
+        {!showSearch && <RecommendedMovie order={order} moviesSeen={moviesSeen} filter={filter} page={page} sort={sort} filterSort={filterSort} />}
+        {showSearch && <SearchResult showSearch={showSearch} movieSeen={moviesSeen} querySearch={searchQuery} filter={filter} sort={sort} filterSort={filterSort} order={order} page={page} />}
       </div>
     </div>
   );
