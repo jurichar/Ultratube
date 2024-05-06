@@ -65,7 +65,6 @@ export default function RecommendedMovie(props: propsRecommended) {
     }
     setUpMovies();
   }, [filter, page, getMoviesJson, sort]);
-  // create when movie is cliking here to get only the id of movie
 
   return (
     <div className="w-full h-full flex  pb-60 flex-col gap-4  relative">

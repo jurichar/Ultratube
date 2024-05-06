@@ -9,19 +9,43 @@ import bodyparser from "body-parser";
 import fs from "node:fs";
 import torrentStream from "torrent-stream";
 import yifysubtitles from "./api-subtitle.js";
+import { flushMoviesJob } from "./jobs/flushMovies.js";
 
 app.use(cors());
 app.use(bodyparser.json());
 
+flushMoviesJob();
+
 const TORRENT_PATH = "./torrents";
 
-import {
-  getTorrentMetadata,
-  generateMagnetURI,
-} from "./bittorent-client/metadataHandler.js";
+import { getTorrentMetadata, generateMagnetURI } from "./bittorent-client/metadataHandler.js";
 
 import { downloadMovie } from "./streaming.js";
+app.get("/big-buck-buck-mkv", async (request, response) => {
+  const range = request.headers.range;
+  const stat = await fs.promises.stat("./BigBuckBunny_320x180.mkv");
+  if (stat.size) {
+    const parts = range.replace(/bytes=/, "").split("-");
+    const start = parseInt(parts[0], 10);
+    const end = parts[1] ? parseInt(parts[1], 10) : stat.size - 1;
+    const videoStream = fs.createReadStream("./BigBuckBunny_320x180.mkv", {
+      start,
+      end,
+    });
+    const converted = ffmpeg(videoStream)
+      .videoCodec("libvpx")
+      .videoBitrate(1024)
+      .audioCodec("libopus")
+      .audioBitrate(128)
+      .format("webm")
+      .outputOptions(["-crf 50", "-deadline realtime"])
+      .on("error", (err) => {});
 
+    converted.pipe(response);
+  } else {
+    return response.status(400).send("error");
+  }
+});
 app.get("/stream/:id", async (request, response) => {
   const { id: torrentId } = request.params;
 
@@ -89,10 +113,17 @@ app.get("/stream/:id", async (request, response) => {
           .format("webm")
           .outputOptions(["-crf 50", "-deadline realtime"])
           .on("error", () => {});
-        pump(converted as any, response);
+        converted.pipe(response);
       }
       isStreaming = true;
     }
+  });
+
+  engine.on("idle", async () => {
+    await fetch(`http://backend:8000/api/movie/${torrentId}/`, {
+      method: "PATCH",
+      body: JSON.stringify({ path: "./torrents/" + videoFile.path }),
+    });
   });
 
   response.on("close", () => {
@@ -122,12 +153,9 @@ async function getTorrentUrl(idTorrent: string) {
 app.get("/subtitles/:id", async (request, response) => {
   const { id: subTitleId } = request.params;
   try {
-    const res = await fetch(
-      `http://backend:8000/api/subtitles/${subTitleId}/`,
-      {
-        method: "GET",
-      },
-    );
+    const res = await fetch(`http://backend:8000/api/subtitles/${subTitleId}/`, {
+      method: "GET",
+    });
     const resSubtitles: { location: string } = await res.json();
 
     const stream = fs.createReadStream(resSubtitles.location);

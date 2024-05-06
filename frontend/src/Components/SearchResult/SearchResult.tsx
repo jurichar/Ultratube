@@ -146,7 +146,6 @@ export default function SearchResult(props: searchResultProps) {
   const updateMoviesSearch = async (query: string) => {
     try {
       const res = await requestExternalSourceSearch(query);
-      console.log(res);
       setMovies(res);
     } catch (error) {
       setMovies([]);

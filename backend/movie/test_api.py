@@ -1,8 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.urls import reverse, reverse_lazy
 from rest_framework.test import APITestCase
-from authentication.test_user_action import setUpAuth
 
+from authentication.test_user_action import setUpAuth
 from movie.models import Comment, FavouriteMovie, Movie, Subtitle
 
 User = get_user_model()
@@ -119,27 +119,6 @@ class TestMovie(MovieAPITestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json(), {"id": movieDb.id})
 
-    # def test_create_existing(self):
-    #     movie = {
-    #         "name": "Return of thedd Jedi",
-    #         "imdb_rating": 1.0,
-    #         "production_year": 1988,
-    #         "duration": 100,
-    #         "thumbnail_cover": "path/to/thumbnail/",
-    #         "quality": "1080p",
-    #         "language": "en",
-    #         "torrent": "eeeee",
-    #     }
-    #     response = self.client.post(
-    #         "http://localhost:8000/api/movies/create_movie/", data=movie
-    #     )
-    #     self.assertEqual(response.status_code, 201)
-    #     self.assertEqual(response.json(), movie)
-    #     response1 = self.client.post(
-    #         "http://localhost:8000/api/movies/create_movie/", data=movie
-    #     )
-    #     self.assertEqual(response1.status_code, 400)
-
     def test_delete(self):
         access_token, client, user = setUpAuth(self)
         custom_header = {"Authorization": f"Bearer {access_token}"}
@@ -195,9 +174,20 @@ class TestMovie(MovieAPITestCase):
             "torrent_hash": movie.torrent_hash,
             "imdb_code": movie.imdb_code,
             "thumbnail_cover": movie.thumbnail_cover,
+            "path": "",
         }
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), expected)
+
+    def test_update_path(self):
+        movie = Movie.objects.first()
+
+        response = self.client.patch(
+            reverse("movies-detail", args=[movie.id]), {"path": "well_done"}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"path": "well_done"})
 
     def test_movie_comments_get(self):
         access_token, client, user = setUpAuth(self)
@@ -445,42 +435,104 @@ class TestWatchedMovie(MovieAPITestCase):
             **custom_header,
         )
         self.assertEqual(response.status_code, 200)
+        json = response.json()
+        self.assertEqual(len(json), 2)
         self.assertEqual(
-            response.json(),
-            [
-                {
-                    "movie": {
-                        "name": self.movie.name,
-                        "id": self.movie.id,
-                        "imdb_rating": self.movie.imdb_rating,
-                        "production_year": self.movie.production_year,
-                        "duration": self.movie.duration,
-                        "thumbnail_cover": self.movie.thumbnail_cover,
-                        "comments_number": 0,
-                        "available_subtitles": [],
-                        "quality": self.movie.quality,
-                        "language": self.movie.language,
-                        "torrent": self.movie.torrent,
-                        "imdb_code": self.movie.imdb_code,
-                        "torrent_hash": self.movie.torrent_hash,
-                    },
-                },
-                {
-                    "movie": {
-                        "name": self.movie1.name,
-                        "id": self.movie1.id,
-                        "imdb_rating": self.movie1.imdb_rating,
-                        "production_year": self.movie1.production_year,
-                        "duration": self.movie1.duration,
-                        "thumbnail_cover": self.movie1.thumbnail_cover,
-                        "comments_number": 0,
-                        "available_subtitles": [],
-                        "quality": self.movie1.quality,
-                        "language": self.movie1.language,
-                        "torrent": self.movie1.torrent,
-                        "imdb_code": self.movie1.imdb_code,
-                        "torrent_hash": self.movie1.torrent_hash,
-                    },
-                },
-            ],
+            json[0]["movie"],
+            {
+                "name": self.movie.name,
+                "id": self.movie.id,
+                "imdb_rating": self.movie.imdb_rating,
+                "production_year": self.movie.production_year,
+                "duration": self.movie.duration,
+                "thumbnail_cover": self.movie.thumbnail_cover,
+                "comments_number": 0,
+                "available_subtitles": [],
+                "quality": self.movie.quality,
+                "language": self.movie.language,
+                "torrent": self.movie.torrent,
+                "imdb_code": self.movie.imdb_code,
+                "torrent_hash": self.movie.torrent_hash,
+                "path": "",
+            },
+        )
+        self.assertEqual(
+            json[1]["movie"],
+            {
+                "name": self.movie1.name,
+                "id": self.movie1.id,
+                "imdb_rating": self.movie1.imdb_rating,
+                "production_year": self.movie1.production_year,
+                "duration": self.movie1.duration,
+                "thumbnail_cover": self.movie1.thumbnail_cover,
+                "comments_number": 0,
+                "available_subtitles": [],
+                "quality": self.movie1.quality,
+                "language": self.movie1.language,
+                "torrent": self.movie1.torrent,
+                "imdb_code": self.movie1.imdb_code,
+                "torrent_hash": self.movie1.torrent_hash,
+                "path": "",
+            },
+        )
+
+    def test_list_watched_all(self):
+        access_token, _, user = setUpAuth(self)
+        custom_header = {"Authorization": f"Bearer {access_token}"}
+        response = self.client.post(
+            reverse("watched-movies-list"),
+            {"movie": self.movie.id},
+            **custom_header,
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual({"movie": self.movie.id, "watcher": user.id}, response.json())
+        response = self.client.post(
+            reverse("watched-movies-list"),
+            {"movie": self.movie1.id},
+            **custom_header,
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual({"movie": self.movie1.id, "watcher": user.id}, response.json())
+
+        response = self.client.get("http://localhost:8000/api/watched-movies/all/")
+        self.assertEqual(response.status_code, 200)
+        json = response.json()
+        self.assertEqual(len(json), 2)
+        self.assertEqual(
+            json[0]["movie"],
+            {
+                "name": self.movie.name,
+                "id": self.movie.id,
+                "imdb_rating": self.movie.imdb_rating,
+                "production_year": self.movie.production_year,
+                "duration": self.movie.duration,
+                "thumbnail_cover": self.movie.thumbnail_cover,
+                "comments_number": 0,
+                "available_subtitles": [],
+                "quality": self.movie.quality,
+                "language": self.movie.language,
+                "torrent": self.movie.torrent,
+                "imdb_code": self.movie.imdb_code,
+                "torrent_hash": self.movie.torrent_hash,
+                "path": "",
+            },
+        )
+        self.assertEqual(
+            json[1]["movie"],
+            {
+                "name": self.movie1.name,
+                "id": self.movie1.id,
+                "imdb_rating": self.movie1.imdb_rating,
+                "production_year": self.movie1.production_year,
+                "duration": self.movie1.duration,
+                "thumbnail_cover": self.movie1.thumbnail_cover,
+                "comments_number": 0,
+                "available_subtitles": [],
+                "quality": self.movie1.quality,
+                "language": self.movie1.language,
+                "torrent": self.movie1.torrent,
+                "imdb_code": self.movie1.imdb_code,
+                "torrent_hash": self.movie1.torrent_hash,
+                "path": "",
+            },
         )

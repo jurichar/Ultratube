@@ -16,6 +16,7 @@ export default function MoviePage() {
   const [cast, setCast] = useState<crewUser[]>();
   const [subtitles, setSubtitles] = useState<subtitles[]>();
   const [movieIdDb, setMovieIdDb] = useState<number>(0);
+  const [errorMovie, setErrorMovie] = useState<boolean>(false);
   const { userData } = useAuth();
   const [subtitlesSrc, setSubtitlesSrc] = useState<[{ blob: string; language: string }]>();
   const navigate = useNavigate();
@@ -52,7 +53,6 @@ export default function MoviePage() {
       try {
         const urls = [];
         for (const sub of subtitles) {
-          console.log(sub);
           const response = await fetch(`http://localhost:8001/subtitles/${sub?.id}`);
           if (!response.ok) {
             throw new Error("Error to get subtitles");
@@ -114,6 +114,7 @@ export default function MoviePage() {
         let message = "Unknown Error";
         if (error instanceof Error) message = error.message;
         notify({ type: "error", msg: message });
+        setErrorMovie(true);
       }
     }
     if (movie && Object.keys(movie).length > 0) {
@@ -185,9 +186,7 @@ export default function MoviePage() {
       return;
     }
     const { movieProps } = state;
-    console.log(movieProps);
     if ("title" in movieProps && movieProps["title"] && movieProps["title"].length > 0) {
-      console.log("here");
       const { title, year, torrent, quality, language, image, trailer, length, genres, torrent_hash } = movieProps;
       getInfoMovie(title, year, torrent, quality, language, image, trailer, length, genres, torrent_hash);
     }
@@ -196,7 +195,6 @@ export default function MoviePage() {
 
   const handleBookMark = async () => {
     try {
-      console.log(movieIdDb);
       await fetchWrapper("api/favourite-movies/", {
         method: "POST",
         body: { movie: movieIdDb },
@@ -204,7 +202,6 @@ export default function MoviePage() {
     } catch (error) {
       notify({ type: "error", msg: "Cant add this movie in favorite" });
     }
-    console.log("hello");
   };
   return (
     <div className="flex flex-col  gap-20 justify-center items-center ">
@@ -235,7 +232,7 @@ export default function MoviePage() {
       {movie?.trailer && <TrailerSection linkEmbed={movie.trailer} />}
       <h1 className="text-4xl font-bold text-white">Movie</h1>
       {movieIdDb && (
-        <video ref={videoRef} onPlay={handleTimeUpdate} onEnded={() => console.log("end")} id="videoPlayer" controls>
+        <video ref={videoRef} onPlay={handleTimeUpdate} id="videoPlayer" controls>
           <source src={`http://localhost:8001/stream/${movieIdDb}`} type="video/mp4" />
           {subtitlesSrc &&
             subtitlesSrc.map((elem, index) => {
@@ -243,6 +240,7 @@ export default function MoviePage() {
             })}
         </video>
       )}
+      {errorMovie && <h1 className="text-secondary text-center"> You can't watch this movie please retry later</h1>}
       <h4 className="text-quinary"> genres : {movie?.genres?.join(",")}</h4>
       <MemberMovie crew={crew} cast={cast} />
       <Comments movieId={movieIdDb} />

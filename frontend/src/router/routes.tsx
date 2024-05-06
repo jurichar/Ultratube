@@ -16,6 +16,7 @@ import { fetchWrapper } from "../fetchWrapper/fetchWrapper";
 import { UserData } from "../types";
 import Bookmarks from "../Components/Bookmarks/Bookmarks";
 import WatchedList from "../Components/WatchedList/WatchedList";
+import ViewMovieExt from "../Components/ViewMovieExt/ViewMovieExt";
 
 export const router = createBrowserRouter([
   {
@@ -81,6 +82,10 @@ export const router = createBrowserRouter([
       {
         path: "movie/:id",
         element: <MoviePage />,
+      },
+      {
+        path: "watch-movie-conversion",
+        element: <ViewMovieExt />,
       },
       {
         path: "/forget-password",

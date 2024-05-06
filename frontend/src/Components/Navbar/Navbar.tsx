@@ -37,6 +37,11 @@ export default function Navbar() {
           <option value="fr">FR</option>
           <option value="es">ES</option>
         </select>
+        <div>
+          <NavLink className="text-secondary text-heading-sm" to="/watch-movie-conversion">
+            CONV
+          </NavLink>
+        </div>
         {userData && (
           <>
             <NavLink to="/bookmarks">
