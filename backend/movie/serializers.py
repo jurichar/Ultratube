@@ -75,6 +75,7 @@ class MovieDetailSerializer(serializers.ModelSerializer):
             "torrent",
             "imdb_code",
             "torrent_hash",
+            "path",
         ]
 
     def get_comments_number(self, obj):
@@ -83,6 +84,13 @@ class MovieDetailSerializer(serializers.ModelSerializer):
     def get_available_subtitles(self, obj):
         subtitles = Subtitle.objects.filter(movie=obj)
         return SubtitleListSerializer(subtitles, many=True).data
+
+
+class MovieUpdateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Movie
+        fields = ["path"]
 
 
 class CommentViewSerializer(serializers.ModelSerializer):
@@ -143,7 +151,7 @@ class WatchedMovieListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WatchedMovie
-        fields = ["movie"]
+        fields = ["movie", "watched_at"]
 
 
 class WatchedMovieCreateSerializer(serializers.ModelSerializer):

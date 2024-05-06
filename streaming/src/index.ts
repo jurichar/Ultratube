@@ -9,9 +9,12 @@ import bodyparser from "body-parser";
 import fs from "node:fs";
 import torrentStream from "torrent-stream";
 import yifysubtitles from "./api-subtitle.js";
+import { flushMoviesJob } from "./jobs/flushMovies.js";
 
 app.use(cors());
 app.use(bodyparser.json());
+
+flushMoviesJob();
 
 const TORRENT_PATH = "./torrents";
 
@@ -114,6 +117,13 @@ app.get("/stream/:id", async (request, response) => {
       }
       isStreaming = true;
     }
+  });
+
+  engine.on("idle", async () => {
+    await fetch(`http://backend:8000/api/movie/${torrentId}/`, {
+      method: "PATCH",
+      body: JSON.stringify({ path: "./torrents/" + videoFile.path }),
+    });
   });
 
   response.on("close", () => {
