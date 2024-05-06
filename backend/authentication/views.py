@@ -361,6 +361,34 @@ class AccessTokenDetail(APIView):
         )
 
 
+class AccesTokenList(APIView):
+    permission_classes = [AllowAny]
+
+    def get_object(self, token):
+        try:
+            return AccessToken.objects.get(token=token)
+        except AccessToken.DoesNotExist:
+            raise Http404
+
+    def post(self, request, format=None):
+        if (
+            "username" in request.data and isinstance(request.data["username"], str)
+        ) and (
+            "password" in request.data and isinstance(request.data["password"], str)
+        ):
+            user = get_object_or_404(
+                User,
+                username=request.data["username"],
+            )
+            authenticate_login_user(
+                request, username=user.username, password=request.data["password"]
+            )
+            access_token = get_or_create_access_token(request)
+            add_user_to_access_token(request, access_token)
+            return Response({"token": access_token}, status=status.HTTP_200_OK)
+        return Response("user not known")
+
+
 class MultipleSerializerMixin:
     detail_serializer_class = UserDetailSerializer
     partial_update_serializer_class = UserPatchSerializer
