@@ -121,7 +121,7 @@ export default function Profile() {
 
   return (
     <div className="w-full p-6 gap-10 overflow-y-auto flex flex-col items-center justify-around">
-      <h1 className="text-quinary text-heading-lg">{t("edit")}</h1>
+      {!ourProfile ? <h1 className="text-quinary text-heading-lg">profile</h1> : <h1 className="text-quinary text-heading-lg">{t("edit")}</h1>}
       <button
         className="w-32 h-32 rounded-full relative transition-all transform hover:scale-105 outline outline-transparent outline-4 hover:outline-white "
         style={{
