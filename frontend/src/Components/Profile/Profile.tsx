@@ -188,11 +188,6 @@ export default function Profile() {
           )}
         </form>
       </div>
-      {ourProfile && (
-        <button className="w-32 h-12 transition-all  text-quinary rounded-full hover:bg-secondary" onClick={handleDisconnect}>
-          {t("disconnect")}
-        </button>
-      )}
     </div>
   );
 }
