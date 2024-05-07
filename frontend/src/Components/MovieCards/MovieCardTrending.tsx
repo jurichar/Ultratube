@@ -23,13 +23,11 @@ export default function MovieCardTrending({ movie, moviesSeen }: MovieCardProps)
     navigate(`/movie/${movie.id}`, { state: { movieProps: movie } });
   };
   useEffect(() => {
-    console.log(moviesSeen);
     if (moviesSeen && moviesSeen?.length > 0) {
       moviesSeen.forEach((elem) => {
         const movieToCompare: Movie = elem.movie;
         if (movieToCompare.imdb_code == movie.imdb_link) {
           setWatch(true);
-          console.log(movieToCompare, movie);
         }
       });
     }

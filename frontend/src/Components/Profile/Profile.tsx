@@ -10,6 +10,7 @@ import { ProfileForm, UserData, UserPatchInterface } from "../../types";
 import { validateEmail } from "../../utils/validateEmail";
 import { notify } from "../../utils/notifyToast";
 import InputPassword from "../Global/InputPassword/InputPassword";
+import { validatePassword } from "../../utils/validatePassword";
 
 export default function Profile() {
   const { t } = useTranslation();
@@ -81,6 +82,10 @@ export default function Profile() {
     if (!handleCheckEmail(formData)) {
       return;
     }
+    if (!handleCheckPassword(formData)) {
+      return;
+    }
+
     call_db_patch(formData);
   };
 
@@ -97,6 +102,17 @@ export default function Profile() {
       if (formData["email"]) {
         if (!validateEmail(formData["email"])) {
           notify({ type: "warning", msg: "email not valid, please retry with another one" });
+          return false;
+        }
+      }
+    }
+    return true;
+  };
+  const handleCheckPassword = (formData: ProfileForm): boolean => {
+    if ("password" in formData) {
+      if (formData["password"]) {
+        if (!validatePassword(formData["password"])) {
+          notify({ type: "error", msg: "You password doesnt fit the security, you need capslock, specific characters, min 8 length password and number" });
           return false;
         }
       }
