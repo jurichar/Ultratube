@@ -17,7 +17,6 @@ export default function TrendingMovie({ moviesSeen }: [{ movie: Movie }]) {
           if ("torrents" in elem == false) {
             return {};
           }
-          console.log(elem);
           const quality = Array.isArray(elem.torrents) && elem.torrents?.length > 0 ? elem.torrents[0].quality : elem.torrents.quality;
           const torrent_url = Array.isArray(elem.torrents) && elem.torrents?.length > 0 ? elem.torrents[0].url : elem.torrents.url;
           return {

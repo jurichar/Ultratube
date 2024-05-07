@@ -8,6 +8,7 @@ import { validateEmail } from "../../utils/validateEmail";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/useAuth";
 import { notify } from "../../utils/notifyToast";
+import { validatePassword } from "../../utils/validatePassword";
 
 const initialState: RegisterType = {
   username: "",
@@ -23,10 +24,6 @@ export default function Register() {
   const { TriggerReload } = useAuth();
   const navigate = useNavigate();
 
-  // const handlePermission = () => {
-  //   fetchWrapper("oauth/user/", { method: "get" }).then((data) => console.log(data));
-  // };
-
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     dispatch({ type: "change", name: event.target.name, value: event.target.value });
   };
@@ -41,8 +38,18 @@ export default function Register() {
 
   const is_valid_arg = ({ username, firstName, lastName, email, password, password1 }: RegisterType): boolean => {
     if (username.length == 0 || firstName.length == 0 || lastName.length == 0 || email.length == 0 || password.length == 0 || password1.length == 0) return false;
-    if (password != password1) return false;
-    if (!validateEmail(email)) return false;
+    if (password != password1) {
+      notify({ type: "error", msg: "password are note the same" });
+      return false;
+    }
+    if (!validateEmail(email)) {
+      notify({ type: "error", msg: "You email is not valid" });
+      return false;
+    }
+    if (!validatePassword(password)) {
+      notify({ type: "error", msg: "You password doesnt fit the security, you need capslock, specific characters, min 8 length password and number" });
+      return false;
+    }
     return true;
   };
 
@@ -53,7 +60,7 @@ export default function Register() {
       if (is_valid_arg({ ...state })) {
         await createUser();
       } else {
-        notify({ type: "error", msg: "argument are not valid" });
+        notify({ type: "error", msg: "argument are not validd" });
       }
     }
   };

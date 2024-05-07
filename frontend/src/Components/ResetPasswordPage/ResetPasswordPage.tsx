@@ -4,6 +4,8 @@ import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
 import { useParams } from "react-router-dom";
 import InputGlobal from "../Global/InputGlobal/InputGlobal";
 import { notify } from "../../utils/notifyToast";
+import { validatePassword } from "../../utils/validatePassword";
+import { validateEmail } from "../../utils/validateEmail";
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState("");
@@ -50,8 +52,10 @@ export default function ResetPasswordPage() {
   const checkFormValidity = () => {
     let valid = true;
     let message = "";
-    if (!checkPasswordValidity()) valid = false;
-    message += "Password must be valid.\n";
+    if (!validateEmail(email)) valid = false;
+    message += "email not valid.\n";
+    if (!validatePassword(password)) valid = false;
+    message += "Password must be valid ( need casplock, number, special character and min 8 characters).\n";
     if (!checkConfirmPasswordValidity()) valid = false;
     message += "Confirm password must be valid.\n";
     if (!valid) notify({ type: "error", msg: message });
@@ -80,14 +84,6 @@ export default function ResetPasswordPage() {
         </svg>
       </div>
     );
-  };
-
-  const checkPasswordValidity = () => {
-    let valid = true;
-    if (password.length < 8) valid = false;
-    // if (!password.match(/[\W_]/)) valid = false;
-    // if (!password.match(/[A-Z]/)) valid = false;
-    return valid;
   };
 
   const checkConfirmPasswordValidity = () => {

@@ -28,13 +28,11 @@ export default function MovieCard({ movie, movieSeen }: MovieCardProps) {
     }
   };
   useEffect(() => {
-    console.log(movieSeen);
     if (movieSeen && movieSeen?.length > 0) {
       movieSeen.forEach((elem) => {
         const movieToCompare: Movie = elem.movie;
         if (movieToCompare.imdb_code == movie.imdb_link) {
           setWatch(true);
-          console.log(movieToCompare, movie);
         }
       });
     }
