@@ -26,7 +26,11 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Home />,
+        element: (
+          <ProtectedRoute>
+            <Home />,
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/login",
@@ -81,7 +85,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "movie/:id",
-        element: <MoviePage />,
+        element: (
+          <ProtectedRoute>
+            <MoviePage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "watch-movie-conversion",
