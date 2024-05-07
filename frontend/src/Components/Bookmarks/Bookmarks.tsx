@@ -26,7 +26,6 @@ export default function Bookmarks() {
     } catch (error) {
       notify({ type: "error", msg: "Cant get all favorite movie" });
     }
-    console.log("hello");
   };
 
   return (
