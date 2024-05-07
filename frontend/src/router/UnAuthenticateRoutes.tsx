@@ -12,7 +12,7 @@ export default function UnAuthenticateRoutes({ children }: Props) {
     setLoading(true);
     if (userData && "username" in userData && "email" in userData && "omniauth" in userData) {
       setLoading(false);
-      return navigate("/");
+      return navigate("/login");
     } else {
       if (!userData && !reload) {
         setLoading(false);
