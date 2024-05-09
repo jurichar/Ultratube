@@ -8,8 +8,10 @@ import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
 import { notify } from "../../utils/notifyToast";
 import { useAuth } from "../../context/useAuth";
 import BookmarkIcon from "../MovieCards/BookmarkIcon";
+import { useTranslation } from "react-i18next";
 
 export default function MoviePage() {
+  const { t } = useTranslation();
   const { state } = useLocation();
   const [movie, setMovie] = useState<Movie>();
   const [crew, setCrew] = useState<crewUser[]>();
@@ -205,7 +207,6 @@ export default function MoviePage() {
   };
   return (
     <div className="flex flex-col  gap-20 justify-center items-center ">
-      cc
       <div className="w-full h-40 text-quinary opacity-100 relative flex flex-col justify-center items-center">
         <div className="w-full h-full bg-cover bg-center bg-no-repeat opacity-30 absolute" style={{ backgroundImage: `url(${movie?.image})` }}></div>
         <div className="relative flex flex-row align-middle">
@@ -213,24 +214,24 @@ export default function MoviePage() {
           {userData && <BookmarkIcon handleClick={handleBookMark} />}
         </div>
         <h2 className="text-2xl">{movie?.year}</h2>
-        {movie && movie?.rating > 0.0 && <h3>imb rating : {movie?.rating} /10 </h3>}
+        {movie && movie?.rating > 0.0 && <h3>{t("imb rating")} : {movie?.rating} /10 </h3>}
         <h3> {movie?.length} minutes</h3>
       </div>
       {movie?.summary ? (
         <div className="w-8/12 flex flex-col  gap-6 justify-center items-center">
-          <h1 className="text-4xl font-bold text-white">Summary</h1>
+          <h1 className="text-4xl font-bold text-white">{t("Summary")}</h1>
           <span className="text-white text-center">{movie?.summary}</span>
         </div>
       ) : (
         movie?.synopsis && (
           <div className="w-8/12 flex flex-col  gap-6 justify-center items-center">
-            <h1 className="text-4xl font-bold text-white">Synopsis</h1>
+            <h1 className="text-4xl font-bold text-white">{t("Synopsis")}</h1>
             <span className="text-white text-center">{movie?.synopsis}</span>
           </div>
         )
       )}
       {movie?.trailer && <TrailerSection linkEmbed={movie.trailer} />}
-      <h1 className="text-4xl font-bold text-white">Movie</h1>
+      <h1 className="text-4xl font-bold text-white">{t("Movie")}</h1>
       {movieIdDb && (
         <video ref={videoRef} onPlay={handleTimeUpdate} id="videoPlayer" controls>
           <source src={`http://localhost:8001/stream/${movieIdDb}`} type="video/mp4" />
@@ -241,7 +242,7 @@ export default function MoviePage() {
         </video>
       )}
       {errorMovie && <h1 className="text-secondary text-center"> You can't watch this movie please retry later</h1>}
-      <h4 className="text-quinary"> genres : {movie?.genres?.join(",")}</h4>
+      <h4 className="text-quinary"> {t("genres")} : {movie?.genres?.join(",")}</h4>
       <MemberMovie crew={crew} cast={cast} />
       <Comments movieId={movieIdDb} />
     </div>

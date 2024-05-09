@@ -29,9 +29,9 @@ export default function Bookmarks() {
   };
 
   return (
-    <div className="w-full h-max text-quinary p-4 flex flex-col items-center justify-around gap-6 md:p-0 md:pl-9">
+    <div className="w-full h-max text-quinary p-4 flex flex-col items-center justify-around gap-6 md:p-0 md:pt-4 ">
       <div className="w-full h-full flex flex-col gap-4 ">
-        <span>{t("Bookmarks")}</span>
+        <h1 className="text-quinary text-heading-lg">{t("bookmarks")}</h1>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
           {" "}
           {movies.map((movie) => (

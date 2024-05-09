@@ -16,6 +16,7 @@
   "logout": "Logout",
   "disconnect": "Disconnect",
   "register": "Register",
+  "Register": "Register",
   "password": "Password",
   "newPassword": "New password",
   "confirmPassword": "Confirm password",
@@ -23,5 +24,17 @@
   "save": "Save",
   "edit": "Edit",
   "chooseAvatar": "Choose an avatar",
-  "close": "Close"
+  "close": "Close",
+  "filter": "Filter",
+  "bookmarks": "Bookmarks",
+  "first_name": "First name",
+  "last_name": "Last name",
+  "username": "Username",
+  "watched": "Watched",
+  "create an account": "Create an account",
+  "log in to your account": "Log in to your account",
+  "forgot password": "Forgot password ?",
+  "Don't have an account?": "Don't have an account?",
+  "Already have an account ?": "Already have an account ?",
+  "Create an account": "Create an account"
 }

@@ -18,7 +18,7 @@ export default function Navbar() {
 
   return (
     <nav className="z-50 bg-tertiary mx-4 sticky top-0 md:top-4 w-full flex justify-between items-center px-4 md:flex-col md:w-24  md:h-[calc(100vh-2rem)] md:py-8 md:rounded">
-      <NavLink to="/">
+      <NavLink to="/" className="mx-3">
         <svg xmlns="http://www.w3.org/2000/svg" width="25" height="20" viewBox="0 0 25 20">
           <path
             d="M20 0L22.5 5H18.75L16.25 0H13.75L16.25 5H12.5L10 0H7.5L10 5H6.25L3.75 0H2.5C1.11875 0 0.0125 1.11875 0.0125 2.5L0 17.5C0 18.8813 1.11875 20 2.5 20H22.5C23.8813 20 25 18.8813 25 17.5V0H20Z"
@@ -28,9 +28,6 @@ export default function Navbar() {
       </NavLink>
       <div className="flex flex-row gap-4 justify-center items-center md:flex-col">
         <select className="w-14 h-9 bg-white border border-gray-300 rounded-md text-gray-700 p-2" onChange={changeLanguage}>
-          <svg className="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-          </svg>
           <option value="en" className="bg-gray-100 text-gray-700">
             EN
           </option>
@@ -39,7 +36,7 @@ export default function Navbar() {
         </select>
         <div>
           <NavLink className="text-secondary text-heading-sm" to="/watch-movie-conversion">
-            CONV
+            conv.
           </NavLink>
         </div>
         {userData && (

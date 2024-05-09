@@ -1,9 +1,11 @@
 import { ChangeEvent, useState } from "react";
+import { useTranslation } from "react-i18next";
 interface Props {
   handleChange: (event: ChangeEvent<HTMLInputElement>) => void;
   name: string;
 }
 export default function InputPassword({ handleChange, name }: Props) {
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
 
   const togglePasswordVisibility = () => {
@@ -32,7 +34,7 @@ export default function InputPassword({ handleChange, name }: Props) {
         name={name}
         className="w-full outline-none bg-tertiary text-quaternary focus:text-quinary placeholder:text-quaternary focus:border-quinary transition-all placeholder:capitalize"
         type={showPassword ? "text" : "password"}
-        placeholder="Password"
+        placeholder={t("password")}
         autoComplete="current-password"
         onChange={handleChange}
       />

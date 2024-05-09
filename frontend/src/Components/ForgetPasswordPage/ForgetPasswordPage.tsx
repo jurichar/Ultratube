@@ -3,8 +3,10 @@ import { useState } from "react";
 import { validateEmail } from "../../utils/validateEmail";
 import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
 import { notify } from "../../utils/notifyToast";
+import { useTranslation } from "react-i18next";
 
 export default function ResetPasswordPage() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -54,7 +56,7 @@ export default function ResetPasswordPage() {
             onChange={(e) => setEmail(e.target.value)}
           />
           <button className="w-32 h-12 transition-all bg-quaternary text-quinary rounded-full hover:bg-quinary hover:text-tertiary" type="submit">
-            Save
+            {t("save")}
           </button>
         </form>
       </div>

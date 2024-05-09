@@ -6,12 +6,14 @@ import RadioInput from "../../Global/RadioInput/RadioInput";
 import { objectFilter, filter } from "../../../types";
 import { useAuth } from "../../../context/useAuth";
 import { notify } from "../../../utils/notifyToast";
+import { useTranslation } from "react-i18next";
 
 type filterProps = {
   initialState: filter;
   handleSubmitFilter: (filter: filter) => void;
 };
 export default function Filter(props: filterProps) {
+  const { t } = useTranslation();
   const { initialState, handleSubmitFilter } = props;
   const [filter, setFilter] = useState<filter>(initialState);
   const [open, setOpen] = useState(false);
@@ -80,7 +82,7 @@ export default function Filter(props: filterProps) {
   }, []);
   return (
     <div className="h-fit transition-all ">
-      <button onClick={() => setOpen(!open)}> open filter</button>
+      <button onClick={() => setOpen(!open)}>{t("filter")}</button>
       <div className={`${open ? "opacity-100  h-3/5" : "h-0   opacity-0"} transition-all transition[height] ease-linear duration-300 w-full flex flex-col gap-8 rounded-md p-4 bg-tertiary `}>
         <div className="flex flex-col gap-4 ">
           <label htmlFor="rating" className="text-heading-sm flex gap-1">

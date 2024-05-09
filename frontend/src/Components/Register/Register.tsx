@@ -29,8 +29,8 @@ export default function Register() {
   };
   const formInput: FormInput[] = [
     { name: "username", value: state.username, placeholder: "username", handleChange },
-    { name: "firstName", value: state.firstName, placeholder: "first name", handleChange },
-    { name: "lastName", value: state.lastName, placeholder: "last name", handleChange },
+    { name: "firstName", value: state.firstName, placeholder: "first_name", handleChange },
+    { name: "lastName", value: state.lastName, placeholder: "last_name", handleChange },
     { name: "email", value: state.email, placeholder: "email", handleChange },
     { name: "password", value: state.password, placeholder: "password", handleChange },
     { name: "password1", value: state.password1, placeholder: "Repeat password", handleChange },
@@ -47,7 +47,7 @@ export default function Register() {
       return false;
     }
     if (!validatePassword(password)) {
-      notify({ type: "error", msg: "You password doesnt fit the security, you need capslock, specific characters, min 8 length password and number" });
+      notify({ type: "error", msg: "You password doesn't fit the security, you need caps lock, specific characters, min 8 length password and number" });
       return false;
     }
     return true;
@@ -56,11 +56,11 @@ export default function Register() {
   const handleSubmit = async (event: MouseEvent<HTMLButtonElement>, name: string) => {
     event.preventDefault();
     event.stopPropagation();
-    if (name == "Register") {
+    if (name == "register") {
       if (is_valid_arg({ ...state })) {
         await createUser();
       } else {
-        notify({ type: "error", msg: "argument are not validd" });
+        notify({ type: "error", msg: "argument are not valid" });
       }
     }
   };
@@ -94,9 +94,9 @@ export default function Register() {
       <FormAuthenticate
         nameOtherAuth={"Already have an account ?"}
         linkOtherAUth={"/login"}
-        valueLinkOtherAuth={"Login"}
+        valueLinkOtherAuth={"login"}
         handleSubmit={handleSubmit}
-        nameForm="Register"
+        nameForm="register"
         formInput={formInput}
         nameSubmit="Create an account"
       />

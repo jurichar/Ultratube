@@ -7,6 +7,7 @@ import { fetchWrapper } from "../../fetchWrapper/fetchWrapper";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/useAuth";
 import { notify } from "../../utils/notifyToast";
+import { useTranslation } from "react-i18next";
 
 const initialState: LoginType = {
   username: "",
@@ -14,6 +15,7 @@ const initialState: LoginType = {
 };
 
 export default function Login() {
+  const { t } = useTranslation();
   const [state, dispatch] = useReducer(reducer, initialState);
   const navigate = useNavigate();
   const { TriggerReload } = useAuth();
@@ -28,7 +30,7 @@ export default function Login() {
 
   const handleSubmit = async (event: MouseEvent<HTMLButtonElement>, name: string) => {
     event.preventDefault();
-    if (name == "Login") {
+    if (name == "login") {
       if (is_valid_arg({ ...state })) {
         await login();
       } else {
@@ -67,13 +69,13 @@ export default function Login() {
         <LogoComponent width="md" />
       </header>
       <FormAuthenticate
-        nameOtherAuth={"Don’t have an account?"}
+        nameOtherAuth={"Don't have an account?"}
         linkOtherAUth={"/register"}
         valueLinkOtherAuth={"Register"}
         handleSubmit={handleSubmit}
-        nameForm="Login"
+        nameForm="login"
         formInput={formInput}
-        nameSubmit="Login to your account"
+        nameSubmit={t("log in to your account")}
       />
     </div>
   );

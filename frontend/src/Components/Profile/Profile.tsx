@@ -178,7 +178,7 @@ export default function Profile() {
           <input
             name="first_name"
             className="w-full h-12 outline-none px-4 bg-tertiary border-b border-quaternary text-quaternary focus:text-quinary placeholder:text-quaternary focus:border-quinary transition-all"
-            placeholder="first name"
+            placeholder={t("first_name")}
             autoComplete="first_name"
             defaultValue={user?.first_name}
             onChange={handleChange}
@@ -188,7 +188,7 @@ export default function Profile() {
             name="last_name"
             className="w-full h-12 outline-none px-4 bg-tertiary border-b border-quaternary text-quaternary focus:text-quinary placeholder:text-quaternary focus:border-quinary transition-all"
             type={"text"}
-            placeholder="last name"
+            placeholder={t("last_name")}
             autoComplete="last_name"
             defaultValue={user?.last_name}
             onChange={handleChange}
