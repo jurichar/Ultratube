@@ -94,10 +94,10 @@ export default function Filter(props: filterProps) {
           <label htmlFor="min-year" className="text-heading-sm">
             Choose your minimal release year
           </label>
-          <InputGlobal handleChange={handleFilter} name="min_year_release" value={filter.min_year_release} type="number" placeholder="Choose your minimal release year" />
+          <InputGlobal handleChange={handleFilter} name="min_year_release" value={filter.min_year_release} type="number" placeholder="Choose your minimal release year" id={"min-year"} />
         </div>
         <RadioInput handleChange={handleFilter} legend="Select your genre:" array={genre} value={filter.genre} name="genre" />
-        <InputGlobal handleChange={handleFilter} name="name" value={filter.name} type="text" placeholder="filter by name :" />
+        <InputGlobal handleChange={handleFilter} name="name" value={filter.name} type="text" placeholder="filter by name :" id="name" />
         <RadioInput handleChange={handleFilter} legend="filter by duration" value={filter.duration} name="duration" array={arrayDuration} />
         <div className="flex w-2/6 gap-4">
           <ButtonCallToAction handleClick={handleDeleteFilter} type="button" name="reset" value="reset filter" />

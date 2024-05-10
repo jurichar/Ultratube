@@ -95,7 +95,7 @@ export default function ResetPasswordPage() {
       <h1 className="text-quinary text-heading-lg">Reset Password</h1>
       <div className="w-full rounded p-6 flex flex-col items-center gap-6 bg-tertiary">
         <form className="w-full flex flex-col gap-4 justify-center items-center" onSubmit={handleFormSubmit}>
-          <InputGlobal handleChange={(event) => setEmail(event.target.value)} value={email} name={"email"} placeholder={"your email"} type="text" />
+          <InputGlobal handleChange={(event) => setEmail(event.target.value)} value={email} name={"email"} placeholder={"your email"} type="text" id="email" />
           <div className="flex w-full h-12 border-b px-4 bg-tertiary border-quaternary focus-within:border-quinary transition-all">
             <input
               name="password"

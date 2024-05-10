@@ -27,10 +27,8 @@ export default function Navbar() {
         </svg>
       </NavLink>
       <div className="flex flex-row gap-4 justify-center items-center md:flex-col">
-        <select className="w-14 h-9 bg-white border border-gray-300 rounded-md text-gray-700 p-2" onChange={changeLanguage}>
-          <option value="en" className="bg-gray-100 text-gray-700">
-            EN
-          </option>
+        <select id="languageSelect" name="languageSelect" className="w-14 h-9 bg-white border border-gray-300 rounded-md text-gray-700 p-2" onChange={changeLanguage}>
+          <option value="en" className="bg-gray-100 text-gray-700">EN</option>
           <option value="fr">FR</option>
           <option value="es">ES</option>
         </select>

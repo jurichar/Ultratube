@@ -46,6 +46,8 @@ const SearchBar = ({ onSearch, setShowSearch, showSearch }: SearchBarProps) => {
           />
         </svg>
         <input
+          id="searchInput"
+          name="searchInput"
           className="w-full outline-none bg-primary text-quaternary focus:text-quinary placeholder:text-quaternary focus:border-quinary transition-all"
           placeholder={t("search")}
           value={search}

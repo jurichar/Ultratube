@@ -179,7 +179,7 @@ export default function Profile() {
             name="first_name"
             className="w-full h-12 outline-none px-4 bg-tertiary border-b border-quaternary text-quaternary focus:text-quinary placeholder:text-quaternary focus:border-quinary transition-all"
             placeholder={t("first_name")}
-            autoComplete="first_name"
+            autoComplete="given-name"
             defaultValue={user?.first_name}
             onChange={handleChange}
             disabled={!ourProfile}
@@ -189,7 +189,7 @@ export default function Profile() {
             className="w-full h-12 outline-none px-4 bg-tertiary border-b border-quaternary text-quaternary focus:text-quinary placeholder:text-quaternary focus:border-quinary transition-all"
             type={"text"}
             placeholder={t("last_name")}
-            autoComplete="last_name"
+            autoComplete="family-name"
             defaultValue={user?.last_name}
             onChange={handleChange}
             disabled={!ourProfile}

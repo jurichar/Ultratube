@@ -15,8 +15,8 @@ export default function RadioInput(props: RadioInput) {
     <fieldset className="flex   flex-wrap gap-4">
       <legend className="text-heading-sm">{legend}</legend>
       <span className="border-2 pl-2 pr-4 border-white rounded-full flex gap-4">
-        <input type="radio" id="all" name={name} value="all" onChange={handleChange} checked={value == "all"} />
-        <label htmlFor="all">all</label>
+        <input type="radio" id={name} name={name} value={name} onChange={handleChange} checked={value == "all"} />
+        <label htmlFor={name}>all</label>
       </span>
       {array.map((elem) => {
         return (
