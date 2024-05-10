@@ -61,7 +61,7 @@ export default function Home() {
       tmpArrayMovie = tmpArrayMovie.filter(({ title }) => title.includes(filter.name));
     }
     if (filter.genre != "all") {
-      tmpArrayMovie = tmpArrayMovie.filter(({ genres }) => genres.includes(filter.genre));
+      tmpArrayMovie = tmpArrayMovie.filter(({ genres }) => genres?.includes(filter.genre));
     }
     if (filter.duration != "all") {
       if (filter.duration == "u_60") {
