@@ -27,14 +27,8 @@ const Comments: React.FC<CommentsProps> = ({ movieId }) => {
 
   async function getComment() {
     try {
-      const res: { results?: CommentMovie[] } = await fetchWrapper("api/comments/", { method: "GET" });
-      if ("results" in res) {
-        if (res["results"] != undefined && res["results"]?.length > 0) {
-          setComments(res["results"]);
-        }
-      } else {
-        setComments([]);
-      }
+      const res : {author: string, author_id: number} = await fetchWrapper(`api/movies/${movieId}/comments/`, { method: "GET" });
+        setComments(res);
     } catch (error) {
       return;
     }
