@@ -1,3 +1,5 @@
+import fs from "node:fs";
+
 export async function downloadMovie(
   engine: any,
 ): Promise<TorrentStream.TorrentFile> {
@@ -17,4 +19,29 @@ export async function downloadMovie(
       });
     });
   });
+}
+
+export async function streamDirectly(path: string, range: string) {
+  const stat = await fs.promises.stat(path);
+  const size = stat.size;
+  if (size) {
+
+    const extension = path.split(".").pop();
+    const parts = range.replace(/bytes=/, "").split("-");
+    const start = parseInt(parts[0], 10);
+    const end = parts[1] ? parseInt(parts[1], 10) : stat.size - 1;
+    const headers = {
+      "Content-Range": `bytes ${start}-${end}/${size}`,
+      "Accept-Ranges": "bytes",
+      "Content-Length": size,
+      "Content-Type": `video/${extension.match(/mp4|webm|ogg/) ? extension : "webm"}`,
+      "Keep-alive": "timeout=10000",
+    };
+    const videoStream = fs.createReadStream(path, {
+      start,
+      end,
+    });
+
+    return { videoStream, headers };
+  }
 }

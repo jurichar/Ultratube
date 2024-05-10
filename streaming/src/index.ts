@@ -20,7 +20,7 @@ const TORRENT_PATH = "./torrents";
 
 import { getTorrentMetadata, generateMagnetURI } from "./bittorent-client/metadataHandler.js";
 
-import { downloadMovie } from "./streaming.js";
+import { downloadMovie, streamDirectly } from "./streaming.js";
 app.get("/big-buck-buck-mkv", async (request, response) => {
   const range = request.headers.range;
   const stat = await fs.promises.stat("./BigBuckBunny_320x180.mkv");
@@ -39,7 +39,7 @@ app.get("/big-buck-buck-mkv", async (request, response) => {
       .audioBitrate(128)
       .format("webm")
       .outputOptions(["-crf 50", "-deadline realtime"])
-      .on("error", (err) => {});
+      .on("error", (err) => { });
 
     converted.pipe(response);
   } else {
@@ -54,7 +54,14 @@ app.get("/stream/:id", async (request, response) => {
     return response.status(400).send("range header required");
   }
 
-  const torrentUrl = await getTorrentUrl(torrentId);
+  const { torrent: torrentUrl, path: moviePath } = await getTorrentUrl(torrentId);
+
+  if (moviePath !== "") {
+    const { videoStream, headers } = await streamDirectly(moviePath, range)
+    response.writeHead(206, headers);
+    pump(videoStream, response);
+  }
+
   const torrentMetaData = await getTorrentMetadata(torrentUrl);
   const magnetURI = generateMagnetURI(torrentMetaData, torrentUrl);
   const engine = torrentStream(magnetURI, {
@@ -112,7 +119,7 @@ app.get("/stream/:id", async (request, response) => {
           .audioBitrate(128)
           .format("webm")
           .outputOptions(["-crf 50", "-deadline realtime"])
-          .on("error", () => {});
+          .on("error", () => { });
         converted.pipe(response);
       }
       isStreaming = true;
@@ -128,7 +135,7 @@ app.get("/stream/:id", async (request, response) => {
 
   response.on("close", () => {
     console.log("Connexion closed, stop streaming...");
-    engine.destroy(() => {});
+    engine.destroy(() => { });
     response.end();
   });
 });
@@ -136,6 +143,7 @@ app.get("/stream/:id", async (request, response) => {
 type MovieObject = {
   torrent_hash: string;
   torrent: string;
+  path: string
 };
 
 async function getTorrentUrl(idTorrent: string) {
@@ -144,7 +152,7 @@ async function getTorrentUrl(idTorrent: string) {
       method: "GET",
     });
     const responseJson: MovieObject = await res.json();
-    return responseJson.torrent;
+    return responseJson;
   } catch (error) {
     return null;
   }
