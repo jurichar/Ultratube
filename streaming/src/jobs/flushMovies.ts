@@ -46,13 +46,14 @@ export function flushMoviesJob() {
           console.log(`${movie.movie.path} is deleted!`);
         },
       );
-      // TODO update db path to blank
+
       const payload = {
         path: "",
       };
 
-      await fetch(`http://backend:8000/api/movie/${movie.movie.id}/`, {
-        method: "PATCH",
+      await fetch(`http://backend:8000/api/movies/${movie.movie.id}/`, {
+        method: "PUT",
+        headers: { 'content-type': 'application/json' },
         body: JSON.stringify(payload),
       });
     }
