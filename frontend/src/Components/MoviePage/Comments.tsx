@@ -23,19 +23,21 @@ const Comments: React.FC<CommentsProps> = ({ movieId }) => {
       return;
     }
     getComment();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [movieId]);
-
+  
   async function getComment() {
     try {
       const res : {author: string, author_id: number} = await fetchWrapper(`api/movies/${movieId}/comments/`, { method: "GET" });
-        setComments(res);
+      setComments(res);
     } catch (error) {
       return;
     }
   }
-
+  
   useEffect(() => {
     getComment();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

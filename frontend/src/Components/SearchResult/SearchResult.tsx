@@ -132,11 +132,8 @@ export default function SearchResult(props: searchResultProps) {
     }
   };
   const requestExternalSourceSearch = async (query: string) => {
-    // let movieSearchFirstSource: Movie[] | undefined = await searchMovies(query);
-    // if (movieSearchFirstSource == undefined) {
-    //   movieSearchFirstSource = [];
-    // }
-    let movieSearchFirstSource : [] = []
+    let movieSearchFirstSource: Movie[] | undefined = await searchMovies(query);
+      movieSearchFirstSource = [];
     let movieSearchSecondSource: Movie[] | null = await getMovieYtsSearch(query);
     if (movieSearchSecondSource == null) {
       movieSearchSecondSource = [];
