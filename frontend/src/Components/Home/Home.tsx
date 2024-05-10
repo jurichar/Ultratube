@@ -58,7 +58,7 @@ export default function Home() {
     tmpArrayMovie = tmpArrayMovie.filter(({ rating }) => rating >= filter.rating);
     tmpArrayMovie = tmpArrayMovie.filter(({ year }) => year >= filter.min_year_release);
     if (filter.name != "") {
-      tmpArrayMovie = tmpArrayMovie.filter(({ title }) => title.includes(filter.name));
+      tmpArrayMovie = tmpArrayMovie.filter(({ title }) => title?.includes(filter.name));
     }
     if (filter.genre != "all") {
       tmpArrayMovie = tmpArrayMovie.filter(({ genres }) => genres?.includes(filter.genre));

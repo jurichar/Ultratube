@@ -67,7 +67,7 @@ AUTHENTICATION_BACKENDS = (
     "authentication.custom_authenticate.CustomAuth",
 )
 AUTH_USER_MODEL = "authentication.User"
-
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'backend']
 OAUTH2_PROVIDER = {
     "SCOPES": {
         "read": "Read scope",

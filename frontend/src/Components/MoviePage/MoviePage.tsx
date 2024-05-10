@@ -188,9 +188,12 @@ export default function MoviePage() {
       return;
     }
     const { movieProps } = state;
-    if ("title" in movieProps && movieProps["title"] && movieProps["title"].length > 0) {
+    if ("title" in movieProps && movieProps["title"] && movieProps["title"].length > 0 && movieProps?.language && movieProps?.quality) {
       const { title, year, torrent, quality, language, image, trailer, length, genres, torrent_hash } = movieProps;
       getInfoMovie(title, year, torrent, quality, language, image, trailer, length, genres, torrent_hash);
+    }
+    else{
+      setErrorMovie(true)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
